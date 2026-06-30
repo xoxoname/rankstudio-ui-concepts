@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크스튜디오 — AI 기반 초고도화 리워드 트래픽 셀프 생성</title>
+<meta name="description" content="AI 기반 셀프 캠페인 플랫폼. URL·키워드·기간·유입규모를 직접 설정하고, 결제 후 진행과 리포트까지. 검색에서 더 잘 발견되도록 돕는 리워드 트래픽 캠페인.">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Unbounded:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --base:#06070c;
+  --base-2:#0b0d16;
+  --ink:#f4f6f8;
+  --ink-dim:#9aa3b2;
+  --ink-faint:#5c6473;
+  --teal:#16c2b3;
+  --teal-soft:#3fe0d2;
+  --coral:#ff7a59;
+  --amber:#ffb053;
+  --glass:rgba(255,255,255,.04);
+  --glass-line:rgba(255,255,255,.09);
+  --maxw:1240px;
+  --display:"Bricolage Grotesque","Pretendard",sans-serif;
+  --display-alt:"Unbounded","Pretendard",sans-serif;
+  --body:"Pretendard",-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{
+  background:var(--base);
+  color:var(--ink);
+  font-family:var(--body);
+  line-height:1.55;
+  overflow-x:hidden;
+  cursor:none;
+}
+@media (max-width:768px){ body{cursor:auto} }
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+::selection{background:var(--teal);color:var(--base)}
+
+/* ---------- Film grain overlay (CSS fallback layer) ---------- */
+.grain{
+  position:fixed;inset:0;z-index:90;pointer-events:none;
+  opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Custom cursor ---------- */
+.cursor{
+  position:fixed;top:0;left:0;width:14px;height:14px;border-radius:50%;
+  background:var(--teal);z-index:9999;pointer-events:none;
+  transform:translate(-50%,-50%);mix-blend-mode:screen;
+  transition:width .25s ease,height .25s ease,background .25s ease;
+}
+.cursor-ring{
+  position:fixed;top:0;left:0;width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(22,194,179,.5);z-index:9998;pointer-events:none;
+  transform:translate(-50%,-50%);
+  transition:width .3s ease,height .3s ease,border-color .3s ease,opacity .3s ease;
+}
+.cursor.hover{width:8px;height:8px;background:var(--coral)}
+.cursor-ring.hover{width:64px;height:64px;border-color:rgba(255,122,89,.6)}
+@media (max-width:768px){.cursor,.cursor-ring{display:none}}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+@media(max-width:768px){.wrap{padding:0 20px}}
+section{position:relative}
+
+/* ---------- Header ---------- */
+header{
+  position:fixed;top:0;left:0;width:100%;z-index:80;
+  padding:22px 0;transition:background .4s ease,padding .4s ease,border-color .4s;
+  border-bottom:1px solid transparent;
+}
+header.scrolled{
+  background:rgba(6,7,12,.72);backdrop-filter:blur(16px);
+  padding:14px 0;border-bottom:1px solid var(--glass-line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--display-alt);font-weight:800;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+.logo .dot{width:9px;height:9px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal)}
+.nav-links{display:flex;gap:34px;align-items:center}
+.nav-links a{font-size:14px;color:var(--ink-dim);font-weight:500;transition:color .25s}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{
+  font-size:14px;font-weight:600;padding:10px 20px;border-radius:100px;
+  background:var(--ink);color:var(--base);transition:transform .25s,box-shadow .25s;
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(22,194,179,.25)}
+@media(max-width:768px){.nav-links a:not(.nav-cta){display:none}}
+
+/* ---------- Hero ---------- */
+.hero{height:100vh;min-height:680px;position:relative;display:flex;align-items:center;overflow:hidden}
+#gl{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:block}
+.hero-fallback{position:absolute;inset:0;z-index:0;display:none;
+  background:radial-gradient(120% 90% at 70% 20%,rgba(22,194,179,.35),transparent 55%),
+             radial-gradient(120% 90% at 20% 80%,rgba(255,122,89,.28),transparent 55%),
+             var(--base);}
+.hero-veil{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(6,7,12,.35) 0%,rgba(6,7,12,0) 30%,rgba(6,7,12,.55) 100%);}
+.hero-inner{position:relative;z-index:2;width:100%}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:600;
+  letter-spacing:.04em;color:var(--teal-soft);padding:7px 15px;border-radius:100px;
+  border:1px solid rgba(22,194,179,.28);background:rgba(22,194,179,.07);margin-bottom:28px;
+}
+.eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(22,194,179,.5)}50%{opacity:.6;box-shadow:0 0 0 7px rgba(22,194,179,0)}}
+h1.hero-h{
+  font-family:var(--display);font-weight:800;line-height:.98;letter-spacing:-.035em;
+  font-size:clamp(44px,7.4vw,108px);max-width:14ch;
+}
+h1.hero-h .ln{display:block;overflow:hidden}
+h1.hero-h .word{display:inline-block;will-change:transform}
+h1.hero-h .grad{
+  background:linear-gradient(100deg,var(--teal-soft),var(--teal) 40%,var(--amber) 90%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  margin-top:30px;max-width:46ch;font-size:clamp(15px,1.7vw,19px);
+  color:var(--ink-dim);font-weight:400;line-height:1.65;
+}
+.hero-actions{margin-top:40px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.btn-primary{
+  font-size:15px;font-weight:700;padding:16px 30px;border-radius:100px;
+  background:linear-gradient(100deg,var(--teal),var(--teal-soft));color:#04201d;
+  display:inline-flex;align-items:center;gap:10px;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s;
+  box-shadow:0 10px 40px rgba(22,194,179,.3);
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 50px rgba(22,194,179,.45)}
+.btn-ghost{
+  font-size:15px;font-weight:600;padding:16px 28px;border-radius:100px;
+  border:1px solid var(--glass-line);color:var(--ink);transition:border-color .3s,background .3s;
+}
+.btn-ghost:hover{border-color:var(--teal);background:rgba(22,194,179,.06)}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:2;
+  font-size:11px;letter-spacing:.25em;color:var(--ink-faint);display:flex;flex-direction:column;align-items:center;gap:10px}
+.scroll-hint .bar{width:1px;height:42px;background:linear-gradient(var(--teal),transparent);animation:drop 2.2s infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}40%{transform:scaleY(1);transform-origin:top}41%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ---------- Section heading ---------- */
+.sec-pad{padding:140px 0}
+@media(max-width:768px){.sec-pad{padding:90px 0}}
+.sec-head{margin-bottom:64px;max-width:720px}
+.sec-tag{font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--coral);text-transform:uppercase;margin-bottom:18px;display:block}
+.sec-title{font-family:var(--display);font-weight:700;font-size:clamp(30px,4.4vw,56px);line-height:1.05;letter-spacing:-.03em}
+.sec-desc{margin-top:20px;color:var(--ink-dim);font-size:17px;max-width:54ch;line-height:1.6}
+
+/* ---------- Campaign types ---------- */
+.types-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:22px}
+@media(max-width:900px){.types-grid{grid-template-columns:1fr}}
+.tcard{
+  position:relative;border:1px solid var(--glass-line);border-radius:24px;
+  background:var(--glass);backdrop-filter:blur(10px);padding:36px;overflow:hidden;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),border-color .4s;
+}
+.tcard:hover{transform:translateY(-6px);border-color:rgba(22,194,179,.4)}
+.tcard::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .5s;
+  background:radial-gradient(80% 120% at var(--mx,50%) var(--my,0%),rgba(22,194,179,.14),transparent 60%)}
+.tcard:hover::before{opacity:1}
+.tcard.big{grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between}
+.tnum{font-family:var(--display-alt);font-weight:600;font-size:14px;color:var(--teal);opacity:.8}
+.ticon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;margin:22px 0 24px;
+  background:rgba(22,194,179,.1);border:1px solid rgba(22,194,179,.22)}
+.tcard h3{font-family:var(--display);font-weight:600;font-size:23px;letter-spacing:-.02em;margin-bottom:12px}
+.tcard p{color:var(--ink-dim);font-size:15px;line-height:1.6}
+.tcard .tags{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-size:12px;font-weight:500;color:var(--ink-dim);padding:6px 12px;border-radius:100px;border:1px solid var(--glass-line)}
+.tcard.feat{background:linear-gradient(160deg,rgba(22,194,179,.1),rgba(6,7,12,.2))}
+.mockbar{margin-top:30px;display:flex;flex-direction:column;gap:14px}
+.mrow{display:flex;align-items:center;gap:14px}
+.mrow .lbl{font-size:12px;color:var(--ink-faint);width:64px;flex-shrink:0}
+.mtrack{flex:1;height:7px;border-radius:100px;background:rgba(255,255,255,.06);overflow:hidden}
+.mfill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--teal),var(--teal-soft));width:0}
+.mfill.c2{background:linear-gradient(90deg,var(--coral),var(--amber))}
+.mval{font-family:var(--display-alt);font-size:13px;color:var(--ink);width:54px;text-align:right;font-weight:600}
+
+/* ---------- How it works ---------- */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative}
+@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.steps{grid-template-columns:1fr}}
+.step{padding:32px 26px;border-left:1px solid var(--glass-line);position:relative}
+.step:first-child{border-left:none}
+@media(max-width:900px){.step{border-left:none;border-top:1px solid var(--glass-line)}}
+.step .sn{font-family:var(--display-alt);font-weight:800;font-size:46px;letter-spacing:-.04em;
+  background:linear-gradient(160deg,var(--teal-soft),var(--coral));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.step h4{font-family:var(--display);font-weight:600;font-size:19px;margin:18px 0 10px;letter-spacing:-.01em}
+.step p{color:var(--ink-dim);font-size:14.5px;line-height:1.6}
+
+/* ---------- Stats ---------- */
+.stats{border-top:1px solid var(--glass-line);border-bottom:1px solid var(--glass-line)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+@media(max-width:768px){.stat-grid{grid-template-columns:1fr 1fr}}
+.stat{padding:56px 30px;text-align:center;border-left:1px solid var(--glass-line)}
+.stat:first-child{border-left:none}
+@media(max-width:768px){.stat{border-left:none}.stat:nth-child(odd){border-right:1px solid var(--glass-line)}.stat:nth-child(n+3){border-top:1px solid var(--glass-line)}}
+.stat .num{font-family:var(--display-alt);font-weight:800;font-size:clamp(40px,5vw,62px);letter-spacing:-.04em;line-height:1}
+.stat .num .suf{font-size:.45em;color:var(--teal);margin-left:2px}
+.stat .lbl{margin-top:14px;color:var(--ink-dim);font-size:14px;font-weight:500}
+
+/* ---------- FAQ ---------- */
+.faq-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:60px}
+@media(max-width:900px){.faq-grid{grid-template-columns:1fr;gap:32px}}
+.faq-item{border-top:1px solid var(--glass-line);padding:26px 0;cursor:pointer}
+.faq-q{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.faq-q span{font-family:var(--display);font-weight:600;font-size:19px;letter-spacing:-.01em}
+.faq-q .plus{flex-shrink:0;width:26px;height:26px;position:relative;transition:transform .35s}
+.faq-q .plus::before,.faq-q .plus::after{content:"";position:absolute;background:var(--teal);border-radius:2px;top:50%;left:50%}
+.faq-q .plus::before{width:14px;height:2px;transform:translate(-50%,-50%)}
+.faq-q .plus::after{width:2px;height:14px;transform:translate(-50%,-50%);transition:transform .35s}
+.faq-item.open .plus{transform:rotate(90deg)}
+.faq-item.open .plus::after{transform:translate(-50%,-50%) rotate(90deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease;color:var(--ink-dim);font-size:15px;line-height:1.7}
+.faq-a p{padding-top:14px}
+
+/* ---------- CTA ---------- */
+.cta{position:relative;overflow:hidden;border-radius:36px;margin:0 32px;
+  padding:96px 40px;text-align:center;
+  background:linear-gradient(150deg,rgba(22,194,179,.12),rgba(255,122,89,.08));
+  border:1px solid var(--glass-line)}
+@media(max-width:768px){.cta{margin:0 16px;padding:64px 24px;border-radius:26px}}
+.cta::before{content:"";position:absolute;inset:0;opacity:.5;
+  background:radial-gradient(60% 120% at 50% 0%,rgba(22,194,179,.3),transparent 60%)}
+.cta-inner{position:relative;z-index:1}
+.cta h2{font-family:var(--display);font-weight:800;font-size:clamp(32px,5vw,64px);letter-spacing:-.035em;line-height:1.02}
+.cta p{margin:22px auto 36px;color:var(--ink-dim);max-width:48ch;font-size:17px}
+
+/* ---------- Footer ---------- */
+footer{padding:80px 0 50px;border-top:1px solid var(--glass-line);margin-top:120px}
+.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:50px}
+.foot-brand{max-width:300px}
+.foot-brand p{color:var(--ink-dim);font-size:14px;margin-top:16px;line-height:1.6}
+.foot-cols{display:flex;gap:64px;flex-wrap:wrap}
+.foot-col h5{font-size:13px;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.foot-col a{display:block;font-size:14px;color:var(--ink-dim);margin-bottom:11px;transition:color .25s}
+.foot-col a:hover{color:var(--ink)}
+.foot-bot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+  padding-top:30px;border-top:1px solid var(--glass-line);font-size:13px;color:var(--ink-faint)}
+.foot-disc{max-width:680px;font-size:12px;color:var(--ink-faint);line-height:1.6;margin-top:24px}
+
+.reveal{opacity:0;transform:translateY(28px)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1!important;transform:none!important}
+  #gl{display:none}
+  .hero-fallback{display:block}
+  body{cursor:auto}
+  .cursor,.cursor-ring{display:none}
+}
+</style>
+</head>
+<body>
+<h2 class="sr-only">랭크스튜디오는 AI 기반 셀프 캠페인 플랫폼입니다. URL과 키워드, 기간, 유입 규모를 직접 설정하고 결제 후 진행 상황과 리포트를 확인할 수 있습니다.</h2>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
+
+<!-- ============ HEADER ============ -->
+<header id="header">
+  <div class="wrap nav">
+    <a href="#" class="logo"><span class="dot"></span>RANK<span style="color:var(--teal-soft)">STUDIO</span></a>
+    <nav class="nav-links">
+      <a href="#types" data-cursor>캠페인 유형</a>
+      <a href="#how" data-cursor>작동 방식</a>
+      <a href="#stats" data-cursor>성과</a>
+      <a href="#faq" data-cursor>FAQ</a>
+      <a href="#cta" class="nav-cta" data-cursor>캠페인 시작</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <canvas id="gl" aria-hidden="true"></canvas>
+  <div class="hero-fallback" aria-hidden="true"></div>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <span class="eyebrow reveal"><span class="pulse"></span>AI 기반 셀프 캠페인 플랫폼</span>
+    <h1 class="hero-h">
+      <span class="ln"><span class="word">AI</span> <span class="word">기반</span> <span class="word">초고도화</span></span>
+      <span class="ln"><span class="word grad">리워드</span> <span class="word grad">트래픽</span></span>
+      <span class="ln"><span class="word">셀프</span> <span class="word">생성</span></span>
+    </h1>
+    <p class="hero-sub reveal">URL·키워드·기간·유입 규모를 직접 설계하면, AI가 실사용자 리워드 유입을 자연스럽게 흐르게 합니다. 결제 후 진행 상황과 리포트까지 한 화면에서.</p>
+    <div class="hero-actions reveal">
+      <a href="#cta" class="btn-primary" data-cursor>캠페인 직접 설계하기 <span aria-hidden="true">→</span></a>
+      <a href="#how" class="btn-ghost" data-cursor>작동 방식 보기</a>
+    </div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">SCROLL<div class="bar"></div></div>
+</section>
+
+<!-- ============ CAMPAIGN TYPES ============ -->
+<section class="sec-pad" id="types">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">캠페인 유형 &amp; 기능</span>
+      <h2 class="sec-title">상품도, 로컬 매장도<br>발견될 자리를 직접 설계</h2>
+      <p class="sec-desc">쇼핑·마켓 상품부터 로컬 매장까지. 목표에 맞춰 유입 캠페인을 직접 구성하고, AI가 자연스러운 흐름으로 최적화합니다.</p>
+    </div>
+    <div class="types-grid">
+      <article class="tcard big feat" data-tilt data-cursor>
+        <div>
+          <span class="tnum">/ 01</span>
+          <div class="ticon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3fe0d2" stroke-width="1.8"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v6M21 7h-6"/></svg>
+          </div>
+          <h3>상품 발견 캠페인</h3>
+          <p>쇼핑·마켓에 올린 상품이 관련 검색에서 더 잘 노출되도록, 실사용자 리워드 유입을 키워드 단위로 설계합니다. 기간과 유입 규모는 직접 조절합니다.</p>
+        </div>
+        <div class="mockbar" aria-hidden="true">
+          <div class="mrow"><span class="lbl">키워드 A</span><div class="mtrack"><span class="mfill" data-w="82"></span></div><span class="mval" data-count="82" data-suf="%">0%</span></div>
+          <div class="mrow"><span class="lbl">키워드 B</span><div class="mtrack"><span class="mfill c2" data-w="64"></span></div><span class="mval" data-count="64" data-suf="%">0%</span></div>
+          <div class="mrow"><span class="lbl">유입 흐름</span><div class="mtrack"><span class="mfill" data-w="91"></span></div><span class="mval" data-count="91" data-suf="%">0%</span></div>
+        </div>
+      </article>
+
+      <article class="tcard" data-tilt data-cursor>
+        <span class="tnum">/ 02</span>
+        <div class="ticon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3fe0d2" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        </div>
+        <h3>로컬 매장 유입</h3>
+        <p>동네 매장이 지역 검색에서 더 자주 발견되도록 위치·키워드 기반 캠페인을 구성합니다.</p>
+        <div class="tags"><span class="tag">지역 키워드</span><span class="tag">방문 유도</span></div>
+      </article>
+
+      <article class="tcard" data-tilt data-cursor>
+        <span class="tnum">/ 03</span>
+        <div class="ticon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3fe0d2" stroke-width="1.8"><path d="M4 4h16v16H4z" opacity=".4"/><path d="M8 14l3-3 2 2 3-4"/></svg>
+        </div>
+        <h3>실시간 리포트</h3>
+        <p>진행 상황·유입 추이·키워드 성과를 한 화면에서. 결제 후 모든 지표가 투명하게 기록됩니다.</p>
+        <div class="tags"><span class="tag">진행률</span><span class="tag">유입 추이</span><span class="tag">CSV</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="sec-pad" id="how" style="background:var(--base-2)">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-tag">작동 방식</span>
+      <h2 class="sec-title">설정에서 리포트까지,<br>네 단계면 충분합니다</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="sn">01</div>
+        <h4>대상 설정</h4>
+        <p>캠페인할 URL과 핵심 키워드를 직접 입력합니다. AI가 키워드 후보를 함께 제안합니다.</p>
+      </div>
+      <div class="step reveal">
+        <div class="sn">02</div>
+        <h4>규모 설계</h4>
+        <p>기간과 일일 유입 규모를 슬라이더로 직접 조절합니다. 예상 흐름이 즉시 계산됩니다.</p>
+      </div>
+      <div class="step reveal">
+        <div class="sn">03</div>
+        <h4>결제 &amp; 진행</h4>
+        <p>결제가 완료되면 AI가 캠페인을 가동하고, 실사용자 리워드 유입이 자연스럽게 흐릅니다.</p>
+      </div>
+      <div class="step reveal">
+        <div class="sn">04</div>
+        <h4>리포트 확인</h4>
+        <p>유입 추이와 키워드별 성과를 실시간으로 확인하고, 다음 캠페인을 최적화합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats" id="stats">
+  <div class="wrap">
+    <div class="stat-grid">
+      <div class="stat reveal">
+        <div class="num"><span data-count="48000" data-suf="">0</span><span class="suf">+</span></div>
+        <div class="lbl">집행된 셀프 캠페인</div>
+      </div>
+      <div class="stat reveal">
+        <div class="num"><span data-count="3.2" data-dec="1">0</span><span class="suf">배</span></div>
+        <div class="lbl">평균 검색 노출 증가</div>
+      </div>
+      <div class="stat reveal">
+        <div class="num"><span data-count="99.2" data-dec="1">0</span><span class="suf">%</span></div>
+        <div class="lbl">캠페인 정상 가동률</div>
+      </div>
+      <div class="stat reveal">
+        <div class="num"><span data-count="12" data-suf="">0</span><span class="suf">분</span></div>
+        <div class="lbl">평균 설정 소요 시간</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec-pad" id="faq">
+  <div class="wrap">
+    <div class="faq-grid">
+      <div class="sec-head reveal" style="margin-bottom:0">
+        <span class="sec-tag">자주 묻는 질문</span>
+        <h2 class="sec-title">궁금한 점,<br>먼저 풀어 드릴게요</h2>
+        <p class="sec-desc">더 궁금한 내용은 캠페인 설계 화면에서 AI 가이드와 함께 확인할 수 있습니다.</p>
+      </div>
+      <div class="faq-list reveal">
+        <div class="faq-item" data-cursor>
+          <div class="faq-q"><span>리워드 트래픽이 정확히 무엇인가요?</span><span class="plus" aria-hidden="true"></span></div>
+          <div class="faq-a"><p>실제 사용자가 리워드·제휴 혜택을 받고 관심사에 맞는 콘텐츠를 탐색하며 발생시키는 자연 유입을 뜻합니다. 자동화된 비정상 유입이 아니라, 사람이 직접 참여하는 흐름입니다.</p></div>
+        </div>
+        <div class="faq-item" data-cursor>
+          <div class="faq-q"><span>유입 규모와 기간을 직접 정할 수 있나요?</span><span class="plus" aria-hidden="true"></span></div>
+          <div class="faq-a"><p>네. 캠페인 설계 화면에서 기간과 일일 유입 규모를 슬라이더로 직접 설정합니다. AI가 입력값에 맞춰 예상 흐름을 즉시 계산해 보여 줍니다.</p></div>
+        </div>
+        <div class="faq-item" data-cursor>
+          <div class="faq-q"><span>성과는 어떻게 확인하나요?</span><span class="plus" aria-hidden="true"></span></div>
+          <div class="faq-a"><p>결제 후 대시보드에서 진행률, 유입 추이, 키워드별 성과를 실시간으로 확인할 수 있고, 리포트는 CSV로 내려받을 수 있습니다.</p></div>
+        </div>
+        <div class="faq-item" data-cursor>
+          <div class="faq-q"><span>어떤 비즈니스에 적합한가요?</span><span class="plus" aria-hidden="true"></span></div>
+          <div class="faq-a"><p>온라인에서 상품을 판매하는 쇼핑·마켓 셀러와, 지역 검색에서 더 자주 발견되고 싶은 로컬 매장 모두에게 맞습니다. 목표에 맞는 캠페인 유형을 선택하면 됩니다.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="sec-pad" id="cta" style="padding-top:40px">
+  <div class="cta reveal">
+    <div class="cta-inner">
+      <h2>오늘, 당신의 캠페인을<br>직접 설계하세요</h2>
+      <p>설정에 12분. 그 다음은 AI가 흐름을 만들고, 당신은 리포트로 확인합니다.</p>
+      <a href="https://seller-channel.example/start" class="btn-primary" data-cursor>무료로 캠페인 설계 시작 <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="logo"><span class="dot"></span>RANK<span style="color:var(--teal-soft)">STUDIO</span></a>
+        <p>AI 기반 셀프 캠페인 플랫폼. 검색에서 더 잘 발견되도록, 유입을 직접 설계합니다.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>제품</h5>
+          <a href="#types" data-cursor>캠페인 유형</a>
+          <a href="#how" data-cursor>작동 방식</a>
+          <a href="#stats" data-cursor>성과</a>
+        </div>
+        <div class="foot-col">
+          <h5>지원</h5>
+          <a href="#faq" data-cursor>FAQ</a>
+          <a href="https://seller-channel.example/help" data-cursor>도움말</a>
+          <a href="https://seller-channel.example/contact" data-cursor>문의</a>
+        </div>
+        <div class="foot-col">
+          <h5>회사</h5>
+          <a href="https://seller-channel.example/about" data-cursor>소개</a>
+          <a href="https://seller-channel.example/terms" data-cursor>이용약관</a>
+          <a href="https://seller-channel.example/privacy" data-cursor>개인정보</a>
+        </div>
+      </div>
+    </div>
+    <p class="foot-disc">리워드 트래픽은 실사용자 리워드·제휴 기반의 자연 유입을 의미하며, 검색 노출 결과는 시장 상황과 콘텐츠 품질에 따라 달라질 수 있습니다. 랭크스튜디오는 셀프 캠페인 설계·집행 도구를 제공합니다.</p>
+    <div class="foot-bot">
+      <span>© 2026 랭크스튜디오 (RANKSTUDIO). All rights reserved.</span>
+      <span>Made with care · Seoul</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ SCRIPTS ============ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+<script>
+const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------------- Custom cursor ---------------- */
+(function(){
+  if(REDUCED || window.matchMedia('(max-width:768px)').matches) return;
+  const dot=document.querySelector('.cursor'), ring=document.querySelector('.cursor-ring');
+  let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
+  window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+  function loop(){rx+=(mx-rx)*.16;ry+=(my-ry)*.16;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);}
+  loop();
+  document.querySelectorAll('[data-cursor]').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{dot.classList.add('hover');ring.classList.add('hover');});
+    el.addEventListener('mouseleave',()=>{dot.classList.remove('hover');ring.classList.remove('hover');});
+  });
+})();
+
+/* ---------------- WebGL Liquid Aurora shader ---------------- */
+(function(){
+  const canvas=document.getElementById('gl');
+  if(REDUCED || typeof THREE==='undefined'){ document.querySelector('.hero-fallback').style.display='block'; canvas.style.display='none'; return; }
+  let renderer;
+  try{
+    renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+  }catch(e){ document.querySelector('.hero-fallback').style.display='block'; canvas.style.display='none'; return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+  const geo=new THREE.PlaneGeometry(2,2);
+
+  const vert=`
+    varying vec2 vUv;
+    void main(){ vUv=uv; gl_Position=vec4(position,1.0); }
+  `;
+  const frag=`
+    precision highp float;
+    varying vec2 vUv;
+    uniform float uTime;
+    uniform vec2 uMouse;
+    uniform vec2 uRes;
+    uniform float uHover;
+
+    // --- Simplex noise (Ashima Arts / Stefan Gustavson) ---
+    vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec2 mod289(vec2 x){return x-floor(x*(1.0/289.0))*289.0;}
+    vec3 permute(vec3 x){return mod289(((x*34.0)+1.0)*x);}
+    float snoise(vec2 v){
+      const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);
+      vec2 i=floor(v+dot(v,C.yy));
+      vec2 x0=v-i+dot(i,C.xx);
+      vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);
+      vec4 x12=x0.xyxy+C.xxzz; x12.xy-=i1;
+      i=mod289(i);
+      vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));
+      vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);
+      m=m*m; m=m*m;
+      vec3 x=2.0*fract(p*C.www)-1.0;
+      vec3 h=abs(x)-0.5;
+      vec3 ox=floor(x+0.5);
+      vec3 a0=x-ox;
+      m*=1.79284291400159-0.85373472095314*(a0*a0+h*h);
+      vec3 g;
+      g.x=a0.x*x0.x+h.x*x0.y;
+      g.yz=a0.yz*x12.xz+h.yz*x12.yw;
+      return 130.0*dot(m,g);
+    }
+    float fbm(vec2 p){
+      float v=0.0,a=0.5;
+      for(int i=0;i<5;i++){ v+=a*snoise(p); p*=2.0; a*=0.5; }
+      return v;
+    }
+    void main(){
+      vec2 uv=vUv;
+      float aspect=uRes.x/uRes.y;
+      vec2 p=uv; p.x*=aspect;
+      vec2 m=uMouse; m.x*=aspect;
+
+      float t=uTime*0.06;
+      // mouse distortion field
+      float d=distance(p,m);
+      float ripple=smoothstep(0.6,0.0,d)*(0.35+uHover*0.4);
+
+      vec2 q=p*1.4;
+      float n1=fbm(q+vec2(t,t*0.7));
+      float n2=fbm(q*1.6+vec2(-t*0.8,t)+n1*0.6+ripple*1.2);
+      float n=fbm(q+vec2(n1,n2)*0.9+t*0.4);
+
+      // palette: base / teal / coral / amber only
+      vec3 base=vec3(0.024,0.027,0.047);
+      vec3 teal=vec3(0.086,0.760,0.701);
+      vec3 coral=vec3(1.0,0.478,0.349);
+      vec3 amber=vec3(1.0,0.690,0.325);
+
+      float f=smoothstep(-0.6,0.9,n);
+      vec3 col=mix(base,teal,f*0.9);
+      col=mix(col,coral,smoothstep(0.35,0.95,n2)*0.55);
+      col=mix(col,amber,smoothstep(0.55,1.0,n1)*0.30);
+      col+=teal*ripple*0.5;
+
+      // vignette
+      float vig=smoothstep(1.25,0.25,length(uv-0.5));
+      col*=0.55+0.55*vig;
+
+      // film grain in shader
+      float g=fract(sin(dot(uv*uRes,vec2(12.9898,78.233))+uTime)*43758.5453);
+      col+=(g-0.5)*0.045;
+
+      gl_FragColor=vec4(col,1.0);
+    }
+  `;
+
+  const uniforms={
+    uTime:{value:0},
+    uMouse:{value:new THREE.Vector2(0.5,0.5)},
+    uRes:{value:new THREE.Vector2(1,1)},
+    uHover:{value:0}
+  };
+  let mat;
+  try{
+    mat=new THREE.ShaderMaterial({vertexShader:vert,fragmentShader:frag,uniforms});
+    const mesh=new THREE.Mesh(geo,mat); scene.add(mesh);
+    // force compile to catch shader errors
+    renderer.compile(scene,camera);
+  }catch(e){
+    document.querySelector('.hero-fallback').style.display='block'; canvas.style.display='none'; return;
+  }
+
+  function resize(){
+    const w=canvas.clientWidth||innerWidth, h=canvas.clientHeight||innerHeight;
+    renderer.setSize(w,h,false);
+    uniforms.uRes.value.set(w,h);
+  }
+  resize(); window.addEventListener('resize',resize);
+
+  let tmx=0.5,tmy=0.5;
+  window.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    tmx=(e.clientX-r.left)/r.width;
+    tmy=1.0-(e.clientY-r.top)/r.height;
+  });
+  const hero=document.querySelector('.hero');
+  hero.addEventListener('mouseenter',()=>gsapHover(1));
+  hero.addEventListener('mouseleave',()=>gsapHover(0));
+  function gsapHover(v){ if(window.gsap) gsap.to(uniforms.uHover,{value:v,duration:.8}); else uniforms.uHover.value=v; }
+
+  const clock=new THREE.Clock();
+  let visible=true;
+  document.addEventListener('visibilitychange',()=>visible=!document.hidden);
+  function render(){
+    requestAnimationFrame(render);
+    if(!visible) return;
+    uniforms.uTime.value=clock.getElapsedTime();
+    uniforms.uMouse.value.x+=(tmx-uniforms.uMouse.value.x)*0.05;
+    uniforms.uMouse.value.y+=(tmy-uniforms.uMouse.value.y)*0.05;
+    renderer.render(scene,camera);
+  }
+  render();
+})();
+
+/* ---------------- Lenis smooth scroll + GSAP ---------------- */
+(function(){
+  if(REDUCED){
+    // anchor smooth fallback handled by default; just init counters/faq
+    initFAQ(); initCounters(true); initBars(true);
+    document.querySelectorAll('.reveal').forEach(el=>el.style.opacity=1);
+    return;
+  }
+  let lenis;
+  if(window.Lenis){
+    lenis=new Lenis({duration:1.1,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+    function raf(t){lenis.raf(t);requestAnimationFrame(raf);}
+    requestAnimationFrame(raf);
+    if(window.ScrollTrigger){ lenis.on('scroll',ScrollTrigger.update); }
+  }
+  // anchor links via lenis
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const id=a.getAttribute('href'); if(id.length<2) return;
+      const tgt=document.querySelector(id); if(!tgt) return;
+      e.preventDefault();
+      if(lenis) lenis.scrollTo(tgt,{offset:-60}); else tgt.scrollIntoView({behavior:'smooth'});
+    });
+  });
+
+  if(window.gsap && window.ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero headline word stagger
+    gsap.set('.hero-h .word',{yPercent:115});
+    gsap.to('.hero-h .word',{yPercent:0,duration:1.05,ease:'power4.out',stagger:.08,delay:.25});
+    gsap.utils.toArray('.hero .reveal').forEach((el,i)=>{
+      gsap.to(el,{opacity:1,y:0,duration:.9,ease:'power3.out',delay:.7+i*.12});
+      gsap.set(el,{y:20});
+    });
+
+    // generic reveal
+    gsap.utils.toArray('.reveal').forEach(el=>{
+      if(el.closest('.hero')) return;
+      gsap.to(el,{opacity:1,y:0,duration:.9,ease:'power3.out',
+        scrollTrigger:{trigger:el,start:'top 86%'}});
+    });
+  } else {
+    document.querySelectorAll('.reveal').forEach(el=>el.style.opacity=1);
+  }
+  initFAQ(); initCounters(false); initBars(false);
+})();
+
+/* ---------------- FAQ accordion ---------------- */
+function initFAQ(){
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      const a=item.querySelector('.faq-a');
+      const open=item.classList.toggle('open');
+      a.style.maxHeight=open?a.scrollHeight+'px':0;
+    });
+  });
+}
+
+/* ---------------- Count-up stats ---------------- */
+function initCounters(now){
+  const els=document.querySelectorAll('[data-count]');
+  function run(el){
+    const target=parseFloat(el.dataset.count);
+    const dec=parseInt(el.dataset.dec||'0');
+    const big=target>=1000;
+    const dur=1600, t0=performance.now();
+    function step(t){
+      const k=Math.min(1,(t-t0)/dur);
+      const e=1-Math.pow(1-k,3);
+      let v=target*e;
+      let out= dec? v.toFixed(dec) : (big? Math.round(v).toLocaleString('ko-KR') : Math.round(v).toString());
+      el.textContent=out;
+      if(k<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if(now || !window.ScrollTrigger){ els.forEach(run); return; }
+  els.forEach(el=>{
+    ScrollTrigger.create({trigger:el,start:'top 90%',once:true,onEnter:()=>run(el)});
+  });
+}
+
+/* ---------------- Mock progress bars ---------------- */
+function initBars(now){
+  const bars=document.querySelectorAll('.mfill[data-w]');
+  function run(b){ b.style.transition='width 1.4s cubic-bezier(.2,.8,.2,1)'; b.style.width=b.dataset.w+'%'; }
+  if(now || !window.ScrollTrigger){ bars.forEach(run); return; }
+  bars.forEach(b=>ScrollTrigger.create({trigger:b,start:'top 95%',once:true,onEnter:()=>run(b)}));
+}
+
+/* ---------------- Header scroll state + card tilt ---------------- */
+(function(){
+  const header=document.getElementById('header');
+  window.addEventListener('scroll',()=>{ header.classList.toggle('scrolled',window.scrollY>40); },{passive:true});
+
+  if(REDUCED) return;
+  document.querySelectorAll('[data-tilt]').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
+  });
+})();
+</script>
+</body>
+</html>

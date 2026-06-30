@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 초고도화 리워드 트래픽 셀프 생성</title>
+<meta name="description" content="랭크스튜디오는 AI 기반 셀프 캠페인 플랫폼입니다. URL·키워드·기간·유입 규모를 직접 설정하고, 실사용자 리워드 트래픽으로 검색 발견성을 높이세요." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+<style>
+  :root{
+    --cream:#f1ebde;
+    --cream-deep:#e7dfcc;
+    --ink:#1b1714;
+    --ink-soft:#3b342d;
+    --oxblood:#7a2b2b;
+    --mustard:#b98b2e;
+    --rule:rgba(27,23,20,.85);
+    --hair:rgba(27,23,20,.22);
+    --serif-disp:"Newsreader","Noto Serif KR",serif;
+    --serif-alt:"Fraunces","Noto Serif KR",serif;
+    --serif-ko:"Noto Serif KR",serif;
+    --sans:"Pretendard",system-ui,sans-serif;
+    --maxw:1240px;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* paper grain / litho texture */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:9999;
+    opacity:.5;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.32'/%3E%3C/svg%3E");
+  }
+  /* subtle vignette so cream feels printed */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:9998;
+    background:radial-gradient(120% 120% at 50% 0%, transparent 60%, rgba(27,23,20,.06) 100%);
+  }
+
+  a{color:inherit;text-decoration:none;}
+  img{display:block;max-width:100%;}
+
+  ::selection{background:var(--oxblood);color:var(--cream);}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+
+  /* ===== rules ===== */
+  .rule{height:2px;background:var(--rule);width:100%;}
+  .hair{height:1px;background:var(--hair);width:100%;}
+
+  /* ===== header ===== */
+  header.site{
+    position:sticky;top:0;z-index:500;
+    background:rgba(241,235,222,.86);
+    backdrop-filter:saturate(140%) blur(6px);
+    border-bottom:2px solid var(--rule);
+  }
+  .nav{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:20px;padding:14px 28px;max-width:var(--maxw);margin:0 auto;
+  }
+  .brand{
+    font-family:var(--serif-disp);
+    font-weight:600;font-size:21px;letter-spacing:.01em;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .brand .iss{font-family:var(--sans);font-size:10px;letter-spacing:.28em;
+    text-transform:uppercase;color:var(--oxblood);font-weight:700;transform:translateY(-2px);}
+  .nav nav{display:flex;gap:26px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;}
+  .nav nav a{opacity:.72;transition:opacity .25s;}
+  .nav nav a:hover{opacity:1;}
+  .nav .cta{
+    font-family:var(--sans);font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:700;border:2px solid var(--ink);padding:9px 16px;border-radius:1px;
+    transition:background .25s,color .25s;
+  }
+  .nav .cta:hover{background:var(--ink);color:var(--cream);}
+  @media(max-width:900px){.nav nav{display:none;}}
+
+  /* ===== shared section frame ===== */
+  section{position:relative;}
+  .eyebrow{
+    font-family:var(--sans);font-size:11px;font-weight:700;
+    letter-spacing:.3em;text-transform:uppercase;color:var(--oxblood);
+    display:flex;align-items:center;gap:14px;
+  }
+  .eyebrow::before{content:"";width:34px;height:2px;background:var(--oxblood);display:inline-block;}
+
+  .idx{
+    font-family:var(--serif-alt);
+    font-weight:400;line-height:.8;color:var(--cream-deep);
+    -webkit-text-stroke:1.5px rgba(27,23,20,.32);
+    font-size:clamp(120px,22vw,320px);
+    letter-spacing:-.02em;
+  }
+
+  /* ===== HERO ===== */
+  .hero{padding:46px 0 30px;}
+  .hero .kicker{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ink-soft);padding-bottom:14px;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:0;
+    border-top:2px solid var(--rule);
+  }
+  .hero-main{padding:30px 40px 30px 0;border-right:2px solid var(--rule);}
+  .hero-side{padding:30px 0 30px 40px;display:flex;flex-direction:column;gap:22px;}
+
+  .headline{
+    font-family:var(--serif-disp);
+    font-weight:500;
+    font-size:clamp(44px,6.4vw,92px);
+    line-height:.98;
+    letter-spacing:-.012em;
+    margin:18px 0 0;
+  }
+  .headline em{font-style:italic;color:var(--oxblood);font-family:var(--serif-disp);}
+  .headline .ko{font-family:var(--serif-ko);font-weight:600;font-size:.82em;display:block;line-height:1.04;letter-spacing:-.02em;margin-top:.08em;}
+
+  .lede{
+    font-family:var(--serif-ko);
+    font-size:clamp(18px,1.5vw,21px);
+    line-height:1.78;
+    max-width:46ch;
+    margin:26px 0 0;
+    color:var(--ink-soft);
+  }
+  .dropcap::first-letter{
+    font-family:var(--serif-alt);
+    font-weight:400;
+    float:left;
+    font-size:4.1em;
+    line-height:.72;
+    padding:8px 12px 0 0;
+    color:var(--oxblood);
+  }
+  .hero-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:34px;}
+  .btn-ink{
+    font-family:var(--sans);font-weight:700;font-size:14px;letter-spacing:.04em;
+    background:var(--ink);color:var(--cream);padding:15px 26px;border-radius:1px;
+    border:2px solid var(--ink);transition:transform .2s,background .25s;
+  }
+  .btn-ink:hover{background:var(--oxblood);border-color:var(--oxblood);transform:translateY(-2px);}
+  .btn-line{
+    font-family:var(--sans);font-weight:600;font-size:14px;letter-spacing:.04em;
+    border-bottom:2px solid var(--ink);padding:4px 2px;transition:padding .2s,color .25s;
+  }
+  .btn-line:hover{color:var(--oxblood);border-color:var(--oxblood);padding-left:8px;}
+  .btn-line::after{content:" →";}
+
+  /* hero collage */
+  .collage{position:relative;}
+  .collage .ph{
+    border:1.5px solid var(--ink);
+    filter:saturate(.86) contrast(1.04);
+  }
+  .collage .big{width:100%;aspect-ratio:4/5;object-fit:cover;}
+  .collage .small{
+    position:absolute;right:-28px;bottom:-26px;width:46%;aspect-ratio:1/1;object-fit:cover;
+    box-shadow:-10px 10px 0 var(--cream),-10px 10px 0 1.5px var(--ink);
+  }
+  @media(max-width:540px){.collage .small{right:0;bottom:-14px;}}
+  .caption{
+    font-family:var(--serif-disp);font-style:italic;font-size:13px;color:var(--ink-soft);
+    display:flex;gap:8px;align-items:baseline;
+  }
+  .caption span{font-family:var(--sans);font-style:normal;font-weight:700;color:var(--oxblood);font-size:11px;letter-spacing:.1em;}
+
+  .side-quote{
+    font-family:var(--serif-alt);font-style:italic;font-size:clamp(20px,1.8vw,26px);
+    line-height:1.3;border-left:2px solid var(--oxblood);padding-left:18px;color:var(--ink);
+  }
+
+  /* marquee ticker */
+  .ticker{
+    border-top:2px solid var(--rule);border-bottom:2px solid var(--rule);
+    overflow:hidden;white-space:nowrap;margin-top:30px;
+  }
+  .ticker .track{display:inline-flex;gap:0;will-change:transform;animation:scrollx 38s linear infinite;}
+  .ticker .track span{
+    font-family:var(--serif-disp);font-style:italic;font-size:18px;padding:11px 30px;
+    display:inline-flex;align-items:center;gap:30px;color:var(--ink-soft);
+  }
+  .ticker .track span::after{content:"✦";color:var(--mustard);font-style:normal;}
+  @keyframes scrollx{to{transform:translateX(-50%);}}
+  @media(prefers-reduced-motion:reduce){.ticker .track{animation:none;}}
+
+  /* ===== section header band ===== */
+  .band{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:end;padding:74px 0 22px;}
+  .band h2{
+    font-family:var(--serif-disp);font-weight:500;font-size:clamp(32px,4.2vw,58px);
+    line-height:1;letter-spacing:-.01em;margin:14px 0 0;
+  }
+  .band h2 em{font-style:italic;color:var(--oxblood);}
+  .band .lead{font-family:var(--serif-ko);color:var(--ink-soft);max-width:40ch;margin-top:14px;}
+  @media(max-width:680px){.band{grid-template-columns:1fr;gap:8px;}.band .idx{font-size:96px;}}
+
+  /* ===== CAMPAIGN TYPES (asymmetric magazine grid) ===== */
+  .types{
+    display:grid;grid-template-columns:repeat(12,1fr);gap:0;
+    border-top:2px solid var(--rule);
+  }
+  .ty{
+    padding:30px 26px 34px;border-right:2px solid var(--rule);border-bottom:2px solid var(--rule);
+    position:relative;background:var(--cream);transition:background .3s;
+  }
+  .ty:hover{background:#ece4d2;}
+  .ty .num{font-family:var(--serif-alt);font-size:15px;color:var(--oxblood);}
+  .ty h3{font-family:var(--serif-disp);font-weight:500;font-size:26px;margin:12px 0 8px;line-height:1.1;}
+  .ty h3 .ko{font-family:var(--serif-ko);font-weight:600;font-size:18px;display:block;margin-top:2px;}
+  .ty p{font-size:14.5px;color:var(--ink-soft);margin:0;line-height:1.66;}
+  .ty .tag{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--mustard);margin-top:16px;display:block;}
+  .ty.c-a{grid-column:span 5;}
+  .ty.c-b{grid-column:span 4;}
+  .ty.c-c{grid-column:span 3;}
+  .ty.c-wide{grid-column:span 7;display:flex;gap:24px;align-items:flex-start;}
+  .ty.c-wide img{width:42%;aspect-ratio:3/4;object-fit:cover;border:1.5px solid var(--ink);filter:grayscale(.2) contrast(1.05);}
+  .ty.c-narrow{grid-column:span 5;}
+  @media(max-width:880px){
+    .ty,.ty.c-a,.ty.c-b,.ty.c-c,.ty.c-wide,.ty.c-narrow{grid-column:span 12;}
+    .ty.c-wide{flex-direction:column;}.ty.c-wide img{width:100%;aspect-ratio:16/9;}
+  }
+
+  /* ===== HOW IT WORKS (steps spread) ===== */
+  .how{padding-bottom:30px;}
+  .steps{border-top:2px solid var(--rule);}
+  .step{
+    display:grid;grid-template-columns:.55fr 1.45fr;gap:36px;
+    padding:34px 0;border-bottom:1px solid var(--hair);align-items:start;
+  }
+  .step .sn{
+    font-family:var(--serif-alt);font-size:clamp(54px,7vw,104px);line-height:.8;color:var(--ink);
+    -webkit-text-stroke:0;display:flex;align-items:baseline;gap:14px;
+  }
+  .step .sn small{font-family:var(--sans);font-size:11px;letter-spacing:.2em;font-weight:700;
+    text-transform:uppercase;color:var(--oxblood);}
+  .step h3{font-family:var(--serif-ko);font-weight:600;font-size:23px;margin:0 0 8px;letter-spacing:-.01em;}
+  .step p{margin:0;color:var(--ink-soft);max-width:54ch;}
+  .step .meta{font-family:var(--sans);font-size:12px;letter-spacing:.05em;color:var(--ink-soft);margin-top:12px;opacity:.8;}
+  @media(max-width:680px){.step{grid-template-columns:1fr;gap:10px;}}
+
+  /* ===== PULL QUOTE feature ===== */
+  .feature{
+    display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:2px solid var(--rule);border-bottom:2px solid var(--rule);
+    margin-top:30px;
+  }
+  .feature .q{padding:54px 44px 54px 0;border-right:2px solid var(--rule);}
+  .feature blockquote{
+    margin:0;font-family:var(--serif-disp);font-weight:400;font-style:italic;
+    font-size:clamp(26px,3.3vw,44px);line-height:1.18;letter-spacing:-.01em;
+  }
+  .feature blockquote .hi{color:var(--oxblood);}
+  .feature .by{font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    font-weight:700;color:var(--ink-soft);margin-top:26px;}
+  .feature .portrait{position:relative;display:flex;align-items:stretch;}
+  .feature .portrait img{width:100%;object-fit:cover;filter:grayscale(.35) contrast(1.06);min-height:340px;}
+  @media(max-width:760px){.feature{grid-template-columns:1fr;}.feature .q{border-right:0;border-bottom:2px solid var(--rule);padding:40px 0;}}
+
+  /* ===== STATS ===== */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:2px solid var(--rule);}
+  .stat{padding:40px 24px;border-right:1px solid var(--hair);}
+  .stat:last-child{border-right:0;}
+  .stat .n{font-family:var(--serif-alt);font-size:clamp(40px,5vw,68px);line-height:1;letter-spacing:-.02em;}
+  .stat .n em{font-style:italic;color:var(--oxblood);}
+  .stat .l{font-family:var(--serif-ko);font-size:14px;color:var(--ink-soft);margin-top:12px;line-height:1.5;}
+  @media(max-width:760px){.stats{grid-template-columns:1fr 1fr;}.stat{border-bottom:1px solid var(--hair);}}
+
+  /* ===== FAQ teaser ===== */
+  .faq{padding-bottom:20px;}
+  .faqlist{border-top:2px solid var(--rule);}
+  .qitem{border-bottom:1px solid var(--hair);padding:26px 0;cursor:pointer;}
+  .qitem .qh{display:flex;justify-content:space-between;gap:20px;align-items:baseline;}
+  .qitem h3{font-family:var(--serif-ko);font-weight:600;font-size:20px;margin:0;letter-spacing:-.01em;}
+  .qitem .mk{font-family:var(--serif-alt);font-size:26px;color:var(--oxblood);line-height:1;transition:transform .3s;}
+  .qitem.open .mk{transform:rotate(45deg);}
+  .qitem .qa{max-height:0;overflow:hidden;transition:max-height .4s ease;color:var(--ink-soft);}
+  .qitem .qa p{margin:16px 0 0;max-width:64ch;}
+  .qitem.open .qa{max-height:240px;}
+
+  /* ===== CTA ===== */
+  .cta-sec{
+    background:var(--ink);color:var(--cream);margin-top:80px;position:relative;overflow:hidden;
+  }
+  .cta-sec .grain{position:absolute;inset:0;opacity:.14;mix-blend-mode:screen;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");}
+  .cta-in{position:relative;padding:90px 28px;max-width:var(--maxw);margin:0 auto;text-align:center;}
+  .cta-in .eyebrow{justify-content:center;color:var(--mustard);}
+  .cta-in .eyebrow::before{background:var(--mustard);}
+  .cta-in h2{font-family:var(--serif-disp);font-weight:500;font-size:clamp(40px,6vw,86px);line-height:1;margin:22px 0 0;letter-spacing:-.01em;}
+  .cta-in h2 em{font-style:italic;color:var(--mustard);}
+  .cta-in .ko{font-family:var(--serif-ko);font-weight:600;font-size:clamp(20px,2.4vw,30px);display:block;margin-top:.18em;}
+  .cta-in p{font-family:var(--serif-ko);max-width:48ch;margin:24px auto 0;color:rgba(241,235,222,.78);}
+  .btn-cream{
+    display:inline-block;margin-top:36px;background:var(--cream);color:var(--ink);
+    font-family:var(--sans);font-weight:700;font-size:15px;letter-spacing:.04em;
+    padding:17px 38px;border-radius:1px;border:2px solid var(--cream);transition:transform .2s,background .25s,color .25s;
+  }
+  .btn-cream:hover{background:var(--mustard);border-color:var(--mustard);transform:translateY(-2px);}
+
+  /* ===== FOOTER ===== */
+  footer.site{padding:60px 0 50px;}
+  .foot-top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px;border-top:2px solid var(--rule);padding-top:40px;}
+  .foot-top .brand{font-size:30px;}
+  .foot-top p{font-family:var(--serif-ko);color:var(--ink-soft);max-width:34ch;margin:14px 0 0;font-size:14.5px;}
+  .fcol h4{font-family:var(--sans);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--oxblood);margin:0 0 14px;}
+  .fcol a{display:block;font-size:14px;padding:5px 0;opacity:.78;transition:opacity .2s,padding-left .2s;}
+  .fcol a:hover{opacity:1;padding-left:6px;}
+  .foot-bot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:48px;
+    font-size:12px;letter-spacing:.04em;color:var(--ink-soft);}
+  .foot-bot .legal{max-width:62ch;opacity:.8;line-height:1.6;}
+  @media(max-width:760px){.foot-top{grid-template-columns:1fr;}}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(26px);}
+  .is-in{opacity:1;transform:none;transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1);}
+  @media(prefers-reduced-motion:reduce){.rv{opacity:1!important;transform:none!important;}}
+
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0;}
+</style>
+</head>
+<body>
+<h2 class="sr-only">랭크스튜디오 — AI 기반 셀프 캠페인 플랫폼의 인쇄 매거진 스타일 랜딩 페이지</h2>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="nav">
+    <div class="brand">랭크스튜디오<span class="iss">No.04 / 캠페인 에디션</span></div>
+    <nav>
+      <a href="#types">캠페인</a>
+      <a href="#how">작동방식</a>
+      <a href="#stats">신뢰</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a href="#cta" class="cta">캠페인 시작</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="kicker">
+      <span>발견되는 브랜드를 위한 매뉴얼</span>
+      <span>2026 · 셀프 캠페인 플랫폼</span>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-main">
+        <div class="eyebrow">AI 기반 리워드 트래픽 스튜디오</div>
+        <h1 class="headline rv">
+          <em>Found,</em> not<br />buried.
+          <span class="ko">AI 기반 초고도화<br />리워드 트래픽 셀프 생성</span>
+        </h1>
+        <p class="lede dropcap rv">
+          좋은 상품과 좋은 매장이 검색의 깊은 곳에 묻혀 사라집니다.
+          랭크스튜디오는 URL·키워드·기간·유입 규모를 직접 설계하고,
+          실사용자가 만드는 리워드 트래픽으로 발견의 흐름을 다시 끌어올리는
+          AI 기반 셀프 캠페인 스튜디오입니다.
+        </p>
+        <div class="hero-actions rv">
+          <a href="#cta" class="btn-ink">무료로 캠페인 설계하기</a>
+          <a href="#how" class="btn-line">작동 방식 보기</a>
+        </div>
+      </div>
+
+      <aside class="hero-side">
+        <figure class="collage rv" style="margin:0;">
+          <img class="ph big" src="https://picsum.photos/seed/rankstudio-shop/720/900" alt="작은 상점의 진열대와 상품을 담은 매거진 사진" loading="lazy" />
+          <img class="ph small" src="https://picsum.photos/seed/rankstudio-hands/420/420" alt="모바일 화면에서 상품을 탐색하는 손" loading="lazy" />
+        </figure>
+        <figcaption class="caption">
+          <span>도판 01</span> 묻혀 있던 매대가 다시 노출되는 순간.
+        </figcaption>
+        <blockquote class="side-quote rv">
+          "보이지 않으면, 존재하지 않는 것과 같다."
+        </blockquote>
+      </aside>
+    </div>
+
+    <!-- ticker -->
+    <div class="ticker" aria-hidden="true">
+      <div class="track">
+        <span>AI 유입 설계</span><span>실사용자 리워드 트래픽</span><span>키워드 직접 설정</span>
+        <span>기간 · 규모 셀프 조정</span><span>실시간 진행 리포트</span><span>투명한 결제</span>
+        <span>AI 유입 설계</span><span>실사용자 리워드 트래픽</span><span>키워드 직접 설정</span>
+        <span>기간 · 규모 셀프 조정</span><span>실시간 진행 리포트</span><span>투명한 결제</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CAMPAIGN TYPES -->
+<section id="types">
+  <div class="wrap">
+    <div class="band">
+      <div class="idx rv">01</div>
+      <div>
+        <div class="eyebrow">캠페인 유형 · 기능</div>
+        <h2 class="rv">하나의 스튜디오,<br /><em>여러 결의 캠페인.</em></h2>
+        <p class="lead rv">상품과 매장의 성격에 따라 유입의 모양을 다르게 설계합니다. 모든 캠페인은 AI가 흐름을 다듬고, 당신이 핵심을 결정합니다.</p>
+      </div>
+    </div>
+
+    <div class="types">
+      <article class="ty c-a rv">
+        <span class="num">— 01</span>
+        <h3>Discovery flow<span class="ko">상품 발견 캠페인</span></h3>
+        <p>쇼핑·마켓 상품의 URL과 핵심 키워드를 등록하면, AI가 관심 맥락이 맞는 실사용자 유입을 설계해 검색에서의 발견성을 끌어올립니다.</p>
+        <span class="tag">URL · 키워드 · 기간</span>
+      </article>
+
+      <article class="ty c-b rv">
+        <span class="num">— 02</span>
+        <h3>Local reach<span class="ko">로컬 매장 유입</span></h3>
+        <p>지역 기반 매장이 동네 검색에서 자연스럽게 떠오르도록, 반경·시간대·관심사를 반영한 리워드 트래픽 캠페인을 구성합니다.</p>
+        <span class="tag">반경 · 시간대 · 관심사</span>
+      </article>
+
+      <article class="ty c-c rv">
+        <span class="num">— 03</span>
+        <h3>Tune<span class="ko">실시간 튜닝</span></h3>
+        <p>진행 중에도 규모와 기간을 직접 조정합니다.</p>
+        <span class="tag">셀프 컨트롤</span>
+      </article>
+
+      <article class="ty c-wide rv">
+        <img src="https://picsum.photos/seed/rankstudio-report/520/700" alt="리포트 화면을 보며 캠페인을 점검하는 사람" loading="lazy" />
+        <div>
+          <span class="num">— 04</span>
+          <h3>Live report<span class="ko">진행 · 성과 리포트</span></h3>
+          <p>결제 후 캠페인이 시작되면, 유입의 흐름과 추이를 한 화면에서 추적합니다. AI가 데이터를 정리해 다음 캠페인의 방향까지 제안합니다. 숫자는 부풀리지 않고, 있는 그대로 보여줍니다.</p>
+          <span class="tag">실시간 대시보드 · AI 인사이트</span>
+        </div>
+      </article>
+
+      <article class="ty c-narrow rv">
+        <span class="num">— 05</span>
+        <h3>Reward traffic<span class="ko">리워드 트래픽이란</span></h3>
+        <p>리워드 트래픽은 보상·제휴를 매개로 참여하는 실사용자의 유입입니다. 기계적 클릭이 아닌, 실제 사람의 관심에서 출발한 흐름이기에 캠페인의 결이 자연스럽습니다.</p>
+        <span class="tag">실사용자 · 리워드 · 제휴</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how">
+  <div class="wrap">
+    <div class="band">
+      <div class="idx rv">02</div>
+      <div>
+        <div class="eyebrow">작동 방식</div>
+        <h2 class="rv">네 번의 선택,<br /><em>그리고 흐름.</em></h2>
+        <p class="lead rv">복잡한 설정은 AI가 맡습니다. 당신이 결정하는 것은 단 네 가지입니다.</p>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step rv">
+        <div class="sn"><small>STEP</small>01</div>
+        <div>
+          <h3>대상 등록 — URL과 키워드</h3>
+          <p>알리고 싶은 상품 페이지나 매장 정보의 URL을 넣고, 발견되고 싶은 키워드를 직접 적습니다. 예시 형식: https://seller-channel.example/items/2048</p>
+          <div class="meta">소요 약 2분 · 즉시 저장</div>
+        </div>
+      </div>
+
+      <div class="step rv">
+        <div class="sn"><small>STEP</small>02</div>
+        <div>
+          <h3>설계 — 기간과 유입 규모</h3>
+          <p>캠페인을 며칠간, 어느 정도 규모로 운영할지 슬라이더로 직접 정합니다. AI가 키워드 난이도를 분석해 권장 구간을 제안하지만, 결정은 언제나 당신의 몫입니다.</p>
+          <div class="meta">AI 권장 구간 제공 · 셀프 조정 가능</div>
+        </div>
+      </div>
+
+      <div class="step rv">
+        <div class="sn"><small>STEP</small>03</div>
+        <div>
+          <h3>결제 — 그리고 시작</h3>
+          <p>설계한 캠페인의 예상 비용을 미리 확인하고 결제합니다. 결제가 완료되면 AI가 실사용자 리워드 트래픽의 유입 흐름을 자연스럽게 배분하며 캠페인을 가동합니다.</p>
+          <div class="meta">투명한 견적 · 결제 즉시 진행</div>
+        </div>
+      </div>
+
+      <div class="step rv">
+        <div class="sn"><small>STEP</small>04</div>
+        <div>
+          <h3>추적 — 리포트로 다음을 그린다</h3>
+          <p>진행 상황과 유입 추이를 실시간 대시보드에서 확인합니다. 캠페인이 끝나면 AI가 결과를 정리하고, 다음 캠페인을 위한 방향을 제안합니다.</p>
+          <div class="meta">실시간 리포트 · AI 회고</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE PULL QUOTE -->
+<section class="wrap">
+  <div class="feature rv">
+    <div class="q">
+      <div class="eyebrow" style="margin-bottom:24px;">에디터스 노트</div>
+      <blockquote>
+        "우리는 순위를 약속하지 않습니다.
+        대신 <span class="hi">발견될 기회</span>를
+        당신 손으로 설계하게 합니다."
+      </blockquote>
+      <div class="by">— 랭크스튜디오 프로덕트 팀</div>
+    </div>
+    <div class="portrait">
+      <img src="https://picsum.photos/seed/rankstudio-editor/760/900" alt="작업 중인 소상공인 인물 컷" loading="lazy" />
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="wrap">
+    <div class="band">
+      <div class="idx rv">03</div>
+      <div>
+        <div class="eyebrow">신뢰의 지표</div>
+        <h2 class="rv">투명하게,<br /><em>측정 가능하게.</em></h2>
+        <p class="lead rv">부풀린 약속 대신 추적 가능한 흐름. 모든 캠페인은 같은 기준으로 기록됩니다.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat rv"><div class="n"><em>12</em>k+</div><div class="l">셀프 설계된<br />캠페인 누적</div></div>
+      <div class="stat rv"><div class="n"><em>3</em>분</div><div class="l">평균 캠페인<br />설계 소요 시간</div></div>
+      <div class="stat rv"><div class="n">100<em>%</em></div><div class="l">실시간으로 추적되는<br />유입 리포트</div></div>
+      <div class="stat rv"><div class="n"><em>24</em>/7</div><div class="l">AI가 다듬는<br />유입 흐름 모니터링</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="faq">
+  <div class="wrap">
+    <div class="band">
+      <div class="idx rv">04</div>
+      <div>
+        <div class="eyebrow">자주 묻는 질문</div>
+        <h2 class="rv">먼저,<br /><em>솔직한 답.</em></h2>
+        <p class="lead rv">에두르지 않고 핵심만. 더 궁금하면 상담으로 이어집니다.</p>
+      </div>
+    </div>
+
+    <div class="faqlist">
+      <div class="qitem rv">
+        <div class="qh"><h3>리워드 트래픽은 정확히 무엇인가요?</h3><div class="mk">+</div></div>
+        <div class="qa"><p>보상·제휴를 매개로 참여하는 실사용자의 유입입니다. 실제 사람의 관심에서 출발한 자연스러운 흐름으로, 캠페인이 더 건강하게 진행됩니다.</p></div>
+      </div>
+      <div class="qitem rv">
+        <div class="qh"><h3>검색 발견성이 반드시 좋아지나요?</h3><div class="mk">+</div></div>
+        <div class="qa"><p>랭크스튜디오는 결과를 보장하지 않습니다. 발견될 기회를 직접 설계하도록 돕는 도구이며, 모든 흐름은 리포트로 투명하게 측정됩니다.</p></div>
+      </div>
+      <div class="qitem rv">
+        <div class="qh"><h3>설정이 어렵지는 않나요?</h3><div class="mk">+</div></div>
+        <div class="qa"><p>URL·키워드·기간·규모 네 가지만 정하면 됩니다. 나머지 복잡한 흐름 배분은 AI가 자동으로 다듬습니다. 평균 3분이면 첫 캠페인을 설계할 수 있습니다.</p></div>
+      </div>
+      <div class="qitem rv">
+        <div class="qh"><h3>진행 상황은 어떻게 확인하나요?</h3><div class="mk">+</div></div>
+        <div class="qa"><p>결제 후 실시간 대시보드에서 유입 추이를 추적합니다. 캠페인 종료 시 AI가 결과를 정리해 다음 방향까지 제안합니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta" class="cta-sec">
+  <div class="grain" aria-hidden="true"></div>
+  <div class="cta-in">
+    <div class="eyebrow">지금, 첫 캠페인</div>
+    <h2><em>Design</em> your discovery.<span class="ko">발견의 흐름을 직접 설계하세요</span></h2>
+    <p>AI가 흐름을 다듬고, 당신이 방향을 정합니다. 3분이면 첫 캠페인을 시작할 수 있습니다.</p>
+    <a href="#cta" class="btn-cream">무료로 캠페인 설계하기</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <div class="brand">랭크스튜디오</div>
+        <p>AI 기반 셀프 캠페인 플랫폼. 좋은 상품과 매장이 검색에서 제대로 발견되도록, 유입을 직접 설계하는 스튜디오.</p>
+      </div>
+      <div class="fcol">
+        <h4>제품</h4>
+        <a href="#types">캠페인 유형</a>
+        <a href="#how">작동 방식</a>
+        <a href="#stats">신뢰 지표</a>
+        <a href="#faq">자주 묻는 질문</a>
+      </div>
+      <div class="fcol">
+        <h4>스튜디오</h4>
+        <a href="#cta">캠페인 시작</a>
+        <a href="#">고객 상담</a>
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 랭크스튜디오. All rights reserved.</span>
+      <span class="legal">랭크스튜디오는 실사용자 리워드 트래픽 기반의 셀프 캠페인 도구를 제공하며, 검색 결과나 노출 성과를 보장하지 않습니다. 모든 캠페인은 투명한 리포트로 측정됩니다.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // FAQ accordion (always available)
+  document.querySelectorAll(".qitem").forEach(function(q){
+    q.addEventListener("click", function(){ q.classList.toggle("open"); });
+  });
+
+  if(reduce){
+    document.querySelectorAll(".rv").forEach(function(el){ el.classList.add("is-in"); });
+    return;
+  }
+
+  // Lenis smooth scroll
+  var lenis;
+  if(window.Lenis){
+    lenis = new Lenis({ duration:1.1, smoothWheel:true });
+    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+
+  if(window.gsap && window.ScrollTrigger){
+    gsap.registerPlugin(ScrollTrigger);
+    if(lenis){ lenis.on("scroll", ScrollTrigger.update); }
+
+    document.querySelectorAll(".rv").forEach(function(el){
+      gsap.to(el, {
+        opacity:1, y:0, duration:.95, ease:"power3.out",
+        scrollTrigger:{ trigger:el, start:"top 88%", once:true },
+        onStart:function(){ el.classList.add("is-in"); }
+      });
+    });
+  } else {
+    document.querySelectorAll(".rv").forEach(function(el){ el.classList.add("is-in"); });
+  }
+
+  // anchor smooth scroll via lenis
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener("click", function(e){
+      var id = a.getAttribute("href");
+      if(id.length>1){
+        var t = document.querySelector(id);
+        if(t){ e.preventDefault(); if(lenis){ lenis.scrollTo(t,{offset:-70}); } else { t.scrollIntoView({behavior:"smooth"}); } }
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

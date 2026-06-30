@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 초고도화 리워드 트래픽 셀프 생성</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --paper:#f7f6f2;
+    --ink:#111111;
+    --red:#e5341f;
+    --g1:#e9e8e2;
+    --g2:#d6d5cd;
+    --g3:#9a9991;
+    --g4:#6b6a63;
+    --g5:#3a3a36;
+    --line:rgba(17,17,17,.13);
+    --line-strong:rgba(17,17,17,.28);
+    --maxw:1440px;
+    --gut:clamp(16px,4vw,40px);
+    --disp:"Archivo","Pretendard",system-ui,sans-serif;
+    --kr:"Pretendard","Archivo",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--kr);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--red);color:var(--paper)}
+
+  /* ---- shell + exposed 12-col grid lines ---- */
+  .shell{position:relative;max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
+  .gridlines{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    max-width:var(--maxw);margin:0 auto;padding:0 var(--gut);
+  }
+  .gridlines .col{
+    position:absolute;top:0;bottom:0;width:0;
+    border-left:1px solid var(--line);
+  }
+  .gridlines .col:last-child{border-right:1px solid var(--line)}
+  @media(max-width:767px){ .gridlines .col:nth-child(n+5):not(:last-child){display:none} }
+
+  .lab{
+    font-family:var(--disp);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    font-size:11px;
+    color:var(--g4);
+  }
+  .idx{
+    font-family:var(--disp);font-weight:700;font-size:11px;
+    letter-spacing:.08em;color:var(--red);
+    font-variant-numeric:tabular-nums;
+  }
+  .tnum{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
+
+  /* ---- header ---- */
+  header{position:sticky;top:0;z-index:50;background:rgba(247,246,242,.86);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;position:relative;z-index:2}
+  .logo{font-family:var(--disp);font-weight:800;font-size:19px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+  .logo .mk{width:13px;height:13px;background:var(--red);display:inline-block;transform:translateY(1px)}
+  .menu{display:flex;gap:30px;align-items:center}
+  .menu a{color:var(--ink);text-decoration:none;font-size:13.5px;font-weight:500;position:relative;padding:4px 0}
+  .menu a::after{content:"";position:absolute;left:0;right:100%;bottom:-2px;height:2px;background:var(--red);transition:right .28s cubic-bezier(.2,.7,.2,1)}
+  .menu a:hover::after{right:0}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .btn{font-family:var(--kr);font-weight:600;font-size:13.5px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:transform .15s ease,background .2s ease,color .2s ease}
+  .btn-red{background:var(--red);color:var(--paper);padding:11px 20px}
+  .btn-red:hover{transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--ink);padding:11px 4px}
+  .btn-ghost:hover{color:var(--red)}
+  .btn-line{background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:13px 22px}
+  .btn-line:hover{background:var(--ink);color:var(--paper)}
+  .arr{transition:transform .2s ease}
+  .btn:hover .arr{transform:translateX(3px)}
+  .burger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:6px}
+  .burger span{width:22px;height:2px;background:var(--ink);display:block}
+  @media(max-width:767px){.menu{display:none}.nav-cta .btn-ghost{display:none}.burger{display:flex}}
+
+  /* ---- hero ---- */
+  .hero{position:relative;z-index:1;border-bottom:1px solid var(--line);padding-top:clamp(40px,7vw,86px);padding-bottom:0}
+  .hero-top{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px;margin-bottom:clamp(22px,4vw,40px)}
+  .hero-tag{display:flex;align-items:center;gap:10px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block;animation:blink 2.4s infinite}
+  @keyframes blink{0%,70%,100%{opacity:1}80%{opacity:.25}}
+  h1.head{
+    font-family:var(--disp);
+    font-weight:900;
+    font-stretch:125%;
+    line-height:.92;
+    letter-spacing:-.022em;
+    font-size:clamp(44px,9vw,128px);
+    max-width:14ch;
+  }
+  h1.head .kr{font-family:var(--kr);font-weight:800;letter-spacing:-.03em}
+  h1.head .red{color:var(--red);position:relative;white-space:nowrap}
+  h1.head .red::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.09em;background:var(--red);transform:scaleX(var(--ul,0));transform-origin:left;transition:transform .7s cubic-bezier(.2,.7,.2,1) .3s}
+  .hero.in h1.head .red::after{--ul:1}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:clamp(30px,5vw,56px);padding-top:clamp(30px,5vw,56px);padding-bottom:clamp(40px,6vw,72px);align-items:start}
+  @media(min-width:900px){.hero-grid{grid-template-columns:1.05fr 1fr}}
+  .hero-sub{font-size:clamp(15px,1.7vw,18.5px);line-height:1.62;color:var(--g5);max-width:44ch;font-weight:400}
+  .hero-sub b{font-weight:600;color:var(--ink)}
+  .hero-actions{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .hero-meta{margin-top:34px;border-top:1px solid var(--line);padding-top:18px;display:flex;gap:clamp(20px,4vw,46px);flex-wrap:wrap}
+  .hero-meta .m{display:flex;flex-direction:column;gap:3px}
+  .hero-meta .mv{font-family:var(--disp);font-weight:800;font-size:clamp(22px,3vw,30px);letter-spacing:-.02em}
+  .hero-meta .ml{font-size:11.5px;color:var(--g4)}
+
+  /* ---- product mockup: campaign dashboard ---- */
+  .mock{background:#fff;border:1px solid var(--ink);box-shadow:14px 14px 0 rgba(17,17,17,.06)}
+  .mock-bar{display:flex;align-items:center;gap:7px;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .mock-bar .tl{width:9px;height:9px;border-radius:50%;background:var(--g2)}
+  .mock-bar .url{margin-left:10px;font-family:var(--disp);font-size:11px;color:var(--g4);letter-spacing:.02em}
+  .mock-body{padding:16px 16px 18px}
+  .mock-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+  .mock-h .t{font-weight:700;font-size:14px}
+  .mock-h .s{font-size:11px;color:var(--g4);margin-top:2px}
+  .pill{font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;border:1px solid var(--ink);display:inline-flex;align-items:center;gap:5px}
+  .pill.live{background:var(--red);color:#fff;border-color:var(--red)}
+  .pill.live .pdot{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 1.8s infinite}
+  /* mini chart */
+  .chartwrap{border:1px solid var(--line);padding:13px 13px 8px;margin-bottom:13px}
+  .chart-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .chart-h .ct{font-size:11px;color:var(--g4);font-weight:500}
+  .chart-h .cv{font-family:var(--disp);font-weight:800;font-size:18px}
+  .chart-h .cv .up{color:var(--red);font-size:11px;margin-left:6px}
+  svg.spark{display:block;width:100%;height:64px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line)}
+  .kpi{padding:11px 12px;border-right:1px solid var(--line)}
+  .kpi:last-child{border-right:none}
+  .kpi .kl{font-size:10px;color:var(--g4);text-transform:uppercase;letter-spacing:.08em;font-family:var(--disp);font-weight:600}
+  .kpi .kv{font-family:var(--disp);font-weight:800;font-size:19px;margin-top:5px;letter-spacing:-.01em}
+  .kpi .kv small{font-size:11px;font-weight:600;color:var(--g3)}
+  .progrow{margin-top:13px;display:flex;flex-direction:column;gap:9px}
+  .pr{display:grid;grid-template-columns:84px 1fr 40px;gap:10px;align-items:center;font-size:11px}
+  .pr .pn{color:var(--g5);font-weight:500}
+  .track{height:6px;background:var(--g1);position:relative}
+  .track i{position:absolute;left:0;top:0;bottom:0;background:var(--ink);width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+  .track i.r{background:var(--red)}
+  .pr .pp{font-family:var(--disp);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* ---- section scaffolding ---- */
+  section{position:relative;z-index:1}
+  .sec-head{display:flex;align-items:baseline;gap:16px;padding:clamp(46px,6vw,82px) 0 clamp(24px,3vw,36px);flex-wrap:wrap}
+  .sec-head h2{font-family:var(--disp);font-weight:900;font-stretch:118%;letter-spacing:-.02em;font-size:clamp(28px,4.6vw,56px);line-height:.98}
+  .sec-head h2 .kr{font-family:var(--kr);font-weight:800;letter-spacing:-.03em}
+  .sec-head .lead{margin-left:auto;max-width:38ch;font-size:14px;color:var(--g5);line-height:1.6;align-self:flex-end}
+
+  /* ---- bento ---- */
+  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:0;border-top:1px solid var(--ink);border-left:1px solid var(--ink);margin-bottom:8px}
+  .cell{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:22px 22px 24px;background:var(--paper);position:relative;min-height:172px;display:flex;flex-direction:column;transition:background .25s ease,color .25s ease}
+  .cell .idx{position:absolute;top:16px;right:18px}
+  .cell h3{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:14px 0 8px;max-width:20ch}
+  .cell p{font-size:13px;color:var(--g4);line-height:1.55;max-width:34ch}
+  .cell .ico{width:34px;height:34px}
+  .cell:hover{background:var(--ink);color:var(--paper)}
+  .cell:hover p{color:var(--g2)}
+  .cell:hover .ico [stroke]{stroke:var(--paper)}
+  .cell:hover .ico [fill="#111111"]{fill:var(--paper)}
+  .cell.accent{background:var(--red);color:var(--paper)}
+  .cell.accent p{color:rgba(247,246,242,.82)}
+  .cell.accent .idx{color:var(--paper)}
+  .cell.accent .ico [stroke]{stroke:var(--paper)}
+  .cell.accent:hover{background:var(--ink)}
+  .span6{grid-column:span 6}.span4{grid-column:span 4}.span3{grid-column:span 3}.span8{grid-column:span 8}.span5{grid-column:span 5}.span7{grid-column:span 7}
+  .cell .big{font-family:var(--disp);font-weight:900;font-stretch:118%;font-size:clamp(30px,4vw,50px);letter-spacing:-.02em;line-height:1;margin-top:auto}
+  .cell .big small{font-size:14px;font-weight:700;letter-spacing:0}
+  @media(max-width:899px){.span6,.span4,.span3,.span8,.span5,.span7{grid-column:span 6}}
+  @media(max-width:560px){.bento{grid-template-columns:1fr}.span6,.span4,.span3,.span8,.span5,.span7{grid-column:span 1}}
+
+  /* ---- how it works ---- */
+  .steps{border-top:1px solid var(--ink)}
+  .step{display:grid;grid-template-columns:88px 1fr;gap:clamp(16px,4vw,48px);padding:clamp(24px,3.4vw,40px) 0;border-bottom:1px solid var(--line);align-items:start}
+  @media(min-width:900px){.step{grid-template-columns:120px 1.1fr 1.4fr}}
+  .step .num{font-family:var(--disp);font-weight:900;font-stretch:120%;font-size:clamp(40px,6vw,82px);line-height:.8;color:var(--ink);letter-spacing:-.03em}
+  .step.on .num{color:var(--red)}
+  .step .st h3{font-size:clamp(19px,2.4vw,26px);font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+  .step .st .sl{font-size:13.5px;color:var(--g4);line-height:1.6;max-width:40ch}
+  .step .detail{font-size:13px;color:var(--g5);line-height:1.62}
+  .step .detail .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .step .detail .row:last-child{border-bottom:none}
+  .step .detail .row span:first-child{color:var(--g4)}
+  .step .detail .row b{font-family:var(--disp);font-weight:700;font-variant-numeric:tabular-nums}
+
+  /* ---- stats bar ---- */
+  .stats{background:var(--ink);color:var(--paper);position:relative;z-index:2;margin-top:clamp(40px,5vw,70px)}
+  .stats-in{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+  @media(min-width:760px){.stats-in{grid-template-columns:repeat(4,1fr)}}
+  .stat{padding:clamp(30px,4vw,52px) clamp(18px,2vw,26px);border-right:1px solid rgba(247,246,242,.16);border-bottom:1px solid rgba(247,246,242,.16)}
+  .stat .sv{font-family:var(--disp);font-weight:900;font-stretch:115%;font-size:clamp(34px,5vw,64px);line-height:.9;letter-spacing:-.03em}
+  .stat .sv .u{color:var(--red)}
+  .stat .sk{font-size:12px;color:rgba(247,246,242,.6);margin-top:12px;letter-spacing:.01em;line-height:1.45}
+  .stat .si{margin-bottom:14px}
+
+  /* ---- faq ---- */
+  .faq{border-top:1px solid var(--ink)}
+  .q{border-bottom:1px solid var(--line);cursor:pointer}
+  .q-h{display:grid;grid-template-columns:48px 1fr 40px;gap:14px;align-items:center;padding:24px 0}
+  .q-h .qi{font-family:var(--disp);font-weight:700;font-size:12px;color:var(--red);font-variant-numeric:tabular-nums}
+  .q-h .qt{font-size:clamp(16px,2vw,20px);font-weight:700;letter-spacing:-.01em}
+  .q-h .qx{justify-self:end;width:22px;height:22px;position:relative}
+  .q-h .qx::before,.q-h .qx::after{content:"";position:absolute;background:var(--ink);transition:transform .3s ease}
+  .q-h .qx::before{left:0;right:0;top:10px;height:2px}
+  .q-h .qx::after{top:0;bottom:0;left:10px;width:2px}
+  .q.open .qx::after{transform:scaleY(0)}
+  .q-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .q-a .inner{padding:0 0 24px 62px;font-size:14px;color:var(--g5);line-height:1.65;max-width:62ch}
+  @media(max-width:560px){.q-a .inner{padding-left:0}}
+
+  /* ---- final cta ---- */
+  .final{border-top:1px solid var(--ink);padding:clamp(54px,8vw,120px) 0;position:relative}
+  .final h2{font-family:var(--disp);font-weight:900;font-stretch:125%;font-size:clamp(40px,8vw,118px);line-height:.9;letter-spacing:-.025em;max-width:13ch}
+  .final h2 .kr{font-family:var(--kr);font-weight:800}
+  .final h2 .red{color:var(--red)}
+  .final-row{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;margin-top:clamp(30px,4vw,48px)}
+  .final-note{font-size:13px;color:var(--g4);max-width:36ch;line-height:1.6}
+
+  /* ---- footer ---- */
+  footer{border-top:1px solid var(--ink);background:var(--paper);position:relative;z-index:2}
+  .foot{display:grid;grid-template-columns:1fr;gap:32px;padding:clamp(40px,5vw,64px) 0 24px}
+  @media(min-width:760px){.foot{grid-template-columns:1.6fr 1fr 1fr 1fr}}
+  .foot .fcol h4{font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--g4);margin-bottom:16px}
+  .foot .fcol a{display:block;color:var(--ink);text-decoration:none;font-size:13.5px;padding:5px 0}
+  .foot .fcol a:hover{color:var(--red)}
+  .foot .brand .logo{font-size:24px;margin-bottom:14px}
+  .foot .brand p{font-size:13px;color:var(--g4);line-height:1.6;max-width:34ch}
+  .foot-bot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding:18px 0 34px;font-size:11.5px;color:var(--g3)}
+  .foot-bot .lab{color:var(--g3)}
+
+  /* reveal */
+  .rev{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .rev.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    .rev{opacity:1;transform:none;transition:none}
+    .dot,.pdot{animation:none}
+    html{scroll-behavior:auto}
+    .track i{transition:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="gridlines" aria-hidden="true">
+  <div class="col" style="left:8.333%"></div>
+  <div class="col" style="left:16.666%"></div>
+  <div class="col" style="left:25%"></div>
+  <div class="col" style="left:33.333%"></div>
+  <div class="col" style="left:41.666%"></div>
+  <div class="col" style="left:50%"></div>
+  <div class="col" style="left:58.333%"></div>
+  <div class="col" style="left:66.666%"></div>
+  <div class="col" style="left:75%"></div>
+  <div class="col" style="left:83.333%"></div>
+  <div class="col" style="left:91.666%"></div>
+  <div class="col" style="left:0"></div>
+  <div class="col" style="left:100%"></div>
+</div>
+
+<header>
+  <div class="shell">
+    <nav class="nav">
+      <a class="logo" href="#top"><span class="mk"></span>랭크스튜디오</a>
+      <div class="menu">
+        <a href="#types">캠페인 유형</a>
+        <a href="#how">작동 방식</a>
+        <a href="#stats">성과 지표</a>
+        <a href="#faq">자주 묻는 질문</a>
+      </div>
+      <div class="nav-cta">
+        <a class="btn btn-ghost" href="#">로그인</a>
+        <a class="btn btn-red" href="#start">무료로 시작 <span class="arr">→</span></a>
+      </div>
+      <button class="burger" aria-label="메뉴 열기"><span></span><span></span><span></span></button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="shell">
+      <div class="hero-top">
+        <div class="hero-tag">
+          <span class="dot"></span>
+          <span class="lab">랭크스튜디오 · AI Self-Campaign Platform</span>
+        </div>
+        <span class="lab tnum">Index 00 — Overview</span>
+      </div>
+
+      <h1 class="head rev">
+        <span class="kr">AI 기반</span> 초고도화<br>
+        <span class="red">리워드 트래픽</span><br>
+        <span class="kr">셀프 생성</span>
+      </h1>
+
+      <div class="hero-grid">
+        <div class="rev">
+          <p class="hero-sub">
+            대상 URL과 목표 키워드, 기간과 유입 규모를 직접 설정하세요.
+            <b>AI 엔진이 검색 환경에 맞춰 유입 흐름을 설계</b>하고,
+            실사용자 리워드·제휴 매체 기반의 트래픽으로 상품과 매장의
+            <b>발견 가능성</b>을 끌어올립니다. 결제부터 진행상태·리포트까지 한 화면에서.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-red" href="#start" style="padding:14px 24px">캠페인 시작하기 <span class="arr">→</span></a>
+            <a class="btn btn-line" href="#how">작동 방식 보기</a>
+          </div>
+          <div class="hero-meta">
+            <div class="m"><span class="mv tnum">3분</span><span class="ml">평균 캠페인 설정 시간</span></div>
+            <div class="m"><span class="mv tnum">24<span style="color:var(--red)">/</span>7</span><span class="ml">실시간 진행 리포트</span></div>
+            <div class="m"><span class="mv tnum">12<span style="color:var(--red)">+</span></span><span class="ml">유입 흐름 최적화 변수</span></div>
+          </div>
+        </div>
+
+        <!-- product mockup -->
+        <div class="rev mock" aria-label="캠페인 대시보드 미리보기">
+          <div class="mock-bar">
+            <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+            <span class="url">app.rankstudio.io / campaign / detail</span>
+          </div>
+          <div class="mock-body">
+            <div class="mock-h">
+              <div>
+                <div class="t">여름 신상 토트백 — 발견 캠페인</div>
+                <div class="s">목표 키워드 · 데일리 토트백 / 캔버스 가방</div>
+              </div>
+              <span class="pill live"><span class="pdot"></span>진행중</span>
+            </div>
+
+            <div class="chartwrap">
+              <div class="chart-h">
+                <span class="ct">일별 검색 반응 추이 (최근 14일)</span>
+                <span class="cv tnum">2,418<span class="up">▲ 37%</span></span>
+              </div>
+              <svg class="spark" viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true">
+                <g stroke="#e9e8e2" stroke-width="1">
+                  <line x1="0" y1="16" x2="320" y2="16"/>
+                  <line x1="0" y1="32" x2="320" y2="32"/>
+                  <line x1="0" y1="48" x2="320" y2="48"/>
+                </g>
+                <polyline class="sparkline" fill="none" stroke="#e5341f" stroke-width="2.4"
+                  stroke-linejoin="round" stroke-linecap="round"
+                  points="0,54 24,50 49,52 74,44 98,46 123,38 147,40 172,30 196,33 221,24 245,26 270,16 294,19 320,9"/>
+                <circle cx="320" cy="9" r="3.4" fill="#e5341f"/>
+              </svg>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><div class="kl">유입</div><div class="kv tnum">8,940</div></div>
+              <div class="kpi"><div class="kl">반응률</div><div class="kv tnum">4.7<small>%</small></div></div>
+              <div class="kpi"><div class="kl">달성</div><div class="kv tnum">72<small>%</small></div></div>
+            </div>
+
+            <div class="progrow">
+              <div class="pr"><span class="pn">유입 규모</span><span class="track"><i class="r" data-w="72%"></i></span><span class="pp tnum">72%</span></div>
+              <div class="pr"><span class="pn">기간 진행</span><span class="track"><i data-w="58%"></i></span><span class="pp tnum">58%</span></div>
+              <div class="pr"><span class="pn">예산 소진</span><span class="track"><i data-w="64%"></i></span><span class="pp tnum">64%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENTO -->
+  <section id="types">
+    <div class="shell">
+      <div class="sec-head rev">
+        <span class="idx tnum">01</span>
+        <h2><span class="kr">캠페인 유형</span> &amp;<br>핵심 지표</h2>
+        <p class="lead">상품·매장의 목표에 맞춰 유입 흐름을 조합하세요. 모든 캠페인은 AI 엔진이 검색 반응을 학습하며 실시간으로 배분을 조정합니다.</p>
+      </div>
+
+      <div class="bento rev">
+        <div class="cell accent span6">
+          <span class="idx tnum">A</span>
+          <svg class="ico" viewBox="0 0 34 34" fill="none"><circle cx="14" cy="14" r="9" stroke="#f7f6f2" stroke-width="2"/><path d="M21 21l8 8" stroke="#f7f6f2" stroke-width="2" stroke-linecap="round"/></svg>
+          <h3>쇼핑 검색 발견 캠페인</h3>
+          <p>마켓 상품이 검색 환경에서 더 잘 노출되도록 유입 흐름을 설계합니다. 키워드별 검색 반응을 AI가 실시간 진단해 배분을 최적화합니다.</p>
+          <div class="big tnum">+37<small>% 반응</small></div>
+        </div>
+
+        <div class="cell span3">
+          <span class="idx tnum">B</span>
+          <svg class="ico" viewBox="0 0 34 34" fill="none"><path d="M5 22l7-8 6 5 11-13" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="29" cy="6" r="2.4" fill="#111111"/></svg>
+          <h3>로컬 검색 유입</h3>
+          <p>매장이 지역 검색에서 발견되도록 자연스러운 유입 흐름을 만듭니다.</p>
+        </div>
+
+        <div class="cell span3">
+          <span class="idx tnum">C</span>
+          <svg class="ico" viewBox="0 0 34 34" fill="none"><rect x="5" y="5" width="11" height="11" stroke="#111111" stroke-width="2"/><rect x="18" y="18" width="11" height="11" stroke="#111111" stroke-width="2"/><path d="M16 10h8M10 16v8" stroke="#111111" stroke-width="2"/></svg>
+          <h3>리워드 트래픽</h3>
+          <p>실사용자 리워드·제휴 매체 기반의 신뢰 가능한 유입.</p>
+        </div>
+
+        <div class="cell span4">
+          <span class="idx tnum">D</span>
+          <svg class="ico" viewBox="0 0 34 34" fill="none"><path d="M17 4l11 6v8c0 7-5 10-11 12-6-2-11-5-11-12v-8l11-6z" stroke="#111111" stroke-width="2" stroke-linejoin="round"/><path d="M12 17l3.5 3.5L23 13" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>AI 안전 가드</h3>
+          <p>비정상 패턴을 회피하고 자연스러운 유입 분포를 유지하도록 AI가 속도와 분산을 제어합니다.</p>
+        </div>
+
+        <div class="cell span4">
+          <span class="idx tnum">E</span>
+          <svg class="ico" viewBox="0 0 34 34" fill="none"><rect x="5" y="6" width="24" height="18" stroke="#111111" stroke-width="2"/><path d="M11 17l4-4 3 3 5-6" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 28h8" stroke="#111111" stroke-width="2" stroke-linecap="round"/></svg>
+          <h3>실시간 리포트</h3>
+          <p>유입·검색 반응·달성률을 한 화면에서. 일·시간 단위 추이를 표처럼 정렬해 제공합니다.</p>
+        </div>
+
+        <div class="cell span4">
+          <span class="idx tnum">F</span>
+          <svg class="ico" viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="12" stroke="#111111" stroke-width="2"/><path d="M17 9v8l5 3" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h3>기간·규모 셀프 설정</h3>
+          <p>유입 규모와 기간을 직접 슬라이더로 조절. 예상 효과를 실시간으로 시뮬레이션합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="shell">
+      <div class="sec-head rev">
+        <span class="idx tnum">02</span>
+        <h2><span class="kr">작동</span> 방식</h2>
+        <p class="lead">설정에서 리포트까지 네 단계. 별도 상담 없이 직접 캠페인을 만들고 진행상태를 추적하세요.</p>
+      </div>
+
+      <div class="steps rev">
+        <div class="step">
+          <div class="num tnum">01</div>
+          <div class="st">
+            <h3>대상과 목표 입력</h3>
+            <p class="sl">대상 URL과 목표 키워드를 등록합니다. 중립 예시: https://seller-channel.example/item/2048</p>
+          </div>
+          <div class="detail">
+            <div class="row"><span>대상 URL</span><b>seller-channel.example</b></div>
+            <div class="row"><span>목표 키워드</span><b>데일리 토트백 외 2</b></div>
+            <div class="row"><span>카테고리 자동 분류</span><b>AI 추천</b></div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="num tnum">02</div>
+          <div class="st">
+            <h3>기간·유입 규모 설정</h3>
+            <p class="sl">캠페인 기간과 일일 유입 규모를 직접 조절하면 예상 검색 반응을 미리 시뮬레이션합니다.</p>
+          </div>
+          <div class="detail">
+            <div class="row"><span>캠페인 기간</span><b>14일</b></div>
+            <div class="row"><span>일일 유입 규모</span><b>600 / day</b></div>
+            <div class="row"><span>예상 반응률</span><b>4.2 – 5.1%</b></div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="num tnum">03</div>
+          <div class="st">
+            <h3>결제 후 AI 자동 진행</h3>
+            <p class="sl">결제가 완료되면 AI 엔진이 검색 반응을 학습하며 유입 흐름의 속도와 분산을 자동으로 조정합니다.</p>
+          </div>
+          <div class="detail">
+            <div class="row"><span>엔진 상태</span><b>최적화 중</b></div>
+            <div class="row"><span>분산 제어</span><b>자동</b></div>
+            <div class="row"><span>안전 가드</span><b>ON</b></div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="num tnum">04</div>
+          <div class="st">
+            <h3>진행상태·리포트 확인</h3>
+            <p class="sl">유입과 검색 반응, 달성률을 실시간으로 확인하고 리포트를 내려받습니다.</p>
+          </div>
+          <div class="detail">
+            <div class="row"><span>누적 유입</span><b>8,940</b></div>
+            <div class="row"><span>목표 달성</span><b>72%</b></div>
+            <div class="row"><span>리포트</span><b>PDF · CSV</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section id="stats" class="stats">
+    <div class="shell">
+      <div class="stats-in">
+        <div class="stat rev">
+          <div class="si lab" style="color:rgba(247,246,242,.5)">Index 03 — Trust</div>
+          <div class="sv tnum">2.4<span class="u">M</span></div>
+          <div class="sk">누적 처리된 유입 흐름<br>(2025 — 2026)</div>
+        </div>
+        <div class="stat rev">
+          <div class="si lab" style="color:rgba(247,246,242,.5)">Reaction</div>
+          <div class="sv tnum">+41<span class="u">%</span></div>
+          <div class="sk">캠페인 시작 후 평균<br>검색 반응 증가폭</div>
+        </div>
+        <div class="stat rev">
+          <div class="si lab" style="color:rgba(247,246,242,.5)">Self-serve</div>
+          <div class="sv tnum">3<span class="u">분</span></div>
+          <div class="sk">평균 캠페인 설정 시간<br>상담 없이 직접 진행</div>
+        </div>
+        <div class="stat rev">
+          <div class="si lab" style="color:rgba(247,246,242,.5)">Retention</div>
+          <div class="sv tnum">96<span class="u">%</span></div>
+          <div class="sk">재시작 캠페인 비율<br>활성 셀러 기준</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="shell">
+      <div class="sec-head rev">
+        <span class="idx tnum">04</span>
+        <h2><span class="kr">자주 묻는</span><br>질문</h2>
+        <p class="lead">더 궁금한 점은 시작 후 대시보드 내 가이드에서 확인할 수 있습니다.</p>
+      </div>
+
+      <div class="faq rev">
+        <div class="q">
+          <div class="q-h"><span class="qi tnum">Q1</span><span class="qt">리워드 트래픽이 정확히 무엇인가요?</span><span class="qx"></span></div>
+          <div class="q-a"><div class="inner">실사용자 리워드 및 제휴 매체를 통해 발생하는 유입 흐름을 의미합니다. AI 엔진이 검색 반응을 학습해 자연스러운 분포로 유입을 설계하므로, 상품과 매장의 발견 가능성을 높이는 데 초점을 둡니다.</div></div>
+        </div>
+        <div class="q">
+          <div class="q-h"><span class="qi tnum">Q2</span><span class="qt">설정한 효과는 어떻게 확인하나요?</span><span class="qx"></span></div>
+          <div class="q-a"><div class="inner">결제 직후부터 대시보드에서 유입·검색 반응·달성률이 실시간으로 갱신됩니다. 일·시간 단위 추이는 표처럼 정렬되어 표시되며, 종료 후에는 PDF·CSV 리포트로 내려받을 수 있습니다.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final" id="start">
+    <div class="shell">
+      <span class="idx tnum rev" style="display:inline-block;margin-bottom:18px">05 — Start</span>
+      <h2 class="rev"><span class="kr">지금</span> 첫 캠페인을<br><span class="red">3분</span> 안에 시작</h2>
+      <div class="final-row rev">
+        <div class="hero-actions" style="margin-top:0">
+          <a class="btn btn-red" href="#" style="padding:16px 28px;font-size:15px">무료로 시작하기 <span class="arr">→</span></a>
+          <a class="btn btn-line" href="#how" style="font-size:15px">작동 방식 다시 보기</a>
+        </div>
+        <p class="final-note">카드 등록 없이 캠페인 설정과 예상 효과 시뮬레이션을 먼저 체험하세요. 결제는 진행 직전에만 요청됩니다.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="shell">
+    <div class="foot">
+      <div class="fcol brand">
+        <span class="logo"><span class="mk"></span>랭크스튜디오</span>
+        <p>AI 기반 셀프 캠페인 플랫폼. 쇼핑 검색과 로컬 검색 환경에서 상품·매장의 발견 가능성을 끌어올립니다.</p>
+      </div>
+      <div class="fcol">
+        <h4>Product</h4>
+        <a href="#types">캠페인 유형</a>
+        <a href="#how">작동 방식</a>
+        <a href="#stats">성과 지표</a>
+      </div>
+      <div class="fcol">
+        <h4>Company</h4>
+        <a href="#">소개</a>
+        <a href="#">이용약관</a>
+        <a href="#">개인정보 처리방침</a>
+      </div>
+      <div class="fcol">
+        <h4>Support</h4>
+        <a href="#faq">자주 묻는 질문</a>
+        <a href="#">고객센터</a>
+        <a href="#">문의하기</a>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 랭크스튜디오 — AI Self-Campaign Platform</span>
+      <span class="lab">Swiss Editorial Grid · Concept 01</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* hero underline + first reveals */
+  requestAnimationFrame(function(){
+    var hero = document.getElementById('hero');
+    if(hero) hero.classList.add('in');
+  });
+
+  /* scroll reveal */
+  var revs = document.querySelectorAll('.rev');
+  if(reduce || !('IntersectionObserver' in window)){
+    revs.forEach(function(el){el.classList.add('in');});
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    },{threshold:.16, rootMargin:'0px 0px -8% 0px'});
+    revs.forEach(function(el){io.observe(el);});
+  }
+
+  /* progress bars fill when mock visible */
+  var bars = document.querySelectorAll('.track i');
+  function fill(){ bars.forEach(function(b){ b.style.width = b.getAttribute('data-w'); }); }
+  if(reduce){ fill(); }
+  else {
+    var mock = document.querySelector('.mock');
+    if(mock && 'IntersectionObserver' in window){
+      var io2 = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting){ setTimeout(fill,260); io2.unobserve(e.target); } });
+      },{threshold:.3});
+      io2.observe(mock);
+    } else { fill(); }
+  }
+
+  /* step active on hover/focus */
+  document.querySelectorAll('.step').forEach(function(s){
+    s.addEventListener('mouseenter',function(){s.classList.add('on');});
+    s.addEventListener('mouseleave',function(){s.classList.remove('on');});
+  });
+
+  /* faq accordion */
+  document.querySelectorAll('.q').forEach(function(q){
+    var head = q.querySelector('.q-h');
+    var ans = q.querySelector('.q-a');
+    head.addEventListener('click',function(){
+      var open = q.classList.toggle('open');
+      ans.style.maxHeight = open ? (ans.querySelector('.inner').offsetHeight + 'px') : '0px';
+    });
+  });
+
+  /* mobile burger -> jump menu (simple) */
+  var burger = document.querySelector('.burger');
+  if(burger){ burger.addEventListener('click',function(){ location.hash = '#types'; }); }
+})();
+</script>
+</body>
+</html>

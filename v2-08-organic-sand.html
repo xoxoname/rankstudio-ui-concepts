@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 셀프 캠페인 플랫폼</title>
+<meta name="description" content="AI 기반 초고도화 리워드 트래픽 셀프 생성. URL·키워드·기간·유입 규모를 직접 설정하고, 결제 후 진행과 리포트를 한곳에서." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Noto+Serif+KR:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+<style>
+  :root {
+    --sand:      #efe6d6;
+    --sand-deep: #e6dabf;
+    --paper:     #f7f1e6;
+    --terra:     #c0603f;
+    --terra-soft:#d98a6a;
+    --sage:      #7c8b6f;
+    --sage-deep: #5f6e54;
+    --ink:       #2c2622;
+    --ink-soft:  #6b6259;
+    --line:      rgba(44,38,34,0.12);
+    --radius-lg: 32px;
+    --radius-md: 20px;
+    --shadow-soft: 0 24px 60px -28px rgba(44,38,34,0.35);
+    --serif: "Fraunces", "Noto Serif KR", serif;
+    --sans:  "Pretendard", "Noto Serif KR", system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--sand);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* paper / fabric grain overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  ::selection { background: var(--terra); color: var(--paper); }
+
+  a { color: inherit; text-decoration: none; }
+
+  .wrap { width: min(1200px, 90vw); margin: 0 auto; }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--terra);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 28px; height: 1px;
+    background: var(--terra);
+    opacity: 0.6;
+  }
+
+  h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.08; letter-spacing: -0.015em; }
+
+  .display {
+    font-size: clamp(2.6rem, 7vw, 5.4rem);
+    font-weight: 500;
+    font-optical-sizing: auto;
+  }
+  .display em { font-style: italic; color: var(--terra); font-weight: 400; }
+
+  .lead { font-size: clamp(1.05rem, 1.6vw, 1.25rem); color: var(--ink-soft); max-width: 46ch; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55em;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.98rem;
+    padding: 0.95em 1.8em;
+    border-radius: 100px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(.2,.8,.2,1), background 0.3s, color 0.3s;
+    will-change: transform;
+  }
+  .btn:hover { transform: translateY(-3px); }
+  .btn-primary { background: var(--terra); color: var(--paper); }
+  .btn-primary:hover { background: #a94f30; }
+  .btn-ghost { background: transparent; border-color: var(--line); color: var(--ink); }
+  .btn-ghost:hover { background: rgba(44,38,34,0.05); }
+  .btn .arrow { transition: transform 0.3s; }
+  .btn:hover .arrow { transform: translateX(4px); }
+
+  /* ---------- HEADER ---------- */
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.1rem 0;
+    transition: background 0.4s, padding 0.4s, box-shadow 0.4s;
+  }
+  header.scrolled {
+    background: rgba(239,230,214,0.82);
+    backdrop-filter: blur(14px);
+    padding: 0.7rem 0;
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-family: var(--serif); font-weight: 600; font-size: 1.4rem; letter-spacing: -0.02em; display: flex; align-items: center; gap: 0.5em; }
+  .logo .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--terra); display: inline-block; }
+  .nav-links { display: flex; gap: 2.2rem; align-items: center; }
+  .nav-links a { font-size: 0.92rem; font-weight: 500; color: var(--ink-soft); transition: color 0.2s; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-cta { font-size: 0.9rem !important; padding: 0.6em 1.3em; }
+  .menu-toggle { display: none; background: none; border: none; font-size: 1.5rem; color: var(--ink); cursor: pointer; }
+
+  /* ---------- HERO ---------- */
+  .hero { position: relative; padding: 12rem 0 6rem; overflow: hidden; }
+  .blob {
+    position: absolute;
+    border-radius: 48% 52% 58% 42% / 55% 48% 52% 45%;
+    filter: blur(2px);
+    z-index: 0;
+  }
+  .blob-1 { width: 520px; height: 520px; background: var(--terra-soft); opacity: 0.16; top: -120px; right: -140px; }
+  .blob-2 { width: 380px; height: 380px; background: var(--sage); opacity: 0.14; bottom: -120px; left: -120px; }
+
+  .hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 4rem; align-items: center; }
+  .hero-copy h1 { margin: 1.4rem 0 1.6rem; }
+  .hero-actions { display: flex; gap: 1rem; margin-top: 2.2rem; flex-wrap: wrap; }
+
+  .hero-art { position: relative; height: 540px; }
+  .hero-photo {
+    position: absolute;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    background: var(--sand-deep);
+  }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hp-main { inset: 0 0 14% 18%; border-radius: 220px 220px 28px 28px; z-index: 2; }
+  .hp-sub  { width: 46%; height: 38%; bottom: 0; left: 0; border-radius: 28px 28px 28px 120px; z-index: 3; }
+  .hero-chip {
+    position: absolute; z-index: 4;
+    top: 8%; left: -2%;
+    background: var(--paper);
+    border-radius: 18px;
+    padding: 0.85rem 1.15rem;
+    box-shadow: var(--shadow-soft);
+    display: flex; align-items: center; gap: 0.7rem;
+  }
+  .hero-chip .ic { width: 38px; height: 38px; border-radius: 12px; background: rgba(124,139,111,0.18); display: grid; place-items: center; color: var(--sage-deep); }
+  .hero-chip b { font-size: 1.15rem; font-family: var(--serif); display: block; line-height: 1; }
+  .hero-chip span { font-size: 0.74rem; color: var(--ink-soft); }
+
+  .hero-foot { display: flex; gap: 2.5rem; margin-top: 3.2rem; flex-wrap: wrap; align-items: center; }
+  .hero-foot .stat b { font-family: var(--serif); font-size: 1.8rem; font-weight: 500; }
+  .hero-foot .stat span { display: block; font-size: 0.82rem; color: var(--ink-soft); }
+  .hero-foot .sep { width: 1px; height: 40px; background: var(--line); }
+
+  /* curved section transition */
+  .arch-top { display: block; width: 100%; height: clamp(60px,8vw,120px); margin-bottom: -1px; }
+
+  /* ---------- TYPES ---------- */
+  section { position: relative; }
+  .pad { padding: 6.5rem 0; }
+  .sec-head { max-width: 640px; margin-bottom: 3.5rem; }
+  .sec-head h2 { font-size: clamp(2rem, 4vw, 3.1rem); margin: 1.1rem 0 1rem; }
+  .sec-head p { color: var(--ink-soft); font-size: 1.05rem; }
+
+  .types { background: var(--paper); }
+  .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+  .type-card {
+    background: var(--sand);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s;
+  }
+  .type-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-soft); }
+  .type-card .ph { height: 200px; overflow: hidden; }
+  .type-card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; }
+  .type-card:hover .ph img { transform: scale(1.06); }
+  .type-card .body { padding: 1.7rem 1.7rem 2rem; }
+  .type-card h3 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+  .type-card p { font-size: 0.95rem; color: var(--ink-soft); }
+  .type-tag { display: inline-block; font-size: 0.74rem; font-weight: 600; letter-spacing: 0.05em; color: var(--sage-deep); background: rgba(124,139,111,0.16); padding: 0.3em 0.85em; border-radius: 100px; margin-bottom: 1rem; }
+
+  /* ---------- FEATURES strip ---------- */
+  .features { background: var(--sand); }
+  .feat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+  .feat {
+    background: var(--paper);
+    border-radius: var(--radius-md);
+    padding: 1.8rem 1.5rem;
+  }
+  .feat .ic { width: 46px; height: 46px; border-radius: 14px; background: rgba(192,96,63,0.13); color: var(--terra); display: grid; place-items: center; margin-bottom: 1.1rem; }
+  .feat h4 { font-family: var(--serif); font-size: 1.22rem; font-weight: 500; margin-bottom: 0.45rem; }
+  .feat p { font-size: 0.88rem; color: var(--ink-soft); }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .how { background: var(--paper); }
+  .steps { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 4rem; align-items: center; }
+  .step {
+    position: relative;
+    padding: 1.7rem 0 1.7rem 3.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .step:last-child { border-bottom: none; }
+  .step .num {
+    position: absolute; left: 0; top: 1.7rem;
+    font-family: var(--serif); font-style: italic;
+    font-size: 1.5rem; color: var(--terra);
+    width: 2.4rem;
+  }
+  .step h4 { font-family: var(--serif); font-size: 1.4rem; font-weight: 500; margin-bottom: 0.35rem; }
+  .step p { font-size: 0.95rem; color: var(--ink-soft); }
+  .how-art { position: relative; height: 520px; }
+  .how-art .photo { position: absolute; overflow: hidden; box-shadow: var(--shadow-soft); }
+  .how-art .photo img { width: 100%; height: 100%; object-fit: cover; }
+  .ha-1 { inset: 0 22% 30% 0; border-radius: 28px 200px 28px 28px; z-index: 2; }
+  .ha-2 { width: 52%; height: 46%; bottom: 0; right: 0; border-radius: 160px 28px 28px 28px; z-index: 3; }
+  .how-badge {
+    position: absolute; z-index: 4; bottom: 8%; left: 4%;
+    background: var(--terra); color: var(--paper);
+    border-radius: 18px; padding: 1rem 1.3rem;
+    box-shadow: var(--shadow-soft);
+  }
+  .how-badge b { font-family: var(--serif); font-size: 1.5rem; display: block; line-height: 1; }
+  .how-badge span { font-size: 0.78rem; opacity: 0.85; }
+
+  /* ---------- TRUST STATS ---------- */
+  .trust { background: var(--ink); color: var(--paper); border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .trust .eyebrow { color: var(--terra-soft); }
+  .trust .eyebrow::before { background: var(--terra-soft); }
+  .trust h2 { color: var(--paper); }
+  .trust .sec-head p { color: rgba(247,241,230,0.7); }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+  .big-stat { padding: 1.5rem 0; border-top: 1px solid rgba(247,241,230,0.18); }
+  .big-stat b { font-family: var(--serif); font-size: clamp(2.6rem, 5vw, 4rem); font-weight: 500; display: block; line-height: 1; color: var(--paper); }
+  .big-stat b em { font-style: normal; color: var(--terra-soft); font-size: 0.6em; }
+  .big-stat span { font-size: 0.92rem; color: rgba(247,241,230,0.65); display: block; margin-top: 0.7rem; }
+
+  /* ---------- FAQ teaser ---------- */
+  .faq { background: var(--ink); color: var(--paper); padding-top: 0; }
+  .faq-wrap { border-top: 1px solid rgba(247,241,230,0.18); padding-top: 4rem; }
+  .faq-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 4rem; }
+  .faq-list .item { border-bottom: 1px solid rgba(247,241,230,0.16); }
+  .faq-q {
+    width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+    color: var(--paper); font-family: var(--serif); font-size: 1.3rem; font-weight: 400;
+    padding: 1.4rem 0; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+  }
+  .faq-q .pm { color: var(--terra-soft); font-size: 1.4rem; transition: transform 0.3s; flex-shrink: 0; }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.45s ease, padding 0.45s ease; }
+  .faq-a p { color: rgba(247,241,230,0.72); font-size: 0.96rem; padding-bottom: 0.2rem; }
+  .item.open .faq-a { max-height: 240px; padding-bottom: 1.4rem; }
+  .item.open .faq-q .pm { transform: rotate(45deg); }
+
+  /* ---------- CTA ---------- */
+  .cta { background: var(--terra); color: var(--paper); text-align: center; overflow: hidden; }
+  .cta .blob-c { position: absolute; width: 600px; height: 600px; border-radius: 46% 54% 60% 40% / 58% 44% 56% 42%; background: rgba(247,241,230,0.08); top: -200px; left: 50%; transform: translateX(-50%); }
+  .cta-inner { position: relative; z-index: 2; max-width: 720px; margin: 0 auto; }
+  .cta h2 { color: var(--paper); font-size: clamp(2.2rem, 5vw, 3.6rem); margin-bottom: 1.3rem; }
+  .cta h2 em { font-style: italic; }
+  .cta p { color: rgba(247,241,230,0.85); font-size: 1.1rem; margin-bottom: 2.4rem; max-width: 48ch; margin-left: auto; margin-right: auto; }
+  .cta .btn-primary { background: var(--paper); color: var(--terra); }
+  .cta .btn-primary:hover { background: #fff; }
+  .cta .btn-ghost { border-color: rgba(247,241,230,0.4); color: var(--paper); }
+  .cta .btn-ghost:hover { background: rgba(247,241,230,0.12); }
+  .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  /* ---------- FOOTER ---------- */
+  footer { background: var(--sand-deep); padding: 4.5rem 0 2.5rem; }
+  .foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 2.5rem; margin-bottom: 3rem; }
+  .foot-brand .logo { margin-bottom: 1rem; }
+  .foot-brand p { font-size: 0.92rem; color: var(--ink-soft); max-width: 34ch; }
+  .foot-col h5 { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); margin-bottom: 1.1rem; }
+  .foot-col a { display: block; font-size: 0.92rem; color: var(--ink-soft); padding: 0.32rem 0; transition: color 0.2s; }
+  .foot-col a:hover { color: var(--terra); }
+  .foot-bottom { border-top: 1px solid var(--line); padding-top: 1.8rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; font-size: 0.82rem; color: var(--ink-soft); }
+  .foot-note { font-size: 0.76rem; color: var(--ink-soft); opacity: 0.8; margin-top: 0.8rem; max-width: 60ch; line-height: 1.6; }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(34px); }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .hero-art { height: 420px; max-width: 480px; }
+    .type-grid { grid-template-columns: 1fr 1fr; }
+    .feat-grid { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 2.5rem; }
+    .how-art { height: 420px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+    .faq-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 620px) {
+    .nav-links { display: none; }
+    .menu-toggle { display: block; }
+    .hero { padding: 9rem 0 4rem; }
+    .pad { padding: 4.5rem 0; }
+    .type-grid, .feat-grid { grid-template-columns: 1fr; }
+    .hero-foot { gap: 1.4rem; }
+    .hero-foot .sep { display: none; }
+    .foot-grid { grid-template-columns: 1fr; }
+    .hero-art { height: 380px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1 !important; transform: none !important; }
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header id="header">
+  <div class="wrap nav">
+    <a href="#top" class="logo"><span class="dot"></span>랭크스튜디오</a>
+    <nav class="nav-links">
+      <a href="#types">캠페인 유형</a>
+      <a href="#how">작동 방식</a>
+      <a href="#trust">성과</a>
+      <a href="#faq">자주 묻는 질문</a>
+      <a href="#cta" class="btn btn-primary nav-cta">시작하기 <span class="arrow">→</span></a>
+    </nav>
+    <button class="menu-toggle" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow reveal">AI 기반 셀프 캠페인</span>
+        <h1 class="display reveal">AI 기반 초고도화<br /><em>리워드 트래픽</em> 셀프 생성</h1>
+        <p class="lead reveal">상품과 로컬 매장이 검색에서 더 잘 발견되도록. URL·키워드·기간·유입 규모를 직접 설정하고, 결제 후 진행 상황과 리포트를 한곳에서 확인하세요.</p>
+        <div class="hero-actions reveal">
+          <a href="#cta" class="btn btn-primary">무료로 캠페인 만들기 <span class="arrow">→</span></a>
+          <a href="#how" class="btn btn-ghost">작동 방식 보기</a>
+        </div>
+        <div class="hero-foot reveal">
+          <div class="stat"><b>12,400+</b><span>진행된 셀프 캠페인</span></div>
+          <div class="sep"></div>
+          <div class="stat"><b>실사용자</b><span>리워드·제휴 기반 유입</span></div>
+          <div class="sep"></div>
+          <div class="stat"><b>실시간</b><span>진행·리포트 대시보드</span></div>
+        </div>
+      </div>
+      <div class="hero-art reveal">
+        <div class="hero-photo hp-main"><img src="https://picsum.photos/seed/rankstudio-warm-cafe/720/900" alt="따뜻한 톤의 로컬 매장 풍경" loading="eager" /></div>
+        <div class="hero-photo hp-sub"><img src="https://picsum.photos/seed/rankstudio-handcraft/520/480" alt="제품을 손질하는 소상공인" loading="eager" /></div>
+        <div class="hero-chip">
+          <div class="ic">↗</div>
+          <div><b>+38%</b><span>평균 유입 상승폭</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <svg class="arch-top" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,120 L0,60 Q720,-40 1440,60 L1440,120 Z" fill="#f7f1e6" />
+  </svg>
+
+  <!-- CAMPAIGN TYPES -->
+  <section class="types pad" id="types">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">캠페인 유형</span>
+        <h2>발견되는 방식을, 직접 고르세요</h2>
+        <p>쇼핑몰 상품부터 동네 매장까지. 목표에 맞춰 유입 캠페인 유형을 선택하고 세부 조건을 직접 설정합니다.</p>
+      </div>
+      <div class="type-grid">
+        <article class="type-card reveal">
+          <div class="ph"><img src="https://picsum.photos/seed/rankstudio-shop-product/600/420" alt="감각적인 상품 진열" /></div>
+          <div class="body">
+            <span class="type-tag">상품 캠페인</span>
+            <h3>마켓 상품 유입</h3>
+            <p>판매 중인 상품 URL과 핵심 키워드를 등록하면, 실사용자 기반 리워드 트래픽으로 노출 기회를 넓힙니다.</p>
+          </div>
+        </article>
+        <article class="type-card reveal">
+          <div class="ph"><img src="https://picsum.photos/seed/rankstudio-local-store/600/420" alt="따뜻한 로컬 매장 입구" /></div>
+          <div class="body">
+            <span class="type-tag">로컬 캠페인</span>
+            <h3>로컬 매장 발견</h3>
+            <p>지역 검색에서 매장이 더 잘 보이도록. 방문 의향이 있는 실사용자에게 자연스럽게 닿게 합니다.</p>
+          </div>
+        </article>
+        <article class="type-card reveal">
+          <div class="ph"><img src="https://picsum.photos/seed/rankstudio-keyword-search/600/420" alt="키워드를 검토하는 모습" /></div>
+          <div class="body">
+            <span class="type-tag">키워드 캠페인</span>
+            <h3>키워드 유입 설계</h3>
+            <p>원하는 키워드·기간·유입 규모를 직접 설정. AI가 자연스러운 유입 흐름을 분배하도록 돕습니다.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features pad">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">왜 랭크스튜디오인가</span>
+        <h2>설정은 간단하게, 결과는 투명하게</h2>
+        <p>AI가 캠페인 조건을 해석해 유입 흐름을 설계하고, 모든 진행 상황을 숨김 없이 보여줍니다.</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat reveal">
+          <div class="ic">⚙</div>
+          <h4>셀프 설정</h4>
+          <p>URL·키워드·기간·유입 규모를 직접 입력. 대행 없이 처음부터 끝까지 스스로 운영합니다.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="ic">✦</div>
+          <h4>AI 유입 설계</h4>
+          <p>AI가 키워드와 목표를 해석해 자연스러운 유입 패턴과 분배 일정을 제안합니다.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="ic">◷</div>
+          <h4>실시간 리포트</h4>
+          <p>유입 추이와 진행률을 대시보드에서 실시간으로 확인. 언제든 캠페인을 조정합니다.</p>
+        </div>
+        <div class="feat reveal">
+          <div class="ic">♥</div>
+          <h4>실사용자 기반</h4>
+          <p>리워드·제휴로 참여하는 실사용자 유입. 사람이 직접 움직이는 트래픽입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how pad" id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">작동 방식</span>
+        <h2>네 단계면, 캠페인이 살아납니다</h2>
+      </div>
+      <div class="steps">
+        <div class="step-list">
+          <div class="step reveal"><span class="num">01</span><h4>대상 등록</h4><p>홍보할 상품 URL이나 매장 정보를 입력하고 핵심 키워드를 등록합니다.</p></div>
+          <div class="step reveal"><span class="num">02</span><h4>조건 설정</h4><p>기간과 유입 규모를 직접 정하면, AI가 권장 유입 흐름을 제안합니다.</p></div>
+          <div class="step reveal"><span class="num">03</span><h4>결제 후 시작</h4><p>설정한 캠페인을 결제하면 곧바로 진행이 시작됩니다.</p></div>
+          <div class="step reveal"><span class="num">04</span><h4>진행·리포트 확인</h4><p>실시간 대시보드에서 유입 추이를 확인하고 필요하면 조정합니다.</p></div>
+        </div>
+        <div class="how-art reveal">
+          <div class="photo ha-1"><img src="https://picsum.photos/seed/rankstudio-workspace-warm/640/620" alt="따뜻한 작업 공간에서 캠페인을 설정하는 모습" /></div>
+          <div class="photo ha-2"><img src="https://picsum.photos/seed/rankstudio-coffee-laptop/420/360" alt="노트북으로 리포트를 확인하는 모습" /></div>
+          <div class="how-badge"><b>실시간</b><span>진행률 트래킹</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STATS -->
+  <section class="trust pad" id="trust">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow">신뢰할 수 있는 성과</span>
+        <h2>숫자로 보는 랭크스튜디오</h2>
+        <p>수많은 소상공인과 셀러가 직접 캠페인을 만들고, 결과를 눈으로 확인했습니다.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="big-stat reveal"><b>12,400<em>+</em></b><span>진행된 셀프 캠페인</span></div>
+        <div class="big-stat reveal"><b>38<em>%</em></b><span>평균 유입 상승폭</span></div>
+        <div class="big-stat reveal"><b>4.8<em>/5</em></b><span>이용자 만족도</span></div>
+        <div class="big-stat reveal"><b>24<em>시간</em></b><span>평균 캠페인 시작 시간</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ TEASER -->
+  <section class="faq pad" id="faq">
+    <div class="wrap faq-wrap">
+      <div class="faq-grid">
+        <div class="reveal">
+          <span class="eyebrow">자주 묻는 질문</span>
+          <h2 style="color:var(--paper); font-size:clamp(1.8rem,3.5vw,2.6rem); margin-top:1rem;">궁금한 점을<br />먼저 풀어 드릴게요</h2>
+          <p style="color:rgba(247,241,230,0.7); margin-top:1rem;">더 자세한 내용은 도움말 센터에서 확인할 수 있습니다.</p>
+          <a href="#cta" class="btn btn-primary" style="margin-top:1.6rem; background:var(--terra-soft); color:var(--ink);">전체 FAQ 보기 <span class="arrow">→</span></a>
+        </div>
+        <div class="faq-list">
+          <div class="item reveal"><button class="faq-q">리워드 트래픽이 정확히 무엇인가요?<span class="pm">+</span></button><div class="faq-a"><p>리워드·제휴 프로그램에 참여하는 실사용자가 직접 만들어 내는 유입을 뜻합니다. 사람이 실제로 움직이는 트래픽으로, 캠페인 조건에 맞춰 자연스럽게 분배됩니다.</p></div></div>
+          <div class="item reveal"><button class="faq-q">설정은 어렵지 않나요?<span class="pm">+</span></button><div class="faq-a"><p>URL·키워드·기간·유입 규모만 입력하면 됩니다. AI가 권장 흐름을 제안하므로, 처음이라도 몇 분 안에 캠페인을 만들 수 있습니다.</p></div></div>
+          <div class="item reveal"><button class="faq-q">진행 상황은 어떻게 확인하나요?<span class="pm">+</span></button><div class="faq-a"><p>결제 후 캠페인이 시작되면, 실시간 대시보드에서 유입 추이와 진행률을 확인할 수 있습니다. 필요할 때 언제든 조건을 조정하세요.</p></div></div>
+          <div class="item reveal"><button class="faq-q">어떤 비즈니스에 적합한가요?<span class="pm">+</span></button><div class="faq-a"><p>온라인에서 상품을 판매하는 마켓 셀러부터 오프라인 로컬 매장까지. 검색에서 더 잘 발견되고 싶은 모든 비즈니스에 맞습니다.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta pad" id="cta">
+    <div class="blob-c"></div>
+    <div class="wrap cta-inner reveal">
+      <span class="eyebrow" style="color:rgba(247,241,230,0.85);">지금 시작하기</span>
+      <h2 style="margin-top:1.2rem;">오늘, 첫 캠페인을<br /><em>직접</em> 만들어 보세요</h2>
+      <p>설정부터 리포트까지, 모든 과정을 스스로. AI가 곁에서 유입 흐름을 함께 설계합니다.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn btn-primary">무료로 시작하기 <span class="arrow">→</span></a>
+        <a href="#how" class="btn btn-ghost">작동 방식 다시 보기</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#top" class="logo"><span class="dot"></span>랭크스튜디오</a>
+        <p>AI 기반 셀프 캠페인 플랫폼. 상품과 로컬 매장이 검색에서 더 잘 발견되도록 돕습니다.</p>
+      </div>
+      <div class="foot-col">
+        <h5>제품</h5>
+        <a href="#types">캠페인 유형</a>
+        <a href="#how">작동 방식</a>
+        <a href="#trust">성과</a>
+        <a href="#cta">요금 안내</a>
+      </div>
+      <div class="foot-col">
+        <h5>리소스</h5>
+        <a href="#faq">자주 묻는 질문</a>
+        <a href="#">도움말 센터</a>
+        <a href="#">가이드</a>
+        <a href="#">블로그</a>
+      </div>
+      <div class="foot-col">
+        <h5>회사</h5>
+        <a href="#">소개</a>
+        <a href="#">문의하기</a>
+        <a href="#">이용약관</a>
+        <a href="#">개인정보처리방침</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 랭크스튜디오. All rights reserved.</span>
+      <span>판매자 채널 안내 · <a href="https://seller-channel.example/guide" style="color:var(--terra);">seller-channel.example</a></span>
+    </div>
+    <p class="foot-note">랭크스튜디오는 리워드·제휴에 참여하는 실사용자 기반 유입 캠페인을 제공합니다. 검색 노출은 외부 서비스 정책과 사용자 반응에 따라 달라질 수 있습니다.</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script>
+(function () {
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // header scroll state
+  var header = document.getElementById("header");
+  function onScroll() {
+    if (window.scrollY > 24) header.classList.add("scrolled");
+    else header.classList.remove("scrolled");
+  }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  // FAQ accordion
+  document.querySelectorAll(".faq-q").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      btn.parentElement.classList.toggle("open");
+    });
+  });
+
+  if (reduced) return;
+
+  // Lenis smooth scroll
+  var lenis = null;
+  if (window.Lenis) {
+    lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+    function raf(t) { lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+
+  // GSAP reveals
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    if (lenis) lenis.on("scroll", ScrollTrigger.update);
+
+    // hero intro
+    gsap.to(".hero .reveal", {
+      opacity: 1, y: 0, duration: 1, ease: "power3.out", stagger: 0.12, delay: 0.15
+    });
+
+    // scroll reveals (skip hero, handled above)
+    gsap.utils.toArray(".reveal").forEach(function (el) {
+      if (el.closest(".hero")) return;
+      gsap.to(el, {
+        opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 86%" }
+      });
+    });
+
+    // gentle parallax on hero photos
+    gsap.to(".hp-sub", { y: -40, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    gsap.to(".blob-1", { y: 80, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+    gsap.to(".ha-2", { y: -36, ease: "none", scrollTrigger: { trigger: ".how", start: "top bottom", end: "bottom top", scrub: true } });
+  }
+})();
+</script>
+</body>
+</html>
