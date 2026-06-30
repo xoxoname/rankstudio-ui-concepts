@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크스튜디오 — 직접 만드는 발견성 캠페인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --ink:#16181d;
+    --ink-2:#41454d;
+    --ink-3:#6b7079;
+    --line:#e6e8ec;
+    --line-2:#d6d9df;
+    --bg:#ffffff;
+    --bg-soft:#f6f7f9;
+    --bg-soft-2:#f0f2f5;
+    --accent:#1f6feb;
+    --accent-ink:#16498f;
+    --accent-soft:#eaf2ff;
+    --pos:#1d8a5a;
+    --pos-soft:#e8f6ef;
+    --neg:#9aa0a8;
+    --radius:14px;
+    --radius-sm:10px;
+    --maxw:1120px;
+    --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    --tnum:"tnum" 1,"lnum" 1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.65;
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    word-break:keep-all;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .tnum{font-feature-settings:var(--tnum)}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{letter-spacing:-0.02em;line-height:1.3;word-break:keep-all}
+
+  /* sticky header */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,0.86);
+    backdrop-filter:saturate(180%) blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:18px;letter-spacing:-0.02em}
+  .brand .mark{
+    width:26px;height:26px;border-radius:7px;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700
+  }
+  .nav-links{display:flex;align-items:center;gap:26px}
+  .nav-links a{font-size:14.5px;color:var(--ink-2);font-weight:500}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .trust-mini{font-size:13px;color:var(--ink-3);font-weight:500}
+  .trust-mini b{color:var(--ink);font-weight:600;font-feature-settings:var(--tnum)}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    font-family:var(--font);font-weight:600;font-size:15px;letter-spacing:-0.01em;
+    border-radius:11px;cursor:pointer;border:1px solid transparent;
+    transition:transform .12s ease,background .15s ease,box-shadow .15s ease;
+    white-space:nowrap;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--accent);color:#fff;padding:11px 20px;box-shadow:0 1px 2px rgba(31,111,235,.25)}
+  .btn-primary:hover{background:#195fcc}
+  .btn-primary.lg{padding:15px 28px;font-size:16.5px;border-radius:13px}
+  .btn-ghost{background:#fff;color:var(--ink);border-color:var(--line-2);padding:11px 18px}
+  .btn-ghost:hover{background:var(--bg-soft);border-color:#c2c6cd}
+  .btn-ghost.lg{padding:15px 26px;font-size:16.5px;border-radius:13px}
+
+  /* hero */
+  .hero{padding:76px 0 60px;text-align:center}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:13px;font-weight:600;color:var(--accent-ink);
+    background:var(--accent-soft);border:1px solid #d4e4ff;
+    padding:6px 13px;border-radius:999px;margin-bottom:22px;letter-spacing:-0.01em
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  h1{font-size:clamp(26px,3.4vw,42px);font-weight:700;margin:0 auto 18px;max-width:14em}
+  .hero-sub{font-size:clamp(16px,1.4vw,18px);color:var(--ink-2);max-width:30em;margin:0 auto 30px;line-height:1.6}
+  .hero-cta{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .hero-trust{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-3)}
+  .hero-trust span{display:inline-flex;align-items:center;gap:6px}
+  .hero-trust .ck{color:var(--pos);font-weight:700}
+
+  /* section frame */
+  section{padding:64px 0}
+  .sec-head{text-align:center;max-width:34em;margin:0 auto 44px}
+  .sec-tag{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:11px}
+  .sec-head h2{font-size:clamp(23px,2.6vw,32px);font-weight:700;margin-bottom:14px}
+  .sec-head p{font-size:16px;color:var(--ink-2)}
+
+  .compare{background:var(--bg-soft)}
+
+  /* comparison table */
+  .cmp-block{margin-bottom:56px}
+  .cmp-block:last-child{margin-bottom:0}
+  .cmp-label{
+    display:flex;align-items:center;gap:10px;justify-content:center;
+    font-size:15px;font-weight:600;color:var(--ink-2);margin-bottom:20px
+  }
+  .cmp-label .vs{
+    font-size:12px;font-weight:700;color:var(--ink-3);background:#fff;border:1px solid var(--line-2);
+    padding:3px 10px;border-radius:999px;letter-spacing:0.02em
+  }
+  .ctable{
+    width:100%;border-collapse:separate;border-spacing:0;
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;
+    font-feature-settings:var(--tnum)
+  }
+  .ctable th,.ctable td{padding:17px 20px;text-align:left;vertical-align:middle;border-bottom:1px solid var(--line)}
+  .ctable tr:last-child th,.ctable tr:last-child td{border-bottom:none}
+  .ctable thead th{background:var(--bg-soft-2);font-size:13.5px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--line-2)}
+  .ctable thead th.col-rs{background:var(--accent-soft);color:var(--accent-ink)}
+  .ctable thead th .col-tag{display:block;font-size:11.5px;font-weight:600;color:var(--ink-3);margin-top:2px}
+  .ctable thead th.col-rs .col-tag{color:var(--accent)}
+  .ctable .rowname{font-size:14.5px;font-weight:600;color:var(--ink);width:30%}
+  .ctable .rowname .rh{display:block;font-size:12.5px;font-weight:400;color:var(--ink-3);margin-top:1px}
+  .ctable td{font-size:14.5px;color:var(--ink-2)}
+  .ctable td.cell-rs{background:#fafcff;color:var(--ink);font-weight:500;border-left:1px solid #e2ecfb;border-right:1px solid #e2ecfb}
+  .ctable tr:last-child td.cell-rs{border-bottom:none}
+  .ico{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;margin-right:8px;vertical-align:-4px;font-size:12px;font-weight:800;flex:0 0 auto}
+  .ico.pos{background:var(--pos-soft);color:var(--pos)}
+  .ico.neg{background:#f0f1f3;color:var(--neg)}
+  .cell-line{display:flex;align-items:flex-start}
+  .cell-line .ico{margin-top:1px}
+  .cmp-after{text-align:center;margin-top:26px}
+
+  /* mobile card variant (hidden on desktop) */
+  .cmp-cards{display:none}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px 22px}
+  .step .num{
+    width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-bottom:16px;
+    font-feature-settings:var(--tnum)
+  }
+  .step h3{font-size:16.5px;font-weight:600;margin-bottom:7px}
+  .step p{font-size:14px;color:var(--ink-2);line-height:1.6}
+
+  /* stats */
+  .stats{background:var(--ink);color:#fff}
+  .stats .sec-head h2{color:#fff}
+  .stats .sec-head p{color:#aeb3bc}
+  .stats .sec-tag{color:#6ea2ff}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .stat{background:#1e2128;border:1px solid #2c3038;border-radius:var(--radius);padding:26px 22px;text-align:center}
+  .stat .big{font-size:34px;font-weight:700;letter-spacing:-0.02em;font-feature-settings:var(--tnum);line-height:1.1;margin-bottom:8px}
+  .stat .lbl{font-size:13.5px;color:#aeb3bc;line-height:1.5}
+  .stats-note{text-align:center;font-size:12.5px;color:#7e848e;margin-top:24px}
+
+  /* faq */
+  .faq-list{max-width:760px;margin:0 auto;border-top:1px solid var(--line)}
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-q{
+    width:100%;text-align:left;background:none;border:none;cursor:pointer;
+    font-family:var(--font);font-size:16.5px;font-weight:600;color:var(--ink);
+    padding:22px 4px;display:flex;align-items:center;justify-content:space-between;gap:16px;letter-spacing:-0.01em
+  }
+  .faq-q .chev{flex:0 0 auto;color:var(--ink-3);transition:transform .2s ease;font-size:18px}
+  .faq-item[open] .faq-q .chev{transform:rotate(180deg)}
+  .faq-a{padding:0 4px 22px;font-size:15px;color:var(--ink-2);line-height:1.7;max-width:62em}
+  details summary{list-style:none}
+  details summary::-webkit-details-marker{display:none}
+
+  /* final cta */
+  .final{text-align:center;background:var(--bg-soft);border-top:1px solid var(--line)}
+  .final h2{font-size:clamp(24px,2.8vw,34px);font-weight:700;margin-bottom:14px}
+  .final p{font-size:16.5px;color:var(--ink-2);margin-bottom:28px;max-width:30em;margin-left:auto;margin-right:auto}
+  .final .hero-trust{margin-top:18px}
+
+  /* footer */
+  footer{padding:46px 0 56px;border-top:1px solid var(--line);background:#fff}
+  .foot{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
+  .foot .brand{margin-bottom:12px}
+  .foot-col h4{font-size:13px;font-weight:600;color:var(--ink-3);margin-bottom:12px;letter-spacing:0.02em}
+  .foot-col a{display:block;font-size:14px;color:var(--ink-2);margin-bottom:9px}
+  .foot-col a:hover{color:var(--ink)}
+  .foot-left{max-width:300px}
+  .foot-left p{font-size:13.5px;color:var(--ink-3);line-height:1.6}
+  .foot-cols{display:flex;gap:54px;flex-wrap:wrap}
+  .foot-bottom{margin-top:36px;padding-top:24px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);line-height:1.7}
+
+  /* responsive */
+  @media (max-width:900px){
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .stat-grid{grid-template-columns:repeat(2,1fr)}
+    .nav-links{display:none}
+  }
+  @media (max-width:768px){
+    .ctable{display:none}
+    .cmp-cards{display:block}
+    .cmp-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+    .cmp-card .crow{font-size:14.5px;font-weight:600;color:var(--ink);padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+    .cmp-card .crow .rh{display:block;font-size:12.5px;font-weight:400;color:var(--ink-3);margin-top:1px}
+    .cmp-opt{display:flex;align-items:flex-start;gap:10px;padding:8px 0}
+    .cmp-opt .otag{flex:0 0 92px;font-size:12.5px;font-weight:600;color:var(--ink-3)}
+    .cmp-opt.is-rs .otag{color:var(--accent)}
+    .cmp-opt .otxt{font-size:14px;color:var(--ink-2);flex:1}
+    .cmp-opt.is-rs .otxt{color:var(--ink);font-weight:500}
+  }
+  @media (max-width:520px){
+    .wrap{padding:0 18px}
+    .hero{padding:52px 0 44px}
+    section{padding:48px 0}
+    .trust-mini{display:none}
+    .nav-cta .btn-ghost{display:none}
+    .hero-cta .btn{width:100%}
+    .foot-cols{gap:32px}
+  }
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a href="#top" class="brand"><span class="mark">랭</span>랭크스튜디오</a>
+    <nav class="nav-links">
+      <a href="#compare">비교</a>
+      <a href="#how">작동 방식</a>
+      <a href="#stats">신뢰</a>
+      <a href="#faq">자주 묻는 질문</a>
+    </nav>
+    <div class="nav-cta">
+      <span class="trust-mini">평균 셋업 <b>4분</b> · 카드 없이 시작</span>
+      <a href="#start" class="btn btn-ghost">데모 보기</a>
+      <a href="#start" class="btn btn-primary">직접 만들어보기</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" id="start">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot"></span>대행사 없이, 직접 만드는 발견성 캠페인</span>
+      <h1>맡기지 말고 직접 만드세요. 노출은 데이터로, 비용은 투명하게.</h1>
+      <p class="hero-sub">
+        쇼핑·마켓·로컬 검색에서 더 잘 발견되도록, URL과 키워드·기간·유입 규모만 설정하면
+        실사용자 유입 캠페인이 시작됩니다. 진행 상황과 리포트는 실시간으로 직접 확인하세요.
+      </p>
+      <div class="hero-cta">
+        <a href="#compare" class="btn btn-primary lg">직접 만들어보기</a>
+        <a href="#how" class="btn btn-ghost lg">작동 방식 보기</a>
+      </div>
+      <div class="hero-trust">
+        <span><span class="ck">✓</span> 신용카드 없이 캠페인 미리 설계</span>
+        <span><span class="ck">✓</span> 설정부터 결제까지 평균 4분</span>
+        <span><span class="ck">✓</span> 비용·진행 100% 대시보드 공개</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section class="compare" id="compare">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">한눈에 비교</div>
+        <h2>맡길 때와 직접 할 때, 무엇이 달라지나요</h2>
+        <p>항목별로 나란히 놓고 보면 차이가 분명합니다. 표를 본 다음, 직접 한 번 설계해 보세요.</p>
+      </div>
+
+      <!-- block 1 -->
+      <div class="cmp-block">
+        <div class="cmp-label">대행사에 맡기기 <span class="vs">VS</span> 랭크스튜디오로 직접</div>
+
+        <table class="ctable">
+          <thead>
+            <tr>
+              <th class="rowname-h"> </th>
+              <th>대행사에 맡기기<span class="col-tag">중간 단계를 거쳐 진행</span></th>
+              <th class="col-rs">랭크스튜디오 셀프<span class="col-tag">내가 직접 설정·운영</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rowname">비용 구조<span class="rh">집행액 대비 부담</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>대행 수수료가 별도로 붙는 경우가 많음</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>설정한 금액만 결제, 항목별로 표시</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">시작 속도<span class="rh">의뢰부터 시작까지</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>견적·협의·발주 등 대기 시간 발생</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>직접 설정 후 결제하면 바로 진행</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">투명성<span class="rh">무엇이 어떻게 진행되나</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>요청해야 중간 보고를 받는 구조</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>진행 현황을 대시보드에서 상시 확인</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">직접 통제<span class="rh">설정 변경의 자유도</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>변경마다 담당자에게 재요청 필요</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>키워드·기간·규모를 내가 직접 조정</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">리포트<span class="rh">결과 확인 방식</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>정해진 주기에 정리본으로 전달</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>실시간 리포트를 언제든 직접 열람</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- mobile cards -->
+        <div class="cmp-cards">
+          <div class="cmp-card">
+            <div class="crow">비용 구조<span class="rh">집행액 대비 부담</span></div>
+            <div class="cmp-opt"><span class="otag">맡기기</span><span class="otxt">대행 수수료가 별도로 붙는 경우가 많음</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">랭크스튜디오</span><span class="otxt">설정한 금액만 결제, 항목별로 표시</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">시작 속도<span class="rh">의뢰부터 시작까지</span></div>
+            <div class="cmp-opt"><span class="otag">맡기기</span><span class="otxt">견적·협의·발주 등 대기 시간 발생</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">랭크스튜디오</span><span class="otxt">직접 설정 후 결제하면 바로 진행</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">투명성<span class="rh">무엇이 어떻게 진행되나</span></div>
+            <div class="cmp-opt"><span class="otag">맡기기</span><span class="otxt">요청해야 중간 보고를 받는 구조</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">랭크스튜디오</span><span class="otxt">진행 현황을 대시보드에서 상시 확인</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">직접 통제<span class="rh">설정 변경의 자유도</span></div>
+            <div class="cmp-opt"><span class="otag">맡기기</span><span class="otxt">변경마다 담당자에게 재요청 필요</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">랭크스튜디오</span><span class="otxt">키워드·기간·규모를 내가 직접 조정</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">리포트<span class="rh">결과 확인 방식</span></div>
+            <div class="cmp-opt"><span class="otag">맡기기</span><span class="otxt">정해진 주기에 정리본으로 전달</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">랭크스튜디오</span><span class="otxt">실시간 리포트를 언제든 직접 열람</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- block 2 -->
+      <div class="cmp-block">
+        <div class="cmp-label">그냥 두기 <span class="vs">VS</span> 유입 캠페인 진행</div>
+
+        <table class="ctable">
+          <thead>
+            <tr>
+              <th class="rowname-h"> </th>
+              <th>그냥 두기<span class="col-tag">자연 노출에만 의존</span></th>
+              <th class="col-rs">유입 캠페인 진행<span class="col-tag">의도한 키워드로 노출 확대</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rowname">발견 가능성<span class="rh">검색에서 보이는 정도</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>경쟁 페이지에 밀려 노출이 제한될 수 있음</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>설정한 키워드 기준으로 노출 기회를 확대</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">유입 규모 예측<span class="rh">계획 가능 여부</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>유입량을 미리 가늠하기 어려움</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>기간·규모를 직접 설정해 예측 가능</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">유입 품질<span class="rh">실제 방문 여부</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>유입 경로를 따로 확인하기 어려움</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>실사용자 유입을 리포트에서 확인</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">데이터 확보<span class="rh">개선에 쓸 자료</span></td>
+              <td><span class="cell-line"><span class="ico neg">–</span>비교·복기에 쓸 데이터가 부족</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>키워드·기간별 결과를 축적해 다음에 활용</span></td>
+            </tr>
+            <tr>
+              <td class="rowname">투입 비용<span class="rh">초기 진입 장벽</span></td>
+              <td><span class="cell-line"><span class="ico pos">✓</span>당장의 비용은 없음</span></td>
+              <td class="cell-rs"><span class="cell-line"><span class="ico pos">✓</span>설정한 예산 안에서만 집행, 상한 명확</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="cmp-cards">
+          <div class="cmp-card">
+            <div class="crow">발견 가능성<span class="rh">검색에서 보이는 정도</span></div>
+            <div class="cmp-opt"><span class="otag">그냥 두기</span><span class="otxt">경쟁 페이지에 밀려 노출이 제한될 수 있음</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">캠페인 진행</span><span class="otxt">설정한 키워드 기준으로 노출 기회를 확대</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">유입 규모 예측<span class="rh">계획 가능 여부</span></div>
+            <div class="cmp-opt"><span class="otag">그냥 두기</span><span class="otxt">유입량을 미리 가늠하기 어려움</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">캠페인 진행</span><span class="otxt">기간·규모를 직접 설정해 예측 가능</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">유입 품질<span class="rh">실제 방문 여부</span></div>
+            <div class="cmp-opt"><span class="otag">그냥 두기</span><span class="otxt">유입 경로를 따로 확인하기 어려움</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">캠페인 진행</span><span class="otxt">실사용자 유입을 리포트에서 확인</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">데이터 확보<span class="rh">개선에 쓸 자료</span></div>
+            <div class="cmp-opt"><span class="otag">그냥 두기</span><span class="otxt">비교·복기에 쓸 데이터가 부족</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">캠페인 진행</span><span class="otxt">키워드·기간별 결과를 축적해 다음에 활용</span></div>
+          </div>
+          <div class="cmp-card">
+            <div class="crow">투입 비용<span class="rh">초기 진입 장벽</span></div>
+            <div class="cmp-opt"><span class="otag">그냥 두기</span><span class="otxt">당장의 비용은 없음</span></div>
+            <div class="cmp-opt is-rs"><span class="otag">캠페인 진행</span><span class="otxt">설정한 예산 안에서만 집행, 상한 명확</span></div>
+          </div>
+        </div>
+
+        <div class="cmp-after">
+          <a href="#start" class="btn btn-primary lg">직접 만들어보기</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">작동 방식</div>
+        <h2>설정에서 리포트까지, 4단계</h2>
+        <p>복잡한 협의 없이, 화면을 따라 입력하면 끝납니다.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <h3>대상 설정</h3>
+          <p>홍보할 페이지 URL을 입력합니다. 예: seller-channel.example</p>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <h3>키워드·기간</h3>
+          <p>노출을 늘리고 싶은 키워드와 진행 기간을 직접 선택합니다.</p>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <h3>규모·결제</h3>
+          <p>유입 규모를 정하면 예상 비용이 표시됩니다. 설정한 금액만 결제합니다.</p>
+        </div>
+        <div class="step">
+          <div class="num">4</div>
+          <h3>진행·리포트</h3>
+          <p>진행 상황과 결과 리포트를 대시보드에서 실시간으로 확인합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats" id="stats">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">신뢰할 수 있는 기준</div>
+        <h2>운영 데이터로 보여드립니다</h2>
+        <p>막연한 약속 대신, 실제 운영에서 확인된 지표를 공개합니다.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="big tnum">4분</div>
+          <div class="lbl">캠페인 설정부터<br>결제까지 평균 소요 시간</div>
+        </div>
+        <div class="stat">
+          <div class="big tnum">100%</div>
+          <div class="lbl">집행 비용·진행 현황<br>대시보드 공개 비율</div>
+        </div>
+        <div class="stat">
+          <div class="big tnum">실시간</div>
+          <div class="lbl">유입·노출 리포트<br>업데이트 주기</div>
+        </div>
+        <div class="stat">
+          <div class="big tnum">0원</div>
+          <div class="lbl">캠페인을 설계하고<br>미리 확인하는 데 드는 비용</div>
+        </div>
+      </div>
+      <p class="stats-note">표시 수치는 플랫폼 운영 기준값이며, 실제 결과는 키워드·기간·시장 상황에 따라 달라질 수 있습니다.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="sec-tag">자주 묻는 질문</div>
+        <h2>궁금한 점을 미리 정리했습니다</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item" open>
+          <summary class="faq-q">‘리워드 트래픽’은 정확히 무엇인가요?<span class="chev">⌄</span></summary>
+          <div class="faq-a">설정한 키워드와 페이지를 통해 들어오는 실사용자 유입을 뜻합니다. 자동 생성된 가짜 트래픽이 아니라, 실제 사용자의 방문을 기반으로 하며 유입 경로는 리포트에서 확인할 수 있습니다.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">대행사 없이 정말 직접 할 수 있나요?<span class="chev">⌄</span></summary>
+          <div class="faq-a">네. URL, 키워드, 기간, 유입 규모만 입력하면 캠페인이 구성됩니다. 별도 협의나 발주 과정 없이 화면에서 직접 설정하고 결제하면 바로 진행됩니다.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">비용은 어떻게 책정되나요?<span class="chev">⌄</span></summary>
+          <div class="faq-a">설정한 유입 규모와 기간에 따라 예상 비용이 결제 전에 표시됩니다. 설정한 금액 안에서만 집행되며, 항목별 사용 내역은 대시보드에서 확인할 수 있습니다.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">진행 상황은 어떻게 확인하나요?<span class="chev">⌄</span></summary>
+          <div class="faq-a">로그인 후 대시보드에서 진행 현황과 리포트를 실시간으로 볼 수 있습니다. 노출·유입 추이를 키워드·기간별로 확인하고, 다음 캠페인 설계에 참고할 수 있습니다.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">어떤 페이지에 활용할 수 있나요?<span class="chev">⌄</span></summary>
+          <div class="faq-a">쇼핑·마켓·로컬 검색에서 더 잘 발견되었으면 하는 페이지라면 활용할 수 있습니다. 판매 채널 페이지, 매장 정보 페이지 등 공개된 URL을 대상으로 설정하면 됩니다.</div>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">결제 전에 미리 살펴볼 수 있나요?<span class="chev">⌄</span></summary>
+          <div class="faq-a">네. 카드 정보 없이도 캠페인을 설계하며 예상 비용과 설정값을 미리 확인할 수 있습니다. 내용을 검토한 뒤 결제 여부를 결정하면 됩니다.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final">
+    <div class="wrap">
+      <h2>먼저 한 번, 직접 설계해 보세요</h2>
+      <p>입력 몇 가지면 캠페인이 어떻게 구성되는지 바로 보입니다. 결제는 그다음에 결정해도 됩니다.</p>
+      <div class="hero-cta">
+        <a href="#start" class="btn btn-primary lg">직접 만들어보기</a>
+        <a href="#how" class="btn btn-ghost lg">작동 방식 다시 보기</a>
+      </div>
+      <div class="hero-trust">
+        <span><span class="ck">✓</span> 신용카드 없이 시작</span>
+        <span><span class="ck">✓</span> 평균 설정 4분</span>
+        <span><span class="ck">✓</span> 비용·진행 전면 공개</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="foot-left">
+        <a href="#top" class="brand"><span class="mark">랭</span>랭크스튜디오</a>
+        <p>대행사 없이 직접 만드는 AI 기반 셀프 캠페인 플랫폼. 쇼핑·마켓·로컬 발견성을 직접 설계하고 데이터로 확인하세요.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h4>제품</h4>
+          <a href="#how">작동 방식</a>
+          <a href="#compare">비교</a>
+          <a href="#stats">운영 지표</a>
+        </div>
+        <div class="foot-col">
+          <h4>안내</h4>
+          <a href="#faq">자주 묻는 질문</a>
+          <a href="#start">캠페인 설계</a>
+          <a href="#top">맨 위로</a>
+        </div>
+        <div class="foot-col">
+          <h4>정책</h4>
+          <a href="#">이용약관</a>
+          <a href="#">개인정보 처리방침</a>
+          <a href="#">문의</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      표시된 지표와 예시는 이해를 돕기 위한 운영 기준값이며, 실제 성과는 키워드·기간·시장 상황에 따라 달라질 수 있습니다. 예시 URL(seller-channel.example)은 설명용 가상 주소입니다.<br>
+      © 2026 랭크스튜디오. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

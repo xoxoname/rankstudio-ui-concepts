@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — 직접 만드는 AI 발견성 캠페인</title>
+<meta name="description" content="대행사 없이 직접 만드는 AI 셀프 캠페인 플랫폼. URL·키워드·기간·유입 규모를 직접 설정하고, 결제 후 실시간 리포트로 쇼핑·마켓·로컬 발견성을 키우세요." />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --paper:#fcfcfa;
+    --card:#ffffff;
+    --ink:#1a1c1a;
+    --ink-soft:#54585a;
+    --ink-faint:#878d8c;
+    --indigo:#4f46e5;
+    --indigo-deep:#3b34c4;
+    --indigo-soft:#eef0ff;
+    --green:#0f9d6e;
+    --green-soft:#e6f6ef;
+    --warm:#fff6ec;
+    --warm-line:#f2e7d8;
+    --line:rgba(26,28,26,.10);
+    --line-strong:rgba(26,28,26,.16);
+    --maxw:1120px;
+    --gut:clamp(20px,5vw,56px);
+    --kr:"Pretendard",system-ui,-apple-system,sans-serif;
+    --r-lg:24px;
+    --r-md:16px;
+    --r-sm:12px;
+    --sh-sm:0 1px 2px rgba(26,28,26,.04),0 2px 8px rgba(26,28,26,.05);
+    --sh-md:0 4px 12px rgba(26,28,26,.06),0 12px 32px rgba(26,28,26,.07);
+    --sh-lg:0 8px 24px rgba(26,28,26,.08),0 24px 60px rgba(26,28,26,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--kr);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    text-rendering:optimizeLegibility;
+    font-size:16px;
+    line-height:1.65;
+    letter-spacing:-.01em;
+    overflow-x:hidden;
+    word-break:keep-all;
+  }
+  a{color:inherit;text-decoration:none}
+  img{display:block;max-width:100%}
+  button{font-family:inherit;cursor:pointer;border:none;background:none}
+  ::selection{background:var(--indigo);color:#fff}
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+
+  /* ── sticky header ──────────────────────────── */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:200;
+    background:rgba(252,252,250,.82);
+    backdrop-filter:saturate(180%) blur(14px);
+    -webkit-backdrop-filter:saturate(180%) blur(14px);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s ease,box-shadow .3s ease;
+  }
+  header.scrolled{border-bottom-color:var(--line);box-shadow:0 1px 12px rgba(26,28,26,.04)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+  .brand .dot{width:11px;height:11px;border-radius:50%;background:var(--indigo);
+    box-shadow:0 0 0 4px var(--indigo-soft)}
+  .nav-links{display:flex;align-items:center;gap:30px}
+  .nav-links a{font-size:14.5px;color:var(--ink-soft);font-weight:500;transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--ink);color:#fff;font-weight:700;font-size:14.5px;
+    padding:11px 20px;border-radius:999px;transition:transform .15s ease,background .2s;
+  }
+  .nav-cta:hover{background:#000;transform:translateY(-1px)}
+  .hamb{display:none;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);
+    align-items:center;justify-content:center;background:var(--card)}
+
+  /* ── hero / wizard ─────────────────────────── */
+  .hero{padding:108px 0 64px;position:relative}
+  .hero::before{
+    content:"";position:absolute;inset:0;z-index:-1;
+    background:
+      radial-gradient(60% 50% at 78% 0%,var(--indigo-soft) 0%,transparent 60%),
+      radial-gradient(50% 50% at 8% 12%,var(--green-soft) 0%,transparent 55%);
+    opacity:.7;
+  }
+  .hero-head{text-align:center;max-width:720px;margin:0 auto 8px}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--card);border:1px solid var(--line);
+    padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;
+    color:var(--ink-soft);box-shadow:var(--sh-sm);margin-bottom:20px;
+  }
+  .eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 0 0 rgba(15,157,110,.5);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(15,157,110,.5)}70%{box-shadow:0 0 0 8px rgba(15,157,110,0)}100%{box-shadow:0 0 0 0 rgba(15,157,110,0)}}
+  h1{
+    font-size:clamp(26px,3.4vw,42px);line-height:1.3;letter-spacing:-.02em;
+    font-weight:800;color:var(--ink);
+  }
+  h1 .hl{color:var(--indigo)}
+  .hero-sub{margin-top:14px;font-size:clamp(15px,1.6vw,17px);color:var(--ink-soft);line-height:1.65}
+
+  /* progress */
+  .wizard{
+    max-width:780px;margin:32px auto 0;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--r-lg);
+    box-shadow:var(--sh-lg);overflow:hidden;
+  }
+  .progress{display:flex;align-items:center;gap:0;padding:18px 22px;border-bottom:1px solid var(--line);background:#fff}
+  .pstep{display:flex;align-items:center;gap:9px;flex:1}
+  .pstep:last-child{flex:0 0 auto}
+  .pnum{
+    width:26px;height:26px;border-radius:50%;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;
+    background:var(--indigo-soft);color:var(--indigo);transition:.3s;
+  }
+  .pstep.active .pnum{background:var(--indigo);color:#fff}
+  .pstep.done .pnum{background:var(--green);color:#fff}
+  .plabel{font-size:13.5px;font-weight:600;color:var(--ink-faint);white-space:nowrap;transition:.3s}
+  .pstep.active .plabel,.pstep.done .plabel{color:var(--ink)}
+  .pbar{flex:1;height:2px;background:var(--line);border-radius:2px;margin:0 12px;position:relative;overflow:hidden}
+  .pbar i{position:absolute;inset:0;width:0;background:var(--indigo);transition:width .4s ease}
+
+  .wbody{padding:30px 30px 34px;position:relative;min-height:286px}
+  .wstep{display:none;animation:fade .45s ease both}
+  .wstep.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .wq{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-bottom:4px}
+  .whint{font-size:14px;color:var(--ink-faint);margin-bottom:20px}
+
+  .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .segcard{
+    text-align:left;background:#fff;border:1.5px solid var(--line);
+    border-radius:var(--r-md);padding:20px 18px;transition:.2s;position:relative;
+  }
+  .segcard:hover{border-color:var(--indigo);transform:translateY(-3px);box-shadow:var(--sh-md)}
+  .segcard.sel{border-color:var(--indigo);background:var(--indigo-soft)}
+  .segcard .ic{font-size:26px;margin-bottom:10px;display:block}
+  .segcard .t{font-weight:700;font-size:16px;letter-spacing:-.02em}
+  .segcard .d{font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.5}
+  .segcard .chk{position:absolute;top:14px;right:14px;width:20px;height:20px;border-radius:50%;
+    background:var(--indigo);color:#fff;display:none;align-items:center;justify-content:center;font-size:12px}
+  .segcard.sel .chk{display:flex}
+
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13.5px;font-weight:600;color:var(--ink-soft);margin-bottom:7px}
+  .field input,.field select{
+    width:100%;font-family:inherit;font-size:15px;color:var(--ink);
+    background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);
+    padding:13px 14px;transition:.2s;
+  }
+  .field input:focus,.field select:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px var(--indigo-soft)}
+  .field input::placeholder{color:var(--ink-faint)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    border:1.5px solid var(--line);border-radius:999px;padding:8px 15px;font-size:13.5px;
+    font-weight:600;color:var(--ink-soft);background:#fff;transition:.18s;
+  }
+  .chip:hover{border-color:var(--indigo);color:var(--ink)}
+  .chip.on{background:var(--indigo);border-color:var(--indigo);color:#fff}
+
+  /* review step */
+  .review{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .rcell{background:var(--warm);border:1px solid var(--warm-line);border-radius:var(--r-sm);padding:13px 15px}
+  .rcell .k{font-size:12px;color:var(--ink-faint);font-weight:600}
+  .rcell .v{font-size:15px;font-weight:700;margin-top:2px;letter-spacing:-.01em}
+  .estimate{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--green-soft);border:1px solid #cdeede;border-radius:var(--r-md);
+    padding:16px 18px;margin-bottom:6px;
+  }
+  .estimate .lbl{font-size:13.5px;font-weight:600;color:#0c7d57}
+  .estimate .num{font-size:20px;font-weight:800;color:#0a6b4b;letter-spacing:-.02em}
+
+  /* wizard footer */
+  .wfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px}
+  .btn-back{
+    font-size:14.5px;font-weight:600;color:var(--ink-soft);padding:13px 18px;border-radius:var(--r-sm);
+    transition:.18s;visibility:hidden;
+  }
+  .btn-back.show{visibility:visible}
+  .btn-back:hover{background:var(--indigo-soft);color:var(--indigo)}
+  .btn-next{
+    display:inline-flex;align-items:center;gap:9px;
+    background:var(--indigo);color:#fff;font-weight:700;font-size:15px;
+    padding:14px 26px;border-radius:999px;transition:.18s;box-shadow:0 6px 16px rgba(79,70,229,.28);
+  }
+  .btn-next:hover:not(:disabled){background:var(--indigo-deep);transform:translateY(-1px)}
+  .btn-next:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+  .btn-next.final{background:var(--green);box-shadow:0 6px 16px rgba(15,157,110,.3)}
+  .btn-next.final:hover:not(:disabled){background:#0c875e}
+
+  .trust-row{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px 22px;
+    margin-top:24px;font-size:13.5px;color:var(--ink-soft);font-weight:500;
+  }
+  .trust-row span{display:inline-flex;align-items:center;gap:7px}
+  .trust-row .ti{color:var(--green);font-weight:800}
+
+  /* ── section base ──────────────────────────── */
+  section{padding:84px 0}
+  .sec-head{text-align:center;max-width:620px;margin:0 auto 48px}
+  .sec-tag{font-size:13px;font-weight:700;color:var(--indigo);letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px}
+  h2{font-size:clamp(23px,2.6vw,32px);line-height:1.3;letter-spacing:-.02em;font-weight:800}
+  .sec-head p{margin-top:12px;color:var(--ink-soft);font-size:16px}
+
+  /* how it works */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .scard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:24px 22px;box-shadow:var(--sh-sm)}
+  .scard .n{
+    width:34px;height:34px;border-radius:11px;background:var(--indigo-soft);color:var(--indigo);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;margin-bottom:14px;
+  }
+  .scard h3{font-size:16.5px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+  .scard p{font-size:14px;color:var(--ink-soft);line-height:1.6}
+
+  /* campaign types */
+  .types{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .tcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);transition:.25s}
+  .tcard:hover{box-shadow:var(--sh-md);transform:translateY(-4px)}
+  .tcard .ph{aspect-ratio:16/10;background:var(--line);overflow:hidden}
+  .tcard .ph img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+  .tcard:hover .ph img{transform:scale(1.05)}
+  .tcard .tx{padding:20px 22px 24px}
+  .tcard .badge{display:inline-block;font-size:12px;font-weight:700;color:var(--green);background:var(--green-soft);padding:4px 11px;border-radius:999px;margin-bottom:10px}
+  .tcard h3{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-bottom:6px}
+  .tcard p{font-size:14px;color:var(--ink-soft);line-height:1.6}
+
+  /* stats */
+  .stats-sec{background:var(--ink);color:#fff;border-radius:0}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+  .stat .num{font-size:clamp(30px,4vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1.1}
+  .stat .num .u{font-size:.5em;color:#9aa0c4;font-weight:700;margin-left:2px}
+  .stat .lbl{margin-top:8px;font-size:14px;color:#b8bccf;font-weight:500}
+  .stats-sec .sec-head h2{color:#fff}
+  .stats-sec .sec-head p{color:#b8bccf}
+  .stats-sec .sec-tag{color:#a9a4ff}
+
+  /* faq teaser */
+  .faq{max-width:780px;margin:0 auto}
+  .qitem{border:1px solid var(--line);border-radius:var(--r-md);background:var(--card);margin-bottom:12px;overflow:hidden;box-shadow:var(--sh-sm)}
+  .qhead{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;width:100%;text-align:left}
+  .qhead .qt{font-size:16px;font-weight:700;letter-spacing:-.01em}
+  .qhead .ar{flex:0 0 auto;width:26px;height:26px;color:var(--ink-faint);transition:transform .3s}
+  .qitem.open .qhead .ar{transform:rotate(45deg);color:var(--indigo)}
+  .qbody{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .qbody p{padding:0 22px 20px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+
+  /* final cta */
+  .final-cta{text-align:center;background:linear-gradient(180deg,var(--indigo-soft),var(--paper) 70%);border-radius:var(--r-lg);padding:64px 32px;border:1px solid var(--line)}
+  .final-cta h2{max-width:560px;margin:0 auto}
+  .final-cta p{margin-top:14px;color:var(--ink-soft);font-size:16px;max-width:480px;margin-left:auto;margin-right:auto}
+  .cta-group{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .btn-hero{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--indigo);color:#fff;font-weight:700;font-size:16.5px;
+    padding:17px 38px;border-radius:999px;box-shadow:0 10px 30px rgba(79,70,229,.32);transition:.18s;
+  }
+  .btn-hero:hover{background:var(--indigo-deep);transform:translateY(-2px)}
+  .cta-note{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink-soft);font-weight:500}
+  .cta-note .ti{color:var(--green);font-weight:800}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:48px 0 40px;background:#fff}
+  .foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:28px}
+  .foot .brand{margin-bottom:12px}
+  .foot-desc{font-size:13.5px;color:var(--ink-soft);max-width:280px;line-height:1.6}
+  .foot-cols{display:flex;gap:56px;flex-wrap:wrap}
+  .fcol h4{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;letter-spacing:-.01em}
+  .fcol a{display:block;font-size:13.5px;color:var(--ink-soft);margin-bottom:8px;transition:color .2s}
+  .fcol a:hover{color:var(--indigo)}
+  .foot-bottom{margin-top:36px;padding-top:24px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:12.5px;color:var(--ink-faint)}
+
+  /* ── responsive ───────────────────────────── */
+  @media (max-width:980px){
+    .steps{grid-template-columns:repeat(2,1fr)}
+    .types{grid-template-columns:1fr 1fr}
+    .stats{grid-template-columns:repeat(2,1fr);gap:32px 24px}
+  }
+  @media (max-width:768px){
+    .nav-links{display:none}
+    .hamb{display:flex}
+    .nav-cta{display:none}
+  }
+  @media (max-width:640px){
+    .hero{padding:92px 0 48px}
+    .wbody{padding:24px 20px 28px}
+    .progress{padding:14px 16px;overflow-x:auto}
+    .plabel{display:none}
+    .pbar{margin:0 8px}
+    .seg{grid-template-columns:1fr}
+    .row2{grid-template-columns:1fr}
+    .review{grid-template-columns:1fr}
+    .types{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .foot-cols{gap:32px}
+    section{padding:60px 0}
+    .estimate{flex-direction:column;align-items:flex-start;gap:6px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ── sticky header ── -->
+<header id="hd">
+  <div class="wrap nav">
+    <a class="brand" href="#top"><span class="dot"></span>랭크스튜디오</a>
+    <nav class="nav-links">
+      <a href="#how">작동 방식</a>
+      <a href="#types">캠페인 유형</a>
+      <a href="#stats">성과</a>
+      <a href="#faq">자주 묻는 질문</a>
+    </nav>
+    <a class="nav-cta" href="#top">캠페인 만들기 →</a>
+    <button class="hamb" aria-label="메뉴">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ── hero / wizard ── -->
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-head">
+      <span class="eyebrow"><span class="pulse"></span>대행사 없이 직접 만드는 셀프 캠페인</span>
+      <h1>무엇을 <span class="hl">알리고</span> 싶으세요?<br>3단계면 캠페인이 완성돼요.</h1>
+      <p class="hero-sub">URL·키워드·기간·유입 규모를 직접 설정하고, 결제 후 실시간 리포트까지. 아래에서 바로 시작해 보세요.</p>
+    </div>
+
+    <!-- wizard -->
+    <div class="wizard" id="wiz">
+      <!-- progress -->
+      <div class="progress" id="prog">
+        <div class="pstep active" data-step="1"><span class="pnum">1</span><span class="plabel">대상 선택</span></div>
+        <div class="pbar"><i></i></div>
+        <div class="pstep" data-step="2"><span class="pnum">2</span><span class="plabel">키워드·기간</span></div>
+        <div class="pbar"><i></i></div>
+        <div class="pstep" data-step="3"><span class="pnum">3</span><span class="plabel">검토·만들기</span></div>
+      </div>
+
+      <div class="wbody">
+        <!-- step 1 -->
+        <div class="wstep show" data-s="1">
+          <div class="wq">무엇을 알릴까요?</div>
+          <div class="whint">알리고 싶은 대상을 선택하면 다음 단계가 자동으로 맞춰져요.</div>
+          <div class="seg">
+            <button class="segcard" data-seg="쇼핑 상품">
+              <span class="chk">✓</span>
+              <span class="ic">🛍️</span>
+              <span class="t">쇼핑 상품</span>
+              <span class="d">검색 결과에서 더 잘 발견되도록</span>
+            </button>
+            <button class="segcard" data-seg="마켓 상품">
+              <span class="chk">✓</span>
+              <span class="ic">📦</span>
+              <span class="t">마켓 상품</span>
+              <span class="d">오픈마켓·스토어 노출 강화</span>
+            </button>
+            <button class="segcard" data-seg="우리 매장">
+              <span class="chk">✓</span>
+              <span class="ic">📍</span>
+              <span class="t">우리 매장</span>
+              <span class="d">지역 검색·지도 발견성 향상</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- step 2 -->
+        <div class="wstep" data-s="2">
+          <div class="wq">어떤 키워드로, 얼마 동안 진행할까요?</div>
+          <div class="whint">대상에 맞춰 예시를 채워뒀어요. 자유롭게 바꿔도 됩니다.</div>
+          <div class="field">
+            <label for="url">대상 URL</label>
+            <input id="url" type="text" placeholder="https://seller-channel.example/item/12345" value="https://seller-channel.example/item/12345" />
+          </div>
+          <div class="field">
+            <label for="kw">핵심 키워드</label>
+            <input id="kw" type="text" placeholder="예: 무선 핸디 청소기" />
+            <div class="chips" style="margin-top:10px" id="kwChips">
+              <button class="chip" data-kw="무선 청소기">무선 청소기</button>
+              <button class="chip" data-kw="핸디형 청소기">핸디형 청소기</button>
+              <button class="chip" data-kw="차량용 청소기">차량용 청소기</button>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field" style="margin-bottom:0">
+              <label for="period">진행 기간</label>
+              <select id="period">
+                <option>7일</option>
+                <option selected>14일</option>
+                <option>30일</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label for="scale">일일 유입 규모</label>
+              <select id="scale">
+                <option>가볍게 (소규모)</option>
+                <option selected>표준</option>
+                <option>집중 (대규모)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- step 3 -->
+        <div class="wstep" data-s="3">
+          <div class="wq">설정을 확인하고 캠페인을 만들어요.</div>
+          <div class="whint">결제 전 마지막 검토 단계예요. 언제든 이전으로 돌아가 수정할 수 있어요.</div>
+          <div class="review">
+            <div class="rcell"><div class="k">알릴 대상</div><div class="v" id="rSeg">쇼핑 상품</div></div>
+            <div class="rcell"><div class="k">핵심 키워드</div><div class="v" id="rKw">무선 청소기</div></div>
+            <div class="rcell"><div class="k">진행 기간</div><div class="v" id="rPeriod">14일</div></div>
+            <div class="rcell"><div class="k">유입 규모</div><div class="v" id="rScale">표준</div></div>
+          </div>
+          <div class="estimate">
+            <span class="lbl">예상 리워드 트래픽 (실사용자 제휴 유입)</span>
+            <span class="num" id="rEst">일 평균 120~180</span>
+          </div>
+        </div>
+
+        <!-- footer -->
+        <div class="wfoot">
+          <button class="btn-back" id="back">← 이전</button>
+          <button class="btn-next" id="next" disabled>다음 단계 →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="trust-row">
+      <span><span class="ti">✓</span> 진행 결과는 실시간 리포트로 투명 공개</span>
+      <span><span class="ti">✓</span> 직접 설정·직접 결제, 숨은 비용 없음</span>
+      <span><span class="ti">✓</span> 시작 전 예상 규모 미리 확인</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── how it works ── -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">작동 방식</div>
+      <h2>설정부터 리포트까지, 네 단계로 끝나요.</h2>
+      <p>복잡한 상담이나 견적 대기 없이, 화면에서 직접 만들고 바로 진행합니다.</p>
+    </div>
+    <div class="steps">
+      <div class="scard"><div class="n">1</div><h3>대상 입력</h3><p>알릴 URL과 키워드, 진행 기간을 직접 설정해요.</p></div>
+      <div class="scard"><div class="n">2</div><h3>규모 선택</h3><p>일일 유입 규모를 고르면 예상 트래픽이 바로 계산돼요.</p></div>
+      <div class="scard"><div class="n">3</div><h3>결제·진행</h3><p>설정한 내용대로 결제하면 캠페인이 자동으로 시작돼요.</p></div>
+      <div class="scard"><div class="n">4</div><h3>실시간 리포트</h3><p>유입 추이와 진행 상황을 대시보드에서 투명하게 확인해요.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── campaign types ── -->
+<section id="types" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">캠페인 유형</div>
+      <h2>알리고 싶은 대상에 맞춰 골라요.</h2>
+      <p>리워드 트래픽은 실사용자에게 리워드를 제공하는 제휴 유입 방식이에요.</p>
+    </div>
+    <div class="types">
+      <div class="tcard">
+        <div class="ph"><img src="https://picsum.photos/seed/rsshop/640/400" alt="쇼핑 상품 캠페인" loading="lazy" /></div>
+        <div class="tx"><span class="badge">쇼핑</span><h3>쇼핑 상품 발견성</h3><p>검색·추천 영역에서 상품이 더 잘 노출되도록 키워드 유입을 만들어요.</p></div>
+      </div>
+      <div class="tcard">
+        <div class="ph"><img src="https://picsum.photos/seed/rsmarket/640/400" alt="마켓 상품 캠페인" loading="lazy" /></div>
+        <div class="tx"><span class="badge">마켓</span><h3>마켓 상품 노출</h3><p>오픈마켓·스토어 채널에서 상품 페이지로의 자연스러운 방문을 늘려요.</p></div>
+      </div>
+      <div class="tcard">
+        <div class="ph"><img src="https://picsum.photos/seed/rslocal/640/400" alt="우리 매장 캠페인" loading="lazy" /></div>
+        <div class="tx"><span class="badge">로컬</span><h3>우리 매장 발견성</h3><p>지역 검색과 지도 영역에서 우리 매장이 더 잘 보이도록 도와요.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── stats ── -->
+<section id="stats" class="stats-sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">투명한 성과</div>
+      <h2>숫자로 확인하는 진행 결과</h2>
+      <p>모든 캠페인의 유입은 실시간 리포트로 기록되고 공유돼요.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">3<span class="u">단계</span></div><div class="lbl">설정부터 시작까지</div></div>
+      <div class="stat"><div class="num">100<span class="u">%</span></div><div class="lbl">셀프 설정·셀프 결제</div></div>
+      <div class="stat"><div class="num">24<span class="u">시간</span></div><div class="lbl">리포트 실시간 갱신</div></div>
+      <div class="stat"><div class="num">0<span class="u">건</span></div><div class="lbl">숨은 비용·추가 견적</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── faq teaser ── -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">자주 묻는 질문</div>
+      <h2>시작 전에 궁금한 점</h2>
+    </div>
+    <div class="faq">
+      <div class="qitem">
+        <button class="qhead"><span class="qt">리워드 트래픽이 정확히 뭔가요?</span><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        <div class="qbody"><p>실사용자에게 리워드를 제공하고, 제휴를 통해 설정한 키워드·URL로 자연스러운 방문을 만드는 유입 방식이에요. 진행 내역은 모두 리포트에 기록됩니다.</p></div>
+      </div>
+      <div class="qitem">
+        <button class="qhead"><span class="qt">대행사 상담 없이 정말 직접 만들 수 있나요?</span><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        <div class="qbody"><p>네. 위 위저드처럼 대상·키워드·기간·규모를 직접 설정하고 결제하면 캠페인이 시작돼요. 별도의 견적 대기나 상담 절차가 없습니다.</p></div>
+      </div>
+      <div class="qitem">
+        <button class="qhead"><span class="qt">진행 상황은 어떻게 확인하나요?</span><svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+        <div class="qbody"><p>대시보드에서 일별 유입 추이와 진행률을 실시간으로 볼 수 있어요. 설정한 규모 대비 실제 진행 결과를 투명하게 확인할 수 있습니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── final cta ── -->
+<section>
+  <div class="wrap">
+    <div class="final-cta">
+      <h2>지금 바로 첫 캠페인을 만들어 보세요.</h2>
+      <p>3단계, 몇 분이면 충분해요. 시작 전에 예상 규모를 미리 확인할 수 있어요.</p>
+      <div class="cta-group">
+        <a class="btn-hero" href="#top">캠페인 만들기 →</a>
+        <span class="cta-note"><span class="ti">✓</span> 직접 설정 · 투명한 실시간 리포트</span>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ── footer ── -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="brand" href="#top"><span class="dot"></span>랭크스튜디오</a>
+        <p class="foot-desc">대행사 없이 직접 만드는 AI 셀프 캠페인 플랫폼. 쇼핑·마켓·로컬 발견성을 직접 키우세요.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="fcol"><h4>제품</h4><a href="#how">작동 방식</a><a href="#types">캠페인 유형</a><a href="#stats">성과</a></div>
+        <div class="fcol"><h4>지원</h4><a href="#faq">자주 묻는 질문</a><a href="#top">시작하기</a></div>
+        <div class="fcol"><h4>회사</h4><a href="#top">소개</a><a href="#top">문의</a></div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 랭크스튜디오. All rights reserved.</span>
+      <span>이용약관 · 개인정보처리방침</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // sticky header shadow
+  var hd=document.getElementById('hd');
+  window.addEventListener('scroll',function(){
+    hd.classList.toggle('scrolled',window.scrollY>8);
+  },{passive:true});
+
+  // ── wizard state ──
+  var state={step:1,seg:null,kw:'',period:'14일',scale:'표준'};
+  var total=3;
+  var prog=document.getElementById('prog');
+  var pSteps=prog.querySelectorAll('.pstep');
+  var pBars=prog.querySelectorAll('.pbar i');
+  var steps=document.querySelectorAll('.wstep');
+  var nextBtn=document.getElementById('next');
+  var backBtn=document.getElementById('back');
+
+  function estimate(){
+    var base={'가볍게 (소규모)':[60,90],'표준':[120,180],'집중 (대규모)':[260,360]}[state.scale]||[120,180];
+    return '일 평균 '+base[0]+'~'+base[1];
+  }
+
+  function render(){
+    // progress
+    pSteps.forEach(function(p){
+      var s=+p.dataset.step;
+      p.classList.toggle('active',s===state.step);
+      p.classList.toggle('done',s<state.step);
+    });
+    pBars.forEach(function(b,i){
+      // bar i sits between step i+1 and i+2
+      b.style.width=(state.step>i+1)?'100%':'0';
+    });
+    // steps
+    steps.forEach(function(st){st.classList.toggle('show',+st.dataset.s===state.step)});
+    // footer
+    backBtn.classList.toggle('show',state.step>1);
+    if(state.step===total){
+      nextBtn.textContent='광고 만들기';
+      nextBtn.classList.add('final');
+    }else{
+      nextBtn.textContent='다음 단계 →';
+      nextBtn.classList.remove('final');
+    }
+    // gate
+    var ok=true;
+    if(state.step===1) ok=!!state.seg;
+    if(state.step===2) ok=true; // prefilled
+    nextBtn.disabled=!ok;
+    // review fill
+    if(state.step===3){
+      document.getElementById('rSeg').textContent=state.seg||'쇼핑 상품';
+      document.getElementById('rKw').textContent=state.kw||document.getElementById('kw').value||'무선 청소기';
+      document.getElementById('rPeriod').textContent=document.getElementById('period').value;
+      document.getElementById('rScale').textContent=document.getElementById('scale').value;
+      document.getElementById('rEst').textContent=estimate();
+    }
+  }
+
+  // segment select
+  document.querySelectorAll('.segcard').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.segcard').forEach(function(x){x.classList.remove('sel')});
+      c.classList.add('sel');
+      state.seg=c.dataset.seg;
+      render();
+    });
+  });
+
+  // keyword chips
+  var kwInput=document.getElementById('kw');
+  document.querySelectorAll('#kwChips .chip').forEach(function(ch){
+    ch.addEventListener('click',function(){
+      document.querySelectorAll('#kwChips .chip').forEach(function(x){x.classList.remove('on')});
+      ch.classList.add('on');
+      kwInput.value=ch.dataset.kw;
+      state.kw=ch.dataset.kw;
+    });
+  });
+  kwInput.addEventListener('input',function(){state.kw=kwInput.value});
+  document.getElementById('period').addEventListener('change',function(e){state.period=e.target.value});
+  document.getElementById('scale').addEventListener('change',function(e){state.scale=e.target.value});
+
+  nextBtn.addEventListener('click',function(){
+    if(state.step<total){state.step++;render();
+      document.getElementById('wiz').scrollIntoView({behavior:'smooth',block:'nearest'});
+    }else{
+      // final
+      nextBtn.textContent='캠페인 생성 중…';
+      nextBtn.disabled=true;
+      setTimeout(function(){
+        nextBtn.textContent='✓ 시작되었어요';
+      },900);
+    }
+  });
+  backBtn.addEventListener('click',function(){
+    if(state.step>1){state.step--;render();}
+  });
+
+  render();
+
+  // ── faq accordion ──
+  document.querySelectorAll('.qitem .qhead').forEach(function(h){
+    h.addEventListener('click',function(){
+      var item=h.parentElement;
+      var body=item.querySelector('.qbody');
+      var open=item.classList.contains('open');
+      document.querySelectorAll('.qitem').forEach(function(q){
+        q.classList.remove('open');
+        q.querySelector('.qbody').style.maxHeight='0';
+      });
+      if(!open){item.classList.add('open');body.style.maxHeight=body.scrollHeight+'px';}
+    });
+  });
+})();
+</script>
+</body>
+</html>
