@@ -3,52 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>랭크스튜디오 — 전환형 UI 시안 10종</title>
+    <title>랭크스튜디오 — 다크 프리미엄 디테일 시안 10종</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-      :root { --bg:#f5f6f8; --card:#ffffff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --accent:#2563eb; }
+      :root { --bg:#07090d; --card:#10141b; --ink:#eef2f1; --muted:#8b97a0; --line:rgba(238,242,241,.1); --accent:#2dd4bf; }
       * { box-sizing:border-box; margin:0; }
       body { background:var(--bg); color:var(--ink); font-family:"Pretendard",sans-serif; padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 88px; -webkit-font-smoothing:antialiased; }
-      header { max-width:1200px; margin:0 auto 40px; }
-      .kicker { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:800; }
-      h1 { font-size:clamp(26px,3.6vw,40px); line-height:1.25; margin:12px 0 14px; letter-spacing:-.02em; word-break:keep-all; }
-      header p { color:var(--muted); font-size:15.5px; line-height:1.7; max-width:74ch; }
-      .grid { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
-      @media (max-width:800px){ .grid{ grid-template-columns:1fr; } }
-      .card { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); display:flex; flex-direction:column; transition:transform .16s ease, box-shadow .16s ease; }
-      .card:hover { transform:translateY(-4px); box-shadow:0 18px 40px -24px rgba(17,24,39,.35); }
-      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1040; object-fit:cover; object-position:top; background:#eee; }
+      header { max-width:1240px; margin:0 auto 26px; }
+      .kicker { font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:800; }
+      h1 { font-size:clamp(26px,3.6vw,42px); line-height:1.22; margin:12px 0 14px; letter-spacing:-.02em; word-break:keep-all; }
+      header p { color:var(--muted); font-size:15.5px; line-height:1.7; max-width:76ch; }
+      .tabs { max-width:1240px; margin:0 auto 30px; display:flex; gap:8px; flex-wrap:wrap; }
+      .tabs a { font-size:13px; font-weight:700; color:var(--muted); border:1px solid var(--line); padding:8px 14px; border-radius:999px; text-decoration:none; }
+      .tabs a.on { color:var(--bg); background:var(--accent); border-color:var(--accent); }
+      .tabs a:hover { color:var(--ink); }
+      .grid { max-width:1240px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+      @media (max-width:820px){ .grid{ grid-template-columns:1fr; } }
+      .card { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); display:flex; flex-direction:column; transition:transform .16s ease, border-color .16s ease; }
+      .card:hover { transform:translateY(-4px); border-color:var(--accent); }
+      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1040; object-fit:cover; object-position:top; background:#161a22; }
       .meta { padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px; }
       .num { font-size:12px; color:var(--accent); font-weight:800; letter-spacing:.08em; }
-      .meta h2 { font-size:19px; letter-spacing:-.01em; word-break:keep-all; }
-      .meta p { color:var(--muted); font-size:13.5px; line-height:1.55; margin-top:2px; }
-      .open { margin-top:12px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#fff; font-weight:700; font-size:13.5px; padding:10px 17px; border-radius:9px; }
-      .open:hover { background:#1d4fd7; }
-      footer { max-width:1200px; margin:48px auto 0; color:var(--muted); font-size:13px; line-height:1.8; }
-      footer a { color:var(--ink); }
+      .meta h2 { font-size:19px; word-break:keep-all; }
+      .meta p { color:var(--muted); font-size:13.5px; line-height:1.55; }
+      .open { margin-top:11px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#07090d; font-weight:800; font-size:13.5px; padding:10px 17px; border-radius:9px; }
+      footer { max-width:1240px; margin:48px auto 0; color:var(--muted); font-size:13px; line-height:1.8; }
     </style>
   </head>
   <body>
     <header>
-      <div class="kicker">RANKSTUDIO · 전환·이해도 중심 · 10 CONCEPTS</div>
-      <h1>랭크스튜디오 — 전환형 UI 시안 10종</h1>
-      <p>레퍼런스(풀림애드의 "문제→해결→증거" 이해도 + 셀프마케팅의 "바로 광고 만들기")를 기준으로, <b>Pretendard 폰트 위주 · 정상 글자크기/간격 · 바로 클릭 가능한 "광고 만들기"</b>를 적용한 전환 중심 시안입니다. 카드를 열면 실제 입력·견적 계산·위저드가 동작합니다.</p>
+      <div class="kicker">RANKSTUDIO · 다크 프리미엄 · 디테일 강화 · 10 CONCEPTS</div>
+      <h1>다크 프리미엄 + 스티키 CTA — 디테일 10종</h1>
+      <p>가장 반응이 좋았던 방향(다크 프리미엄 · 틸 악센트 · 하단 스티키 "광고 만들기")을, 풀림애드 수준의 <b>이해도·디테일</b>로 깊게 발전시킨 10가지 변주입니다. 인터랙티브 데이터 시각화 · 호버 주석 · 프로그레시브 디스클로저 · 실제 동작하는 견적/위저드 적용. 전부 Pretendard · 정상 글자크기/간격.</p>
     </header>
+    <nav class="tabs">
+      <a class="on" href="index.html">다크 프리미엄 디테일 10종</a>
+      <a href="cv-gallery.html">전환형 10종</a>
+      <a href="award-gallery.html">어워즈 스타일 10종</a>
+    </nav>
     <main class="grid">
-      <article class="card"><a href="cv-01-quickstart.html" target="_blank"><img class="shot" src="previews/g-cv-01-quickstart.png" alt="인라인 퀵스타트"/></a><div class="meta"><span class="num">01</span><h2>인라인 퀵스타트</h2><p>히어로에서 바로 URL→키워드→예상비용→광고 만들기. 즉시 전환.</p><a class="open" href="cv-01-quickstart.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-02-problem-solution.html" target="_blank"><img class="shot" src="previews/g-cv-02-problem-solution.png" alt="문제→해결 스토리"/></a><div class="meta"><span class="num">02</span><h2>문제 → 해결 스토리</h2><p>풀림애드형. 묻힌 상품→AI 신호→증거→정직 고지로 신뢰 구축.</p><a class="open" href="cv-02-problem-solution.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-03-wizard.html" target="_blank"><img class="shot" src="previews/g-cv-03-wizard.png" alt="위저드형 히어로"/></a><div class="meta"><span class="num">03</span><h2>위저드형 히어로</h2><p>히어로가 곧 1단계. 대상 선택→키워드→검토, 마찰 0.</p><a class="open" href="cv-03-wizard.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-04-dark-sticky.html" target="_blank"><img class="shot" src="previews/g-cv-04-dark-sticky.png" alt="다크 프리미엄 스티키"/></a><div class="meta"><span class="num">04</span><h2>다크 프리미엄 + 스티키 CTA</h2><p>움직이는 제품 데모 + 하단 고정 "광고 만들기" 바. 틸 악센트.</p><a class="open" href="cv-04-dark-sticky.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-05-pricing.html" target="_blank"><img class="shot" src="previews/g-cv-05-pricing.png" alt="가격·견적 계산기"/></a><div class="meta"><span class="num">05</span><h2>가격·견적 계산기</h2><p>슬라이더로 예상 유입·비용 실시간 → 이 조건으로 바로 만들기.</p><a class="open" href="cv-05-pricing.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-06-social-proof.html" target="_blank"><img class="shot" src="previews/g-cv-06-social-proof.png" alt="신뢰·사례"/></a><div class="meta"><span class="num">06</span><h2>신뢰·사례 중심</h2><p>통계 카운트업·후기·업종 사례로 안심시켜 전환.</p><a class="open" href="cv-06-social-proof.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-07-mobile-flow.html" target="_blank"><img class="shot" src="previews/g-cv-07-mobile-flow.png" alt="모바일앱 플로우"/></a><div class="meta"><span class="num">07</span><h2>모바일앱 플로우</h2><p>큰 탭 카드 + 하단 고정 풋바 CTA. 한 손에 들어오는 흐름.</p><a class="open" href="cv-07-mobile-flow.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-08-comparison.html" target="_blank"><img class="shot" src="previews/g-cv-08-comparison.png" alt="비교표"/></a><div class="meta"><span class="num">08</span><h2>비교표 설득</h2><p>맡기기 vs 직접, 그냥 두기 vs 캠페인. 항목별 대비로 명확.</p><a class="open" href="cv-08-comparison.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-09-faq.html" target="_blank"><img class="shot" src="previews/g-cv-09-faq.png" alt="FAQ 안심"/></a><div class="meta"><span class="num">09</span><h2>FAQ·안심 전환</h2><p>구매 직전 망설임을 즉답 FAQ로 제거. 정직함으로 신뢰.</p><a class="open" href="cv-09-faq.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="cv-10-allinone.html" target="_blank"><img class="shot" src="previews/g-cv-10-allinone.png" alt="올인원 압축"/></a><div class="meta"><span class="num">10</span><h2>올인원 압축</h2><p>첫 스크롤에 가치+퀵스타트+3스텝+통계. 명확함이 무기.</p><a class="open" href="cv-10-allinone.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-10-flagship.html" target="_blank"><img class="shot" src="previews/g-dp-10-flagship.png" alt=""/></a><div class="meta"><span class="num">10 · 추천</span><h2>올인원 플래그십</h2><p>퀵스타트+제품데모+증거차트+비교+FAQ 종합. 가장 완성형.</p><a class="open" href="dp-10-flagship.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-07-dashboard.html" target="_blank"><img class="shot" src="previews/g-dp-07-dashboard.png" alt=""/></a><div class="meta"><span class="num">07 · 추천</span><h2>대시보드 퍼스트</h2><p>받게 될 리포트를 미리 체험. 인터랙티브 차트+프로그레시브 공개.</p><a class="open" href="dp-07-dashboard.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-01-data-story.html" target="_blank"><img class="shot" src="previews/g-dp-01-data-story.png" alt=""/></a><div class="meta"><span class="num">01</span><h2>데이터 스토리</h2><p>문제→해결→증거를 인터랙티브 차트로. 풀림애드 깊이.</p><a class="open" href="dp-01-data-story.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-02-interactive-demo.html" target="_blank"><img class="shot" src="previews/g-dp-02-interactive-demo.png" alt=""/></a><div class="meta"><span class="num">02</span><h2>인터랙티브 제품 데모</h2><p>탭 전환 라이브 데모 + 호버 주석으로 즉시 이해.</p><a class="open" href="dp-02-interactive-demo.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-05-walkthrough.html" target="_blank"><img class="shot" src="previews/g-dp-05-walkthrough.png" alt=""/></a><div class="meta"><span class="num">05</span><h2>단계별 워크스루</h2><p>실제 화면+입력 예시+팁으로 "5분이면 됨"을 증명.</p><a class="open" href="dp-05-walkthrough.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-06-comparison-proof.html" target="_blank"><img class="shot" src="previews/g-dp-06-comparison-proof.png" alt=""/></a><div class="meta"><span class="num">06</span><h2>비교 + 증거 헤비</h2><p>상세 비교표 + 전후 데이터 + 사례 지표로 설득.</p><a class="open" href="dp-06-comparison-proof.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-03-detail-bento.html" target="_blank"><img class="shot" src="previews/g-dp-03-detail-bento.png" alt=""/></a><div class="meta"><span class="num">03</span><h2>디테일 베엔토</h2><p>타일마다 미니 인터랙티브 explainer. 한 화면에 전체 파악.</p><a class="open" href="dp-03-detail-bento.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-04-feature-theater.html" target="_blank"><img class="shot" src="previews/g-dp-04-feature-theater.png" alt=""/></a><div class="meta"><span class="num">04</span><h2>피처 시어터(주석)</h2><p>핀 스크롤 + 콜아웃 주석이 제품 UI를 짚어 설명.</p><a class="open" href="dp-04-feature-theater.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-08-editorial-tech.html" target="_blank"><img class="shot" src="previews/g-dp-08-editorial-tech.png" alt=""/></a><div class="meta"><span class="num">08</span><h2>에디토리얼 × 테크</h2><p>풍부한 카피·데이터 콜아웃으로 깊이와 격.</p><a class="open" href="dp-08-editorial-tech.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="dp-09-trust.html" target="_blank"><img class="shot" src="previews/g-dp-09-trust.png" alt=""/></a><div class="meta"><span class="num">09</span><h2>신뢰 · 투명성 헤비</h2><p>유입 원리·정직 고지·기준을 상세히. 투명성으로 전환.</p><a class="open" href="dp-09-trust.html" target="_blank">열기 →</a></div></article>
     </main>
     <footer>
-      10종 모두 Pretendard 위주 · 외부 플랫폼 실명/금지표현 0 · 'AI 기반' 포지셔닝 · 정직한 "특정 순위 약속 안 함" · 320/768/1440 반응형.<br/>
-      이전 시안 — 어워즈 스타일 10종: <a href="award-gallery.html">보기</a> · 아트디렉션/에디토리얼: v2-*.html, concept-*.html 파일 직접 접근.
+      10종 모두 다크 프리미엄 · 단일 틸 악센트 · Pretendard · 외부 플랫폼 실명/금지표현 0 · 정직한 "특정 순위 약속 안 함" · 320/768/1440 반응형 · prefers-reduced-motion 정지.
     </footer>
   </body>
 </html>

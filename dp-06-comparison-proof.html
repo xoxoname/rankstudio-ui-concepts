@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크스튜디오 — 직접 운영하는 발견성 캠페인</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --ink:#0a0c10;
+    --ink-2:#0f1218;
+    --panel:#13171f;
+    --panel-2:#171c26;
+    --line:rgba(255,255,255,.07);
+    --line-2:rgba(255,255,255,.13);
+    --text:#eef1f6;
+    --text-2:#a8b0c0;
+    --text-3:#6c7587;
+    --teal:#2dd4bf;
+    --teal-2:#5fe9d8;
+    --teal-soft:rgba(45,212,191,.13);
+    --teal-line:rgba(45,212,191,.32);
+    --warm:#f0a868;
+    --warm-soft:rgba(240,168,104,.12);
+    --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+    --font:"Pretendard Variable",Pretendard,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    background:var(--ink);
+    color:var(--text);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    word-break:keep-all;
+    overflow-x:hidden;
+    padding-bottom:86px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,h4{letter-spacing:-.02em;line-height:1.3;font-weight:700}
+  p{font-size:16px;color:var(--text-2)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12.5px;font-weight:600;letter-spacing:.02em;
+    color:var(--teal);background:var(--teal-soft);
+    border:1px solid var(--teal-line);
+    padding:6px 12px;border-radius:999px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal)}
+  .num{font-variant-numeric:tabular-nums}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
+  .rv.in{opacity:1;transform:none}
+
+  /* header */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,12,16,.78);
+    backdrop-filter:saturate(160%) blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;font-size:17px}
+  .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#1f2530,#10131a);border:1px solid var(--teal-line);display:grid;place-items:center}
+  .logo span{width:11px;height:11px;border-radius:3px;background:var(--teal);box-shadow:0 0 14px rgba(45,212,191,.6)}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{font-size:14.5px;color:var(--text-2);transition:color .18s}
+  .nav-links a:hover{color:var(--text)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font);font-weight:600;font-size:15px;cursor:pointer;border-radius:11px;border:none;transition:transform .14s,background .18s,box-shadow .18s}
+  .btn-primary{background:var(--teal);color:#04231e;padding:12px 22px;box-shadow:0 6px 22px rgba(45,212,191,.24)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(45,212,191,.34)}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line-2);padding:11px 18px}
+  .btn-ghost:hover{background:var(--panel)}
+  .nav .btn-primary{padding:10px 18px;font-size:14.5px}
+
+  /* hero */
+  .hero{position:relative;padding:78px 0 30px;overflow:hidden}
+  .hero::before{content:"";position:absolute;top:-220px;left:50%;transform:translateX(-50%);width:820px;height:560px;background:radial-gradient(circle,rgba(45,212,191,.16),transparent 62%);filter:blur(22px);pointer-events:none;z-index:0}
+  .hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  .hero h1{font-size:clamp(26px,3.4vw,44px);margin:18px 0 0}
+  .hero h1 b{color:var(--teal);font-weight:700}
+  .hero .sub{font-size:clamp(15px,1.4vw,17px);max-width:520px;margin:18px 0 0;color:var(--text-2)}
+  .cta-row{display:flex;align-items:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+  .trust-inline{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text-3)}
+  .avatars{display:flex}
+  .avatars i{width:24px;height:24px;border-radius:50%;border:2px solid var(--ink);margin-left:-7px;background:var(--panel-2);display:grid;place-items:center;font-style:normal;font-size:11px;color:var(--teal);font-weight:700}
+  .avatars i:first-child{margin-left:0}
+  .stars{color:var(--teal);letter-spacing:1px;font-size:12px}
+
+  /* hero mini-compare card */
+  .hero-card{border-radius:18px;border:1px solid var(--line-2);background:linear-gradient(180deg,var(--ink-2),var(--ink));box-shadow:0 40px 90px -34px rgba(0,0,0,.7);overflow:hidden}
+  .hc-bar{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.012)}
+  .hc-bar .tl{width:10px;height:10px;border-radius:50%;background:#2a3140}
+  .hc-bar .tt{margin-left:8px;font-family:var(--mono);font-size:11.5px;color:var(--text-3)}
+  .hc-live{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--teal);font-weight:600}
+  .pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  .hc-body{padding:20px}
+  .hc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .hc-row:last-child{border-bottom:none}
+  .hc-l{font-size:13px;color:var(--text-2)}
+  .hc-meter{flex:1;height:8px;border-radius:99px;background:var(--panel);overflow:hidden;max-width:160px}
+  .hc-meter i{display:block;height:100%;border-radius:99px;width:0;transition:width 1s cubic-bezier(.22,.61,.36,1)}
+  .hc-meter.before i{background:linear-gradient(90deg,#3a424f,#4c5562)}
+  .hc-meter.after i{background:linear-gradient(90deg,var(--teal),var(--teal-2))}
+  .hc-v{font-family:var(--mono);font-size:12.5px;font-weight:600;width:58px;text-align:right}
+  .hc-v.b{color:var(--text-3)}
+  .hc-v.a{color:var(--teal)}
+  .hc-foot{margin-top:14px;display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--text-3)}
+  .hc-badge{font-family:var(--mono);color:var(--teal);background:var(--teal-soft);border:1px solid var(--teal-line);padding:3px 9px;border-radius:99px}
+
+  /* section base */
+  section{padding:88px 0}
+  .sec-head{max-width:640px;margin-bottom:48px}
+  .sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+  .sec-head h2{font-size:clamp(23px,2.6vw,34px);margin-top:14px}
+  .sec-head p{margin-top:14px;font-size:16px}
+
+  /* problem band */
+  .prob-band{background:linear-gradient(180deg,var(--ink-2),var(--ink));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .probs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .prob{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px 22px;position:relative}
+  .prob .pn{font-family:var(--mono);font-size:11.5px;color:var(--warm);font-weight:600}
+  .prob h3{font-size:16px;margin-top:10px}
+  .prob p{font-size:13.5px;margin-top:8px;line-height:1.6}
+  .prob .ico{position:absolute;top:22px;right:22px;width:30px;height:30px;border-radius:9px;background:var(--warm-soft);border:1px solid rgba(240,168,104,.26);display:grid;place-items:center}
+  .prob .ico b{width:9px;height:9px;border-radius:2px;background:var(--warm)}
+
+  /* comparison table */
+  .cmp-wrap{border:1px solid var(--line-2);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,var(--ink-2),var(--ink))}
+  .cmp-tabs{display:flex;gap:8px;padding:16px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .cmp-tab{font-size:13.5px;font-weight:600;color:var(--text-3);background:var(--panel);border:1px solid var(--line);padding:8px 16px;border-radius:99px;cursor:pointer;transition:all .18s}
+  .cmp-tab[aria-selected="true"]{color:#04231e;background:var(--teal);border-color:var(--teal)}
+  .cmp-panel{display:none}
+  .cmp-panel.active{display:block}
+  .cmp-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr}
+  .cmp-grid>div{padding:16px 20px;border-bottom:1px solid var(--line)}
+  .cmp-head{background:rgba(255,255,255,.015);font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px}
+  .cmp-head.col-them{color:var(--text-2)}
+  .cmp-head.col-us{color:var(--teal)}
+  .cmp-head .chip{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px}
+  .cmp-head.col-them .chip{background:rgba(255,255,255,.05);color:var(--text-3)}
+  .cmp-head.col-us .chip{background:var(--teal-soft);color:var(--teal);border:1px solid var(--teal-line)}
+  .cmp-feat{font-size:14px;font-weight:600;color:var(--text)}
+  .cmp-feat em{display:block;font-style:normal;font-size:12px;color:var(--text-3);font-weight:400;margin-top:3px}
+  .cmp-cell{font-size:13.5px;color:var(--text-2);display:flex;align-items:flex-start;gap:9px}
+  .cmp-cell .mk{width:18px;height:18px;border-radius:6px;flex:none;display:grid;place-items:center;margin-top:1px;font-size:11px;font-weight:700}
+  .mk.no{background:rgba(255,255,255,.05);color:var(--text-3)}
+  .mk.yes{background:var(--teal-soft);color:var(--teal);border:1px solid var(--teal-line)}
+  .cmp-cell.us{color:var(--text)}
+  .cmp-grid>div:nth-last-child(-n+3){border-bottom:none}
+  .cmp-note{padding:14px 20px;font-size:12px;color:var(--text-3);border-top:1px solid var(--line);background:rgba(255,255,255,.012)}
+
+  /* chart section */
+  .chart-shell{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:stretch}
+  .chart-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;position:relative;overflow:hidden}
+  .chart-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap}
+  .chart-top h3{font-size:16px}
+  .seg{display:inline-flex;background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+  .seg button{font-family:var(--font);font-size:12.5px;font-weight:600;color:var(--text-3);background:transparent;border:none;padding:6px 13px;border-radius:8px;cursor:pointer;transition:all .18s}
+  .seg button[aria-pressed="true"]{color:#04231e;background:var(--teal)}
+  .chart-legend{display:flex;gap:18px;margin:6px 0 14px;font-size:12.5px;color:var(--text-3)}
+  .chart-legend span{display:flex;align-items:center;gap:7px}
+  .lg-d{width:18px;height:3px;border-radius:99px}
+  .lg-d.b{background:#4c5562}
+  .lg-d.a{background:var(--teal)}
+  .chart-svg{width:100%;height:auto;display:block}
+  .grid-l{stroke:var(--line);stroke-width:1}
+  .axis-t{fill:var(--text-3);font-size:11px;font-family:var(--mono)}
+  .ln-before{fill:none;stroke:#4c5562;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .ln-after{fill:none;stroke:var(--teal);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(45,212,191,.4))}
+  .ar-after{fill:url(#fillAfter)}
+  .dot-after{fill:var(--teal-2);stroke:var(--ink);stroke-width:2}
+  .chart-cap{font-size:11.5px;color:var(--text-3);margin-top:10px}
+
+  .delta-list{display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .delta{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .delta .dl{font-size:12.5px;color:var(--text-3);font-family:var(--mono)}
+  .delta .dv{font-size:clamp(26px,3vw,34px);font-weight:700;letter-spacing:-.03em;margin-top:4px;font-variant-numeric:tabular-nums}
+  .delta .dv b{color:var(--teal);font-weight:700}
+  .delta .dd{font-size:12.5px;color:var(--text-2);margin-top:4px}
+  .delta .spark{display:flex;align-items:flex-end;gap:3px;height:30px;margin-top:12px}
+  .delta .spark i{flex:1;background:linear-gradient(180deg,var(--teal),rgba(45,212,191,.22));border-radius:3px 3px 0 0;height:0;transition:height .8s cubic-bezier(.22,.61,.36,1)}
+
+  /* case metrics */
+  .cases{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .case{background:linear-gradient(180deg,var(--panel),var(--ink-2));border:1px solid var(--line);border-radius:var(--radius);padding:24px;transition:transform .16s,border-color .18s}
+  .case:hover{transform:translateY(-3px);border-color:var(--teal-line)}
+  .case-top{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+  .case-ic{width:38px;height:38px;border-radius:11px;background:var(--teal-soft);border:1px solid var(--teal-line);display:grid;place-items:center;flex:none}
+  .case-ic b{width:13px;height:13px;border-radius:4px;background:var(--teal)}
+  .case-top .ct{font-size:14px;font-weight:600}
+  .case-top .cs{font-size:12px;color:var(--text-3)}
+  .case-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .cm{background:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 13px}
+  .cm .cml{font-size:11px;color:var(--text-3);font-family:var(--mono)}
+  .cm .cmv{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-top:3px;font-variant-numeric:tabular-nums}
+  .cm .cmv small{font-size:11px;color:var(--teal);font-weight:600;margin-left:4px}
+  .case q{display:block;font-size:13px;color:var(--text-2);line-height:1.65;quotes:none;border-top:1px solid var(--line);padding-top:13px}
+
+  /* stats band */
+  .stats-band{background:linear-gradient(180deg,var(--ink-2),var(--ink));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+  .stat .big{font-size:clamp(28px,3.4vw,42px);font-weight:700;letter-spacing:-.03em;color:var(--text);font-variant-numeric:tabular-nums}
+  .stat .big b{color:var(--teal);font-weight:700}
+  .stat .cap{font-size:13.5px;color:var(--text-3);margin-top:6px}
+
+  /* pricing */
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 24px;position:relative;transition:transform .16s,border-color .18s}
+  .plan:hover{transform:translateY(-3px)}
+  .plan.feat{border-color:var(--teal-line);background:linear-gradient(180deg,rgba(45,212,191,.06),var(--panel))}
+  .plan .ribbon{position:absolute;top:-11px;left:24px;font-size:11px;font-weight:700;color:#04231e;background:var(--teal);padding:4px 11px;border-radius:99px}
+  .plan h3{font-size:15px}
+  .plan .pp{font-size:clamp(26px,3vw,32px);font-weight:700;letter-spacing:-.03em;margin-top:12px}
+  .plan .pp small{font-size:13px;color:var(--text-3);font-weight:500}
+  .plan .ps{font-size:12.5px;color:var(--text-3);margin-top:4px}
+  .plan ul{list-style:none;margin:18px 0;display:flex;flex-direction:column;gap:10px}
+  .plan li{font-size:13.5px;color:var(--text-2);display:flex;align-items:flex-start;gap:9px}
+  .plan li::before{content:"";width:16px;height:16px;border-radius:5px;background:var(--teal-soft);border:1px solid var(--teal-line);flex:none;margin-top:2px;background-image:linear-gradient(45deg,transparent 45%,var(--teal) 45%,var(--teal) 55%,transparent 55%)}
+  .plan .btn{width:100%}
+
+  /* faq + honest notice */
+  .faq-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:32px;align-items:start}
+  .notice{background:linear-gradient(180deg,var(--panel),var(--ink-2));border:1px solid var(--line);border-radius:16px;padding:26px 24px}
+  .notice h3{font-size:16px;display:flex;align-items:center;gap:9px}
+  .notice h3 .nb{width:20px;height:20px;border-radius:6px;background:var(--teal-soft);border:1px solid var(--teal-line);display:grid;place-items:center}
+  .notice h3 .nb b{width:8px;height:8px;border-radius:2px;background:var(--teal)}
+  .notice ul{list-style:none;margin-top:16px;display:flex;flex-direction:column;gap:13px}
+  .notice li{font-size:13.5px;color:var(--text-2);line-height:1.6;padding-left:18px;position:relative}
+  .notice li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+  .faq{display:flex;flex-direction:column}
+  .qa{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:12px;overflow:hidden}
+  .qa summary{list-style:none;cursor:pointer;padding:18px 22px;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary .plus{width:20px;height:20px;flex:none;position:relative;transition:transform .2s}
+  .qa summary .plus::before,.qa summary .plus::after{content:"";position:absolute;background:var(--teal);border-radius:2px}
+  .qa summary .plus::before{top:9px;left:2px;width:16px;height:2px}
+  .qa summary .plus::after{top:2px;left:9px;width:2px;height:16px}
+  .qa[open] summary .plus{transform:rotate(45deg)}
+  .qa .ans{padding:0 22px 20px;font-size:14px;color:var(--text-2);line-height:1.7}
+
+  /* final cta */
+  .final{text-align:center;position:relative;overflow:hidden}
+  .final::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:720px;height:440px;background:radial-gradient(circle,rgba(45,212,191,.15),transparent 60%);filter:blur(22px);pointer-events:none}
+  .final .wrap{position:relative}
+  .final h2{font-size:clamp(26px,3.2vw,42px);max-width:640px;margin:18px auto 0}
+  .final p{margin:16px auto 0;max-width:500px}
+  .final .cta-row{margin-top:32px;justify-content:center}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:48px 0 40px}
+  .foot{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  .foot p{font-size:13.5px;color:var(--text-3);max-width:280px;margin-top:14px;line-height:1.6}
+  .foot-cols{display:flex;gap:56px;flex-wrap:wrap}
+  .foot-col h5{font-size:13px;color:var(--text-2);font-weight:600;margin-bottom:14px}
+  .foot-col a{display:block;font-size:13.5px;color:var(--text-3);margin-bottom:10px;transition:color .16s}
+  .foot-col a:hover{color:var(--text)}
+  .foot-legal{margin-top:36px;padding-top:24px;border-top:1px solid var(--line);font-size:12.5px;color:var(--text-3);line-height:1.7}
+
+  /* sticky bar */
+  .sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;background:rgba(12,15,20,.93);backdrop-filter:saturate(160%) blur(16px);border-top:1px solid var(--line-2)}
+  .sticky-in{max-width:1180px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .sticky-tx{display:flex;align-items:center;gap:14px;min-width:0}
+  .sticky-tx .st-t{font-size:15px;font-weight:600;color:var(--text)}
+  .sticky-tx .st-s{font-size:13px;color:var(--text-3)}
+  .sticky-trust{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-3)}
+  .sticky-bar .btn-primary{padding:12px 24px;white-space:nowrap}
+
+  /* mobile card view for comparison */
+  .cmp-cards{display:none}
+
+  /* responsive */
+  @media (max-width:980px){
+    .hero .wrap{grid-template-columns:1fr;gap:34px}
+    .probs{grid-template-columns:1fr}
+    .chart-shell{grid-template-columns:1fr}
+    .cases{grid-template-columns:1fr 1fr}
+    .stats{grid-template-columns:1fr 1fr;gap:32px 16px}
+    .price-grid{grid-template-columns:1fr}
+    .faq-grid{grid-template-columns:1fr;gap:24px}
+  }
+  @media (max-width:768px){
+    .nav-links{display:none}
+    .hero{padding:54px 0 22px}
+    section{padding:60px 0}
+    .cases{grid-template-columns:1fr}
+    .sticky-trust{display:none}
+    .st-s{display:none}
+    /* comparison -> cards */
+    .cmp-grid{display:none}
+    .cmp-cards{display:flex;flex-direction:column;gap:12px;padding:16px}
+    .cmp-card{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:16px}
+    .cmp-card .cf{font-size:14px;font-weight:700;color:var(--text)}
+    .cmp-card .cf em{display:block;font-style:normal;font-size:12px;color:var(--text-3);font-weight:400;margin-top:3px}
+    .cmp-card .rowm{display:flex;gap:10px;margin-top:12px}
+    .cmp-card .rowm>div{flex:1;background:var(--ink);border:1px solid var(--line);border-radius:9px;padding:10px 11px}
+    .cmp-card .rowm .lbl{font-size:10.5px;font-family:var(--mono);color:var(--text-3)}
+    .cmp-card .rowm .txt{font-size:12.5px;margin-top:5px;color:var(--text-2)}
+    .cmp-card .rowm .txt.us{color:var(--teal)}
+  }
+  @media (max-width:420px){
+    .wrap{padding:0 18px}
+    .cases{grid-template-columns:1fr}
+    .case-metrics{grid-template-columns:1fr 1fr}
+    .sticky-in{padding:11px 18px}
+    .cta-row{flex-direction:column;align-items:stretch}
+    .cta-row .btn{width:100%}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .rv{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><div class="logo"><span></span></div>랭크스튜디오</div>
+    <nav class="nav-links">
+      <a href="#problem">왜 직접</a>
+      <a href="#compare">비교</a>
+      <a href="#data">전후 데이터</a>
+      <a href="#cases">사례</a>
+      <a href="#price">요금</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="btn btn-primary" onclick="go('start')">광고 만들기</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow"><span class="dot"></span> AI 기반 셀프 캠페인 플랫폼</span>
+      <h1>대행사에 맡길까 망설이는 동안, <b>직접</b> 두 배 더 발견됩니다</h1>
+      <p class="sub">URL·키워드·기간·유입 규모만 정하면 됩니다. 쇼핑·마켓·로컬에서 실사용자 유입을 직접 설계하고, 결제하고, 리포트로 확인하세요. 숫자로 비교하면 선택은 분명해집니다.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="go('start')">광고 만들기</button>
+        <button class="btn btn-ghost" onclick="go('compare')">먼저 비교해 보기</button>
+      </div>
+      <div class="cta-row" style="margin-top:18px">
+        <div class="trust-inline">
+          <span class="avatars"><i>김</i><i>이</i><i>박</i><i>최</i></span>
+          <span><span class="stars">★★★★★</span> 셀러 4,800팀이 직접 운영 중</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- hero mini before/after -->
+    <div class="hero-card" aria-label="전후 비교 요약">
+      <div class="hc-bar">
+        <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+        <span class="tt">seller-channel.example / 발견성 요약</span>
+        <span class="hc-live"><span class="pulse"></span> 14일 추정</span>
+      </div>
+      <div class="hc-body">
+        <div class="hc-row">
+          <span class="hc-l">키워드 노출 점유</span>
+          <div class="hc-meter before"><i data-w="28"></i></div>
+          <span class="hc-v b">이전</span>
+        </div>
+        <div class="hc-row">
+          <span class="hc-l">키워드 노출 점유</span>
+          <div class="hc-meter after"><i data-w="74"></i></div>
+          <span class="hc-v a">이후</span>
+        </div>
+        <div class="hc-row">
+          <span class="hc-l">일 평균 유입</span>
+          <div class="hc-meter before"><i data-w="34"></i></div>
+          <span class="hc-v b">이전</span>
+        </div>
+        <div class="hc-row">
+          <span class="hc-l">일 평균 유입</span>
+          <div class="hc-meter after"><i data-w="81"></i></div>
+          <span class="hc-v a">이후</span>
+        </div>
+        <div class="hc-foot">
+          <span>예시 셀러 · 쇼핑 발견성 캠페인</span>
+          <span class="hc-badge">추정 +2.4배</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem" class="prob-band">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow"><span class="dot"></span> 지금 겪는 일</span>
+      <h2>좋은 상품인데, 발견이 안 됩니다</h2>
+      <p>대행사에 맡기면 비용과 시간이 들고, 그냥 두면 묻힙니다. 직접 운영하면 무엇이 달라지는지 숫자로 비교해 보세요.</p>
+    </div>
+    <div class="probs">
+      <div class="prob rv">
+        <div class="ico"><b></b></div>
+        <div class="pn">PROBLEM 01</div>
+        <h3>대행사는 깜깜이</h3>
+        <p>견적 미팅, 긴 계약, 그리고 무엇에 얼마가 쓰였는지 보이지 않는 청구서. 통제권이 내 손에 없습니다.</p>
+      </div>
+      <div class="prob rv">
+        <div class="ico"><b></b></div>
+        <div class="pn">PROBLEM 02</div>
+        <h3>그냥 두면 묻힘</h3>
+        <p>검색 결과 2페이지 아래, 추천 영역 밖. 노출이 없으면 클릭도, 방문도, 전환도 없습니다.</p>
+      </div>
+      <div class="prob rv">
+        <div class="ico"><b></b></div>
+        <div class="pn">PROBLEM 03</div>
+        <h3>성과는 추측뿐</h3>
+        <p>무엇이 효과가 있었는지 데이터 없이 감으로 판단하면, 다음 결정도 다시 감에 의존하게 됩니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow"><span class="dot"></span> 상세 비교</span>
+      <h2>나란히 놓고 보면 선택이 분명해집니다</h2>
+      <p>항목별로 직접 비교했습니다. 탭으로 두 가지 관점을 전환해 보세요.</p>
+    </div>
+
+    <div class="cmp-wrap rv">
+      <div class="cmp-tabs" role="tablist">
+        <button class="cmp-tab" role="tab" aria-selected="true" data-panel="p-agency">대행사 vs 직접 운영</button>
+        <button class="cmp-tab" role="tab" aria-selected="false" data-panel="p-nothing">그냥 두기 vs 유입 캠페인</button>
+      </div>
+
+      <!-- PANEL A -->
+      <div class="cmp-panel active" id="p-agency" role="tabpanel">
+        <div class="cmp-grid">
+          <div class="cmp-head">비교 항목</div>
+          <div class="cmp-head col-them">대행사 위탁 <span class="chip">기존</span></div>
+          <div class="cmp-head col-us">직접 운영 <span class="chip">랭크스튜디오</span></div>
+
+          <div class="cmp-feat">시작까지 걸리는 시간<em>설정에서 진행까지</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>미팅·견적·계약에 평균 며칠</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>화면에서 약 5분, 바로 시작</div>
+
+          <div class="cmp-feat">비용 투명성<em>무엇에 얼마가</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>묶음 청구, 항목 구분 어려움</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>결제 전 예상 비용을 화면에 표시</div>
+
+          <div class="cmp-feat">통제권<em>규모·기간 조절</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>변경 시 담당자에게 요청</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>슬라이더로 직접 조절, 즉시 반영</div>
+
+          <div class="cmp-feat">성과 가시성<em>리포트·추이</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>월말 요약 위주, 지연 보고</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>대시보드 실시간 + 주간 리포트</div>
+
+          <div class="cmp-feat">유입 방식<em>트래픽 성격</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>방식이 공개되지 않는 경우</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>실사용자 기반 유입을 명시</div>
+
+          <div class="cmp-feat">최소 단위<em>소규모 테스트</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>최소 계약 단위가 큰 편</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>필요한 만큼만 소규모로 시작</div>
+
+          <div class="cmp-feat">반복·확장<em>다음 캠페인</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>매번 재협의 필요</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>설정 복제로 즉시 재실행</div>
+        </div>
+        <!-- mobile cards -->
+        <div class="cmp-cards" aria-hidden="true">
+          <div class="cmp-card"><div class="cf">시작까지 걸리는 시간<em>설정에서 진행까지</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">평균 며칠</div></div><div><div class="lbl">직접 운영</div><div class="txt us">약 5분</div></div></div></div>
+          <div class="cmp-card"><div class="cf">비용 투명성<em>무엇에 얼마가</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">묶음 청구</div></div><div><div class="lbl">직접 운영</div><div class="txt us">결제 전 표시</div></div></div></div>
+          <div class="cmp-card"><div class="cf">통제권<em>규모·기간 조절</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">담당자 요청</div></div><div><div class="lbl">직접 운영</div><div class="txt us">직접 조절</div></div></div></div>
+          <div class="cmp-card"><div class="cf">성과 가시성<em>리포트·추이</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">월말 요약</div></div><div><div class="lbl">직접 운영</div><div class="txt us">실시간+주간</div></div></div></div>
+          <div class="cmp-card"><div class="cf">유입 방식<em>트래픽 성격</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">비공개 경우</div></div><div><div class="lbl">직접 운영</div><div class="txt us">실사용자 명시</div></div></div></div>
+          <div class="cmp-card"><div class="cf">최소 단위<em>소규모 테스트</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">큰 편</div></div><div><div class="lbl">직접 운영</div><div class="txt us">소규모 가능</div></div></div></div>
+          <div class="cmp-card"><div class="cf">반복·확장<em>다음 캠페인</em></div><div class="rowm"><div><div class="lbl">대행사</div><div class="txt">재협의</div></div><div><div class="lbl">직접 운영</div><div class="txt us">설정 복제</div></div></div></div>
+        </div>
+        <div class="cmp-note">표의 비교는 일반적인 위탁 방식과의 차이를 설명하기 위한 예시이며, 실제 조건은 업체와 계약에 따라 다를 수 있습니다.</div>
+      </div>
+
+      <!-- PANEL B -->
+      <div class="cmp-panel" id="p-nothing" role="tabpanel">
+        <div class="cmp-grid">
+          <div class="cmp-head">비교 항목</div>
+          <div class="cmp-head col-them">그냥 두기 <span class="chip">현재</span></div>
+          <div class="cmp-head col-us">유입 캠페인 <span class="chip">직접 운영</span></div>
+
+          <div class="cmp-feat">검색 노출<em>키워드 가시성</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>아래 페이지에 머무름</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>노린 키워드 노출을 끌어올림</div>
+
+          <div class="cmp-feat">방문 유입<em>일 평균</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>자연 유입에만 의존</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>실사용자 유입을 더해 흐름 형성</div>
+
+          <div class="cmp-feat">발견 경로<em>추천·연관</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>추천 영역 진입이 더딤</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>관심 신호가 쌓여 노출 기회 확대</div>
+
+          <div class="cmp-feat">데이터 확보<em>의사결정 근거</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>무엇이 통하는지 알기 어려움</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>키워드·기간별 추이를 리포트로 확인</div>
+
+          <div class="cmp-feat">속도<em>변화 체감</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>변화까지 오래 걸림</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>기간을 정해 집중적으로 운영</div>
+
+          <div class="cmp-feat">예산 통제<em>지출 범위</em></div>
+          <div class="cmp-cell"><span class="mk no">—</span>지출은 없지만 기회도 흘려보냄</div>
+          <div class="cmp-cell us"><span class="mk yes">✓</span>정한 예산 안에서만 운영</div>
+        </div>
+        <div class="cmp-cards" aria-hidden="true">
+          <div class="cmp-card"><div class="cf">검색 노출<em>키워드 가시성</em></div><div class="rowm"><div><div class="lbl">그냥 두기</div><div class="txt">아래 머무름</div></div><div><div class="lbl">캠페인</div><div class="txt us">노출 상승</div></div></div></div>
+          <div class="cmp-card"><div class="cf">방문 유입<em>일 평균</em></div><div class="rowm"><div><div class="lbl">그냥 두기</div><div class="txt">자연 의존</div></div><div><div class="lbl">캠페인</div><div class="txt us">흐름 형성</div></div></div></div>
+          <div class="cmp-card"><div class="cf">발견 경로<em>추천·연관</em></div><div class="rowm"><div><div class="lbl">그냥 두기</div><div class="txt">진입 더딤</div></div><div><div class="lbl">캠페인</div><div class="txt us">기회 확대</div></div></div></div>
+          <div class="cmp-card"><div class="cf">데이터 확보<em>의사결정</em></div><div class="rowm"><div><div class="lbl">그냥 두기</div><div class="txt">알기 어려움</div></div><div><div class="lbl">캠페인</div><div class="txt us">추이 확인</div></div></div></div>
+          <div class="cmp-card"><div class="cf">속도<em>변화 체감</em></div><div class="rowm"><div><div class="lbl">그냥 두기</div><div class="txt">오래 걸림</div></div><div><div class="lbl">캠페인</div><div class="txt us">집중 운영</div></div></div></div>
+          <div class="cmp-card"><div class="cf">예산 통제<em>지출 범위</em></div><div class="rowm"><div><div class="lbl">그냥 두기</div><div class="txt">기회 흘림</div></div><div><div class="lbl">캠페인</div><div class="txt us">예산 내</div></div></div></div>
+        </div>
+        <div class="cmp-note">표시된 비교는 일반적인 경향을 설명하기 위한 예시이며, 실제 결과는 시장 상황과 설정에 따라 달라질 수 있습니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE/AFTER DATA -->
+<section id="data">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow"><span class="dot"></span> 전후 데이터</span>
+      <h2>유입과 발견성이 어떻게 차오르는지</h2>
+      <p>스크롤하면 곡선이 채워집니다. 기간을 전환해 추정 흐름을 비교해 보세요.</p>
+    </div>
+
+    <div class="chart-shell rv">
+      <div class="chart-card">
+        <div class="chart-top">
+          <h3>키워드 노출 점유 추정</h3>
+          <div class="seg" role="group" aria-label="기간 전환">
+            <button data-range="14" aria-pressed="true">14일</button>
+            <button data-range="30" aria-pressed="false">30일</button>
+            <button data-range="90" aria-pressed="false">90일</button>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <span><span class="lg-d b"></span> 캠페인 전</span>
+          <span><span class="lg-d a"></span> 캠페인 후</span>
+        </div>
+        <svg class="chart-svg" id="chart" viewBox="0 0 640 300" preserveAspectRatio="none" aria-label="전후 추정 곡선">
+          <defs>
+            <linearGradient id="fillAfter" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(45,212,191,.28)"/>
+              <stop offset="100%" stop-color="rgba(45,212,191,0)"/>
+            </linearGradient>
+          </defs>
+          <g id="grid"></g>
+          <g id="axis"></g>
+          <path class="ar-after" id="area" d=""/>
+          <path class="ln-before" id="lineB" d=""/>
+          <path class="ln-after" id="lineA" d=""/>
+          <circle class="dot-after" id="endDot" r="4.5" cx="0" cy="0" style="opacity:0"/>
+        </svg>
+        <div class="chart-cap">추정 곡선은 평균적 운영 패턴을 단순화해 보여주는 예시입니다. 실제 추이는 키워드·시장 상황에 따라 달라집니다.</div>
+      </div>
+
+      <div class="delta-list">
+        <div class="delta">
+          <div class="dl">노출 점유 변화</div>
+          <div class="dv"><span class="num" data-count="2.4" data-suffix="배" data-dec="1">0</span><b></b></div>
+          <div class="dd">캠페인 전 대비 추정 노출 점유</div>
+          <div class="spark"><i data-h="30"></i><i data-h="42"></i><i data-h="38"></i><i data-h="60"></i><i data-h="72"></i><i data-h="88"></i><i data-h="100"></i></div>
+        </div>
+        <div class="delta">
+          <div class="dl">일 평균 유입</div>
+          <div class="dv"><b><span class="num" data-count="2380" data-suffix="" data-dec="0">0</span></b></div>
+          <div class="dd">14일 운영 시점 추정 일 유입</div>
+          <div class="spark"><i data-h="34"></i><i data-h="46"></i><i data-h="52"></i><i data-h="58"></i><i data-h="74"></i><i data-h="90"></i><i data-h="100"></i></div>
+        </div>
+        <div class="delta">
+          <div class="dl">추천 노출 진입</div>
+          <div class="dv"><span class="num" data-count="63" data-suffix="%" data-dec="0">0</span></div>
+          <div class="dd">연관·추천 영역 진입 추정 비율</div>
+          <div class="spark"><i data-h="28"></i><i data-h="36"></i><i data-h="44"></i><i data-h="55"></i><i data-h="66"></i><i data-h="80"></i><i data-h="100"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASES -->
+<section id="cases">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow"><span class="dot"></span> 익명 사례 지표</span>
+      <h2>직접 운영한 셀러들의 14일</h2>
+      <p>식별 정보를 제거한 익명 사례입니다. 같은 화면에서 누구나 설정할 수 있습니다.</p>
+    </div>
+    <div class="cases">
+      <div class="case rv">
+        <div class="case-top"><div class="case-ic"><b></b></div><div><div class="ct">패션 셀러 A</div><div class="cs">쇼핑 발견성 · 14일</div></div></div>
+        <div class="case-metrics">
+          <div class="cm"><div class="cml">키워드 노출</div><div class="cmv">2.6<small>배</small></div></div>
+          <div class="cm"><div class="cml">일 평균 유입</div><div class="cmv">+138<small>%</small></div></div>
+        </div>
+        <q>“규모를 직접 조절하니 어디에 얼마가 쓰이는지 한눈에 보였어요. 리포트가 깔끔합니다.”</q>
+      </div>
+      <div class="case rv">
+        <div class="case-top"><div class="case-ic"><b></b></div><div><div class="ct">로컬 카페 B</div><div class="cs">로컬 발견성 · 21일</div></div></div>
+        <div class="case-metrics">
+          <div class="cm"><div class="cml">지역 노출</div><div class="cmv">3.1<small>배</small></div></div>
+          <div class="cm"><div class="cml">방문 문의</div><div class="cmv">+92<small>%</small></div></div>
+        </div>
+        <q>“지역 키워드 노출이 눈에 띄게 올라왔어요. 주간 요약 덕에 다음 계획이 수월했습니다.”</q>
+      </div>
+      <div class="case rv">
+        <div class="case-top"><div class="case-ic"><b></b></div><div><div class="ct">생활용품 마켓 C</div><div class="cs">마켓 발견성 · 14일</div></div></div>
+        <div class="case-metrics">
+          <div class="cm"><div class="cml">채널 방문</div><div class="cmv">2.2<small>배</small></div></div>
+          <div class="cm"><div class="cml">재실행</div><div class="cmv">3<small>회</small></div></div>
+        </div>
+        <q>“설정부터 결제까지 5분이면 끝나요. 필요할 때 바로 시작하는 게 가장 좋습니다.”</q>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAND -->
+<section class="stats-band">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat rv"><div class="big"><b class="num" data-count="4800" data-suffix="">0</b>+</div><div class="cap">캠페인을 직접 운영하는 셀러</div></div>
+      <div class="stat rv"><div class="big"><b class="num" data-count="2.4" data-suffix="배" data-dec="1">0</b></div><div class="cap">평균 키워드 노출 증가폭(추정)</div></div>
+      <div class="stat rv"><div class="big"><b class="num" data-count="92" data-suffix="%">0</b></div><div class="cap">재사용을 선택한 비율</div></div>
+      <div class="stat rv"><div class="big"><b class="num" data-count="5" data-suffix="분">0</b></div><div class="cap">캠페인 생성 평균 소요</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="price">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow"><span class="dot"></span> 투명 요금</span>
+      <h2>필요한 만큼만, 미리 확인하고 결제</h2>
+      <p>모든 금액은 결제 전 화면에 표시됩니다. 숨은 비용은 없습니다.</p>
+    </div>
+    <div class="price-grid">
+      <div class="plan rv">
+        <h3>테스트</h3>
+        <div class="pp">소규모 <small>부터</small></div>
+        <div class="ps">처음 효과를 가볍게 확인</div>
+        <ul>
+          <li>단일 키워드 캠페인</li>
+          <li>최대 7일 운영</li>
+          <li>기본 진행 대시보드</li>
+          <li>주간 리포트 1회</li>
+        </ul>
+        <button class="btn btn-ghost" onclick="go('start')">이 규모로 시작</button>
+      </div>
+      <div class="plan feat rv">
+        <span class="ribbon">가장 많이 선택</span>
+        <h3>성장</h3>
+        <div class="pp">중간 규모 <small>부터</small></div>
+        <div class="ps">키워드를 묶어 집중 운영</div>
+        <ul>
+          <li>다중 키워드 캠페인</li>
+          <li>최대 30일 운영</li>
+          <li>실시간 대시보드 + 추이</li>
+          <li>주간 리포트 + 다운로드</li>
+          <li>설정 복제 재실행</li>
+        </ul>
+        <button class="btn btn-primary" onclick="go('start')">이 규모로 시작</button>
+      </div>
+      <div class="plan rv">
+        <h3>확장</h3>
+        <div class="pp">대규모 <small>부터</small></div>
+        <div class="ps">여러 채널을 동시에</div>
+        <ul>
+          <li>다채널·다캠페인 운영</li>
+          <li>기간 자유 설정</li>
+          <li>채널별 성과 비교 리포트</li>
+          <li>우선 지원</li>
+        </ul>
+        <button class="btn btn-ghost" onclick="go('start')">이 규모로 시작</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ + HONEST NOTICE -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="eyebrow"><span class="dot"></span> 정직 고지 · 자주 묻는 질문</span>
+      <h2>시작 전에, 솔직하게 알려드립니다</h2>
+    </div>
+    <div class="faq-grid">
+      <div class="notice rv">
+        <h3><span class="nb"><b></b></span> 미리 약속드리는 것</h3>
+        <ul>
+          <li>모든 유입은 실사용자 기반으로 운영됩니다.</li>
+          <li>결제 전에 예상 비용을 화면에 표시합니다.</li>
+          <li>성과는 시장 상황과 설정에 따라 달라질 수 있습니다.</li>
+          <li>표시된 수치와 사례는 이해를 돕기 위한 예시입니다.</li>
+          <li>원할 때 캠페인을 멈추고 다시 시작할 수 있습니다.</li>
+        </ul>
+      </div>
+      <div class="faq">
+        <details class="qa rv" open>
+          <summary>리워드 트래픽이 무엇인가요?<span class="plus"></span></summary>
+          <div class="ans">실제 사람이 직접 페이지를 방문하는 실사용자 유입을 뜻합니다. 자동화된 비정상 유입이 아니라, 실사용자가 캠페인을 통해 페이지를 찾아오는 방식입니다.</div>
+        </details>
+        <details class="qa rv">
+          <summary>비교 표의 수치는 어떻게 산정했나요?<span class="plus"></span></summary>
+          <div class="ans">표와 그래프의 수치는 일반적인 운영 패턴을 단순화해 보여주는 예시입니다. 특정 성과를 약속하는 값이 아니며, 실제 결과는 키워드·시장·설정에 따라 달라집니다.</div>
+        </details>
+        <details class="qa rv">
+          <summary>대행사 없이 정말 직접 만들 수 있나요?<span class="plus"></span></summary>
+          <div class="ans">네. URL·키워드·기간·유입 규모만 화면에서 설정하면 됩니다. 별도 미팅이나 계약 절차 없이 직접 생성하고 결제할 수 있습니다.</div>
+        </details>
+        <details class="qa rv">
+          <summary>성과는 어떻게 확인하나요?<span class="plus"></span></summary>
+          <div class="ans">대시보드에서 진행 현황을 실시간으로 보고, 주간 리포트로 키워드 노출과 유입 추이를 정리해 드립니다. 리포트는 언제든 내려받을 수 있습니다.</div>
+        </details>
+        <details class="qa rv">
+          <summary>비용은 어떻게 책정되나요?<span class="plus"></span></summary>
+          <div class="ans">설정한 기간과 유입 규모에 따라 예상 비용이 결제 전 화면에 표시됩니다. 원하는 만큼만 선택해 결제하며, 숨은 비용은 없습니다.</div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="start" class="final">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span> 지금 시작</span>
+    <h2>망설이는 동안에도 발견성은 흘러갑니다</h2>
+    <p>설정에서 리포트까지 한 화면에서. 필요한 만큼만, 직접 운영하세요.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="alert('데모 화면입니다.')">광고 만들기</button>
+      <button class="btn btn-ghost" onclick="go('compare')">비교 다시 보기</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <div class="brand"><div class="logo"><span></span></div>랭크스튜디오</div>
+        <p>대행사 없이 직접 만드는 AI 셀프 캠페인 플랫폼. 쇼핑·마켓·로컬 발견성을 높이세요.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>제품</h5>
+          <a href="#compare">비교</a>
+          <a href="#data">전후 데이터</a>
+          <a href="#price">요금</a>
+        </div>
+        <div class="foot-col">
+          <h5>리소스</h5>
+          <a href="#faq">자주 묻는 질문</a>
+          <a href="https://seller-channel.example">셀러 채널</a>
+          <a href="#start">시작하기</a>
+        </div>
+        <div class="foot-col">
+          <h5>고객지원</h5>
+          <a href="https://seller-channel.example">문의하기</a>
+          <a href="#faq">이용 안내</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      표시된 수치와 사례, 비교 표는 이해를 돕기 위한 예시입니다. 실제 성과는 시장 상황과 설정에 따라 달라질 수 있습니다.<br>
+      © 2026 랭크스튜디오. 모든 유입은 실사용자 기반으로 운영됩니다.
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY CTA BAR -->
+<div class="sticky-bar">
+  <div class="sticky-in">
+    <div class="sticky-tx">
+      <div>
+        <div class="st-t">5분이면 첫 캠페인이 시작됩니다</div>
+        <div class="st-s">대행사 없이 직접 설정 · 필요한 만큼만 결제</div>
+      </div>
+      <div class="sticky-trust"><span class="stars">★★★★★</span> 셀러 4,800팀 운영 중</div>
+    </div>
+    <button class="btn btn-primary" onclick="go('start')">광고 만들기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.go = function(id){ var el=document.getElementById(id); if(el) el.scrollIntoView({behavior: reduce?'auto':'smooth'}); };
+
+  /* ---- reveal on scroll ---- */
+  var rvs = document.querySelectorAll('.rv');
+  if(reduce){ rvs.forEach(function(e){ e.classList.add('in'); }); }
+  else if('IntersectionObserver' in window){
+    var rvo = new IntersectionObserver(function(en){
+      en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('in'); rvo.unobserve(x.target); }});
+    }, {threshold:.16});
+    rvs.forEach(function(e){ rvo.observe(e); });
+  } else { rvs.forEach(function(e){ e.classList.add('in'); }); }
+
+  /* ---- count up ---- */
+  function countUp(el){
+    var target = parseFloat(el.getAttribute('data-count'));
+    var suffix = el.getAttribute('data-suffix') || '';
+    var dec = parseInt(el.getAttribute('data-dec')||'0',10);
+    function fmt(v){ return (dec>0 ? v.toFixed(dec) : Math.round(v)).toLocaleString ? (dec>0? v.toFixed(dec) : Math.round(v).toLocaleString()) : v; }
+    if(reduce){ el.textContent = (dec>0?target.toFixed(dec):Math.round(target).toLocaleString())+suffix; return; }
+    var start = performance.now(), dur=1400;
+    function tick(now){
+      var t=Math.min((now-start)/dur,1), e=1-Math.pow(1-t,3), v=target*e;
+      el.textContent = (dec>0? v.toFixed(dec) : Math.round(v).toLocaleString())+suffix;
+      if(t<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* ---- hero meters ---- */
+  function fillMeters(scope){
+    scope.querySelectorAll('.hc-meter i').forEach(function(i){ i.style.width=(i.getAttribute('data-w')||0)+'%'; });
+  }
+  /* ---- sparks ---- */
+  function fillSparks(scope){
+    scope.querySelectorAll('.spark i').forEach(function(i,idx){ setTimeout(function(){ i.style.height=(i.getAttribute('data-h')||0)+'%'; }, idx*55); });
+  }
+
+  function observeOnce(sel, cb, th){
+    var els=document.querySelectorAll(sel);
+    if(!('IntersectionObserver' in window)){ els.forEach(cb); return; }
+    var o=new IntersectionObserver(function(en){ en.forEach(function(x){ if(x.isIntersecting){ cb(x.target); o.unobserve(x.target); }});}, {threshold:th||.4});
+    els.forEach(function(e){ o.observe(e); });
+  }
+  observeOnce('.num[data-count]', countUp, .6);
+  observeOnce('.hero-card', fillMeters, .3);
+  observeOnce('.delta', fillSparks, .4);
+
+  /* ---- comparison tabs ---- */
+  var tabs=document.querySelectorAll('.cmp-tab');
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.setAttribute('aria-selected','false'); });
+      t.setAttribute('aria-selected','true');
+      document.querySelectorAll('.cmp-panel').forEach(function(p){ p.classList.remove('active'); });
+      document.getElementById(t.getAttribute('data-panel')).classList.add('active');
+    });
+  });
+
+  /* ---- before/after chart ---- */
+  var W=640,H=300,padL=18,padR=18,padT=18,padB=28;
+  var iw=W-padL-padR, ih=H-padT-padB;
+  var datasets={
+    14:{ before:[14,16,15,18,20,19,22,24,23,26,28,27,29,30], after:[14,20,28,34,42,48,55,60,64,68,72,75,78,82] },
+    30:{ before:[12,14,13,16,17,18,17,20,21,22,24,25,26,28,29,30,32,33,34,35], after:[12,18,25,33,40,47,53,58,62,66,70,73,76,79,82,84,86,88,90,92] },
+    90:{ before:[10,12,14,15,17,18,20,22,24,25,27,28,30,32,34,36,38,40,42,44], after:[10,16,24,34,44,52,60,67,73,78,83,87,90,93,95,97,98,99,100,100] }
+  };
+  var maxVal=100;
+  function toPath(arr, fill){
+    var n=arr.length, pts=arr.map(function(v,i){
+      var x=padL + (i/(n-1))*iw;
+      var y=padT + ih - (v/maxVal)*ih;
+      return [x,y];
+    });
+    var d='M'+pts[0][0].toFixed(1)+','+pts[0][1].toFixed(1);
+    for(var i=1;i<pts.length;i++){
+      var p0=pts[i-1],p1=pts[i];
+      var cx=(p0[0]+p1[0])/2;
+      d+=' C'+cx.toFixed(1)+','+p0[1].toFixed(1)+' '+cx.toFixed(1)+','+p1[1].toFixed(1)+' '+p1[0].toFixed(1)+','+p1[1].toFixed(1);
+    }
+    if(fill){ d+=' L'+pts[n-1][0].toFixed(1)+','+(padT+ih)+' L'+pts[0][0].toFixed(1)+','+(padT+ih)+' Z'; }
+    return {d:d,end:pts[n-1]};
+  }
+  var grid=document.getElementById('grid'), axis=document.getElementById('axis');
+  for(var g=0; g<=4; g++){
+    var y=padT + (g/4)*ih;
+    var l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('class','grid-l'); l.setAttribute('x1',padL); l.setAttribute('x2',W-padR); l.setAttribute('y1',y); l.setAttribute('y2',y);
+    grid.appendChild(l);
+    var tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('class','axis-t'); tx.setAttribute('x',padL); tx.setAttribute('y',y-4);
+    tx.textContent=(100-g*25)+'%'; axis.appendChild(tx);
+  }
+  var lineA=document.getElementById('lineA'), lineB=document.getElementById('lineB'), area=document.getElementById('area'), endDot=document.getElementById('endDot');
+  var curRange=14, chartShown=false;
+
+  function renderChart(animate){
+    var ds=datasets[curRange];
+    var pa=toPath(ds.after,false), pb=toPath(ds.before,false), par=toPath(ds.after,true);
+    lineB.setAttribute('d', pb.d);
+    lineA.setAttribute('d', pa.d);
+    area.setAttribute('d', par.d);
+    endDot.setAttribute('cx', pa.end[0]); endDot.setAttribute('cy', pa.end[1]);
+    var len=lineA.getTotalLength ? lineA.getTotalLength() : 600;
+    if(reduce || !animate){
+      lineA.style.strokeDasharray='none'; lineA.style.strokeDashoffset='0';
+      area.style.opacity='1'; endDot.style.opacity='1';
+      return;
+    }
+    lineA.style.transition='none';
+    lineA.style.strokeDasharray=len; lineA.style.strokeDashoffset=len;
+    area.style.opacity='0'; endDot.style.opacity='0';
+    void lineA.getBoundingClientRect();
+    lineA.style.transition='stroke-dashoffset 1.4s cubic-bezier(.22,.61,.36,1)';
+    lineA.style.strokeDashoffset='0';
+    area.style.transition='opacity .9s ease .5s'; area.style.opacity='1';
+    endDot.style.transition='opacity .4s ease 1.3s'; endDot.style.opacity='1';
+  }
+  renderChart(false);
+
+  observeOnce('#chart', function(){ chartShown=true; renderChart(true); }, .3);
+
+  var segBtns=document.querySelectorAll('.seg button');
+  segBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      segBtns.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      b.setAttribute('aria-pressed','true');
+      curRange=parseInt(b.getAttribute('data-range'),10);
+      renderChart(chartShown);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

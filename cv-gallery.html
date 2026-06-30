@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>랭크스튜디오 — 전환형 UI 시안 10종</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+      :root { --bg:#f5f6f8; --card:#ffffff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --accent:#2563eb; }
+      * { box-sizing:border-box; margin:0; }
+      body { background:var(--bg); color:var(--ink); font-family:"Pretendard",sans-serif; padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 88px; -webkit-font-smoothing:antialiased; }
+      header { max-width:1200px; margin:0 auto 40px; }
+      .kicker { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:800; }
+      h1 { font-size:clamp(26px,3.6vw,40px); line-height:1.25; margin:12px 0 14px; letter-spacing:-.02em; word-break:keep-all; }
+      header p { color:var(--muted); font-size:15.5px; line-height:1.7; max-width:74ch; }
+      .grid { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
+      @media (max-width:800px){ .grid{ grid-template-columns:1fr; } }
+      .card { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); display:flex; flex-direction:column; transition:transform .16s ease, box-shadow .16s ease; }
+      .card:hover { transform:translateY(-4px); box-shadow:0 18px 40px -24px rgba(17,24,39,.35); }
+      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1040; object-fit:cover; object-position:top; background:#eee; }
+      .meta { padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px; }
+      .num { font-size:12px; color:var(--accent); font-weight:800; letter-spacing:.08em; }
+      .meta h2 { font-size:19px; letter-spacing:-.01em; word-break:keep-all; }
+      .meta p { color:var(--muted); font-size:13.5px; line-height:1.55; margin-top:2px; }
+      .open { margin-top:12px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#fff; font-weight:700; font-size:13.5px; padding:10px 17px; border-radius:9px; }
+      .open:hover { background:#1d4fd7; }
+      footer { max-width:1200px; margin:48px auto 0; color:var(--muted); font-size:13px; line-height:1.8; }
+      footer a { color:var(--ink); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="kicker">RANKSTUDIO · 전환·이해도 중심 · 10 CONCEPTS</div>
+      <h1>랭크스튜디오 — 전환형 UI 시안 10종</h1>
+      <p>레퍼런스(풀림애드의 "문제→해결→증거" 이해도 + 셀프마케팅의 "바로 광고 만들기")를 기준으로, <b>Pretendard 폰트 위주 · 정상 글자크기/간격 · 바로 클릭 가능한 "광고 만들기"</b>를 적용한 전환 중심 시안입니다. 카드를 열면 실제 입력·견적 계산·위저드가 동작합니다.</p>
+    </header>
+    <main class="grid">
+      <article class="card"><a href="cv-01-quickstart.html" target="_blank"><img class="shot" src="previews/g-cv-01-quickstart.png" alt="인라인 퀵스타트"/></a><div class="meta"><span class="num">01</span><h2>인라인 퀵스타트</h2><p>히어로에서 바로 URL→키워드→예상비용→광고 만들기. 즉시 전환.</p><a class="open" href="cv-01-quickstart.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-02-problem-solution.html" target="_blank"><img class="shot" src="previews/g-cv-02-problem-solution.png" alt="문제→해결 스토리"/></a><div class="meta"><span class="num">02</span><h2>문제 → 해결 스토리</h2><p>풀림애드형. 묻힌 상품→AI 신호→증거→정직 고지로 신뢰 구축.</p><a class="open" href="cv-02-problem-solution.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-03-wizard.html" target="_blank"><img class="shot" src="previews/g-cv-03-wizard.png" alt="위저드형 히어로"/></a><div class="meta"><span class="num">03</span><h2>위저드형 히어로</h2><p>히어로가 곧 1단계. 대상 선택→키워드→검토, 마찰 0.</p><a class="open" href="cv-03-wizard.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-04-dark-sticky.html" target="_blank"><img class="shot" src="previews/g-cv-04-dark-sticky.png" alt="다크 프리미엄 스티키"/></a><div class="meta"><span class="num">04</span><h2>다크 프리미엄 + 스티키 CTA</h2><p>움직이는 제품 데모 + 하단 고정 "광고 만들기" 바. 틸 악센트.</p><a class="open" href="cv-04-dark-sticky.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-05-pricing.html" target="_blank"><img class="shot" src="previews/g-cv-05-pricing.png" alt="가격·견적 계산기"/></a><div class="meta"><span class="num">05</span><h2>가격·견적 계산기</h2><p>슬라이더로 예상 유입·비용 실시간 → 이 조건으로 바로 만들기.</p><a class="open" href="cv-05-pricing.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-06-social-proof.html" target="_blank"><img class="shot" src="previews/g-cv-06-social-proof.png" alt="신뢰·사례"/></a><div class="meta"><span class="num">06</span><h2>신뢰·사례 중심</h2><p>통계 카운트업·후기·업종 사례로 안심시켜 전환.</p><a class="open" href="cv-06-social-proof.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-07-mobile-flow.html" target="_blank"><img class="shot" src="previews/g-cv-07-mobile-flow.png" alt="모바일앱 플로우"/></a><div class="meta"><span class="num">07</span><h2>모바일앱 플로우</h2><p>큰 탭 카드 + 하단 고정 풋바 CTA. 한 손에 들어오는 흐름.</p><a class="open" href="cv-07-mobile-flow.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-08-comparison.html" target="_blank"><img class="shot" src="previews/g-cv-08-comparison.png" alt="비교표"/></a><div class="meta"><span class="num">08</span><h2>비교표 설득</h2><p>맡기기 vs 직접, 그냥 두기 vs 캠페인. 항목별 대비로 명확.</p><a class="open" href="cv-08-comparison.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-09-faq.html" target="_blank"><img class="shot" src="previews/g-cv-09-faq.png" alt="FAQ 안심"/></a><div class="meta"><span class="num">09</span><h2>FAQ·안심 전환</h2><p>구매 직전 망설임을 즉답 FAQ로 제거. 정직함으로 신뢰.</p><a class="open" href="cv-09-faq.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="cv-10-allinone.html" target="_blank"><img class="shot" src="previews/g-cv-10-allinone.png" alt="올인원 압축"/></a><div class="meta"><span class="num">10</span><h2>올인원 압축</h2><p>첫 스크롤에 가치+퀵스타트+3스텝+통계. 명확함이 무기.</p><a class="open" href="cv-10-allinone.html" target="_blank">열기 →</a></div></article>
+    </main>
+    <footer>
+      10종 모두 Pretendard 위주 · 외부 플랫폼 실명/금지표현 0 · 'AI 기반' 포지셔닝 · 정직한 "특정 순위 약속 안 함" · 320/768/1440 반응형.<br/>
+      이전 시안 — 어워즈 스타일 10종: <a href="award-gallery.html">보기</a> · 아트디렉션/에디토리얼: v2-*.html, concept-*.html 파일 직접 접근.
+    </footer>
+  </body>
+</html>

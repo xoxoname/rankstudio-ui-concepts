@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크스튜디오 — 투명하게 운영하는 AI 셀프 캠페인</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --ink:#0a0c10;
+    --ink-2:#0e1117;
+    --panel:#13171f;
+    --panel-2:#171c26;
+    --line:rgba(255,255,255,.07);
+    --line-2:rgba(255,255,255,.13);
+    --text:#eef1f6;
+    --text-2:#a9b1c1;
+    --text-3:#6d7688;
+    --teal:#2dd4bf;
+    --teal-soft:rgba(45,212,191,.13);
+    --teal-line:rgba(45,212,191,.32);
+    --teal-glow:rgba(45,212,191,.6);
+    --warn:#e0b15a;
+    --warn-soft:rgba(224,177,90,.12);
+    --warn-line:rgba(224,177,90,.3);
+    --radius:14px;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;
+    --font:"Pretendard Variable",Pretendard,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    background:var(--ink);
+    color:var(--text);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    word-break:keep-all;
+    overflow-x:hidden;
+    padding-bottom:86px;
+  }
+  .wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+  .narrow{max-width:880px}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,h4{letter-spacing:-.02em;line-height:1.3;font-weight:700}
+  p{font-size:16px;color:var(--text-2)}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12.5px;font-weight:600;letter-spacing:.02em;
+    color:var(--teal);
+    background:var(--teal-soft);
+    border:1px solid var(--teal-line);
+    padding:6px 12px;border-radius:999px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal-glow)}
+
+  /* ---- header ---- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,12,16,.78);
+    backdrop-filter:saturate(160%) blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;font-size:17px}
+  .logo{
+    width:30px;height:30px;border-radius:9px;
+    background:linear-gradient(135deg,#1f2530,#10131a);
+    border:1px solid var(--teal-line);
+    display:grid;place-items:center;
+  }
+  .logo span{width:11px;height:11px;border-radius:3px;background:var(--teal);box-shadow:0 0 14px var(--teal-glow)}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{font-size:14.5px;color:var(--text-2);transition:color .18s}
+  .nav-links a:hover{color:var(--text)}
+  .nav-right{display:flex;align-items:center;gap:14px}
+  .nav-trust{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-3)}
+  .shield{width:14px;height:14px;flex:none}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:var(--font);font-weight:600;font-size:15px;cursor:pointer;
+    border-radius:11px;border:none;transition:transform .14s,background .18s,box-shadow .18s;
+  }
+  .btn-primary{
+    background:var(--teal);color:#04231e;padding:12px 22px;
+    box-shadow:0 6px 22px rgba(45,212,191,.26);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 10px 30px rgba(45,212,191,.38)}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--line-2);padding:11px 18px}
+  .btn-ghost:hover{background:var(--panel)}
+  .nav .btn-primary{padding:10px 18px;font-size:14.5px}
+
+  /* ---- hero ---- */
+  .hero{position:relative;padding:78px 0 30px;text-align:center;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+    width:760px;height:520px;
+    background:radial-gradient(circle,rgba(45,212,191,.16),transparent 62%);
+    filter:blur(20px);pointer-events:none;z-index:0;
+  }
+  .hero .wrap{position:relative;z-index:1}
+  .hero h1{
+    font-size:clamp(26px,3.4vw,44px);
+    max-width:780px;margin:20px auto 0;
+  }
+  .hero h1 b{color:var(--teal);font-weight:700}
+  .hero .sub{font-size:clamp(15px,1.4vw,17px);max-width:600px;margin:18px auto 0;color:var(--text-2)}
+  .cta-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .micro{font-size:13px;color:var(--text-3);margin-top:14px}
+  .hero-badges{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:26px;flex-wrap:wrap}
+  .hbadge{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:12.5px;color:var(--text-2);font-weight:500;
+    background:var(--panel);border:1px solid var(--line);
+    padding:8px 13px;border-radius:999px;
+  }
+  .hbadge svg{width:14px;height:14px;flex:none;color:var(--teal)}
+
+  /* ---- transparency strip / mechanism ---- */
+  .flow{
+    position:relative;z-index:1;max-width:980px;margin:46px auto 0;
+    border-radius:18px;border:1px solid var(--line-2);
+    background:linear-gradient(180deg,var(--ink-2),var(--ink));
+    box-shadow:0 40px 90px -34px rgba(0,0,0,.7);
+    overflow:hidden;text-align:left;
+  }
+  .flow-bar{
+    display:flex;align-items:center;gap:8px;padding:13px 16px;
+    border-bottom:1px solid var(--line);background:rgba(255,255,255,.015);
+  }
+  .flow-bar .tl{width:11px;height:11px;border-radius:50%;background:#2a3140}
+  .flow-bar .label{margin-left:8px;font-family:var(--mono);font-size:12px;color:var(--text-3)}
+  .flow-live{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--teal);font-weight:600}
+  .pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  .flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+  .fstep{background:var(--ink-2);padding:20px 18px;position:relative}
+  .fstep .fn{font-family:var(--mono);font-size:11px;color:var(--teal);font-weight:600}
+  .fstep h4{font-size:14.5px;margin-top:10px;color:var(--text)}
+  .fstep p{font-size:12.5px;margin-top:6px;line-height:1.55;color:var(--text-3)}
+  .fstep .arrow{position:absolute;top:24px;right:-8px;color:var(--text-3);z-index:2}
+
+  /* ---- section base ---- */
+  section{padding:84px 0}
+  .sec-head{max-width:640px;margin-bottom:46px}
+  .sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+  .sec-head h2{font-size:clamp(23px,2.6vw,34px);margin-top:14px}
+  .sec-head p{margin-top:14px;font-size:16px}
+
+  /* ---- mechanism detail (progressive disclosure) ---- */
+  .mech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .mech{
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px 22px;transition:border-color .18s,transform .16s;
+  }
+  .mech:hover{border-color:var(--teal-line);transform:translateY(-2px)}
+  .mech-ic{width:42px;height:42px;border-radius:12px;background:var(--teal-soft);border:1px solid var(--teal-line);display:grid;place-items:center;margin-bottom:16px}
+  .mech-ic svg{width:20px;height:20px;color:var(--teal)}
+  .mech h3{font-size:16.5px}
+  .mech p{font-size:14px;margin-top:9px;line-height:1.62}
+  .mech .more{
+    margin-top:14px;border-top:1px solid var(--line);
+  }
+  .mech details summary{
+    list-style:none;cursor:pointer;padding-top:13px;
+    font-size:13px;font-weight:600;color:var(--teal);
+    display:flex;align-items:center;gap:6px;
+  }
+  .mech details summary::-webkit-details-marker{display:none}
+  .mech details summary .chev{transition:transform .2s}
+  .mech details[open] summary .chev{transform:rotate(90deg)}
+  .mech details .body{font-size:13px;color:var(--text-2);line-height:1.66;padding-top:10px}
+  .mech details .body ul{list-style:none;margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .mech details .body li{display:flex;gap:8px;font-size:12.5px;color:var(--text-2)}
+  .mech details .body li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--teal);flex:none;margin-top:7px}
+
+  /* ---- honest comparison (promise / no-promise) ---- */
+  .honest{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .hcol{border-radius:16px;padding:28px 26px;border:1px solid var(--line)}
+  .hcol.yes{background:linear-gradient(180deg,rgba(45,212,191,.06),var(--ink-2));border-color:var(--teal-line)}
+  .hcol.no{background:linear-gradient(180deg,rgba(224,177,90,.05),var(--ink-2));border-color:var(--warn-line)}
+  .hcol .htag{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;margin-bottom:18px}
+  .hcol.yes .htag{color:var(--teal);background:var(--teal-soft);border:1px solid var(--teal-line)}
+  .hcol.no .htag{color:var(--warn);background:var(--warn-soft);border:1px solid var(--warn-line)}
+  .hcol h3{font-size:18px;margin-bottom:4px}
+  .hcol .hsub{font-size:13.5px;color:var(--text-3);margin-bottom:18px}
+  .hlist{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .hlist li{display:flex;gap:12px;font-size:14.5px;color:var(--text);line-height:1.55}
+  .hlist li .mk{width:22px;height:22px;border-radius:7px;flex:none;display:grid;place-items:center;margin-top:1px}
+  .hcol.yes .mk{background:var(--teal-soft);border:1px solid var(--teal-line);color:var(--teal)}
+  .hcol.no .mk{background:var(--warn-soft);border:1px solid var(--warn-line);color:var(--warn)}
+  .hlist li .mk svg{width:13px;height:13px}
+  .hlist li em{font-style:normal;display:block;font-size:13px;color:var(--text-3);margin-top:3px;line-height:1.5}
+  .honest-note{margin-top:20px;font-size:13.5px;color:var(--text-3);text-align:center;line-height:1.6}
+
+  /* ---- criteria (stats / refund / inspection) tabs ---- */
+  .crit-tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
+  .crit-tab{
+    font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;
+    background:var(--panel);color:var(--text-2);border:1px solid var(--line);
+    padding:10px 18px;border-radius:11px;transition:all .18s;display:flex;align-items:center;gap:8px;
+  }
+  .crit-tab:hover{color:var(--text);border-color:var(--line-2)}
+  .crit-tab[aria-selected="true"]{background:var(--teal-soft);color:var(--teal);border-color:var(--teal-line)}
+  .crit-tab svg{width:15px;height:15px}
+  .crit-panel{display:none}
+  .crit-panel.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .crit-card{
+    background:linear-gradient(180deg,var(--panel),var(--ink-2));
+    border:1px solid var(--line);border-radius:16px;padding:30px 28px;
+  }
+  .crit-card h3{font-size:18px;margin-bottom:8px}
+  .crit-card .lead{font-size:14.5px;color:var(--text-2);margin-bottom:22px;line-height:1.66}
+  .crit-rows{display:flex;flex-direction:column;gap:2px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  .crit-row{display:grid;grid-template-columns:200px 1fr;gap:18px;padding:16px 20px;background:var(--ink-2)}
+  .crit-row .k{font-size:13.5px;color:var(--text);font-weight:600;display:flex;align-items:center;gap:8px}
+  .crit-row .k .num{font-family:var(--mono);font-size:11px;color:var(--teal)}
+  .crit-row .v{font-size:13.5px;color:var(--text-2);line-height:1.6}
+  .crit-foot{margin-top:18px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text-3);line-height:1.6}
+  .crit-foot svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--text-3)}
+
+  /* ---- trust badges + stats ---- */
+  .stats-band{background:linear-gradient(180deg,var(--ink-2),var(--ink));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .badges{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:44px}
+  .badge{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:22px 20px;display:flex;flex-direction:column;gap:10px;transition:border-color .18s;
+  }
+  .badge:hover{border-color:var(--teal-line)}
+  .badge .bic{width:38px;height:38px;border-radius:11px;background:var(--teal-soft);border:1px solid var(--teal-line);display:grid;place-items:center}
+  .badge .bic svg{width:18px;height:18px;color:var(--teal)}
+  .badge h4{font-size:14.5px}
+  .badge p{font-size:12.5px;color:var(--text-3);line-height:1.55}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+  .stat .big{font-size:clamp(28px,3.4vw,40px);font-weight:700;letter-spacing:-.03em;color:var(--text);font-variant-numeric:tabular-nums}
+  .stat .big b{color:var(--teal);font-weight:700}
+  .stat .cap{font-size:13.5px;color:var(--text-3);margin-top:6px}
+
+  /* ---- faq ---- */
+  .faq{max-width:800px;margin:0 auto}
+  .faq-group-label{font-size:12.5px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin:28px 0 12px}
+  .faq-group-label:first-child{margin-top:0}
+  .qa{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:10px;overflow:hidden;transition:border-color .18s}
+  .qa[open]{border-color:var(--teal-line)}
+  .qa summary{list-style:none;cursor:pointer;padding:18px 22px;font-size:15.5px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary .plus{width:20px;height:20px;flex:none;position:relative;transition:transform .25s}
+  .qa summary .plus::before,.qa summary .plus::after{content:"";position:absolute;background:var(--teal);border-radius:2px}
+  .qa summary .plus::before{top:9px;left:2px;width:16px;height:2px}
+  .qa summary .plus::after{top:2px;left:9px;width:2px;height:16px}
+  .qa[open] summary .plus{transform:rotate(45deg)}
+  .qa .ans{padding:0 22px 20px;font-size:14.5px;color:var(--text-2);line-height:1.72}
+
+  /* ---- final cta ---- */
+  .final{text-align:center;position:relative;overflow:hidden}
+  .final::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:680px;height:420px;background:radial-gradient(circle,rgba(45,212,191,.15),transparent 60%);filter:blur(20px);pointer-events:none}
+  .final .wrap{position:relative}
+  .final h2{font-size:clamp(26px,3.2vw,40px);max-width:640px;margin:18px auto 0}
+  .final p{margin:16px auto 0;max-width:500px}
+  .final .cta-row{margin-top:32px}
+  .final .micro{margin-top:18px}
+
+  /* ---- footer ---- */
+  footer{border-top:1px solid var(--line);padding:48px 0 40px}
+  .foot{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+  .foot p{font-size:13.5px;color:var(--text-3);max-width:300px;margin-top:14px;line-height:1.6}
+  .foot-cols{display:flex;gap:56px;flex-wrap:wrap}
+  .foot-col h5{font-size:13px;color:var(--text-2);font-weight:600;margin-bottom:14px}
+  .foot-col a{display:block;font-size:13.5px;color:var(--text-3);margin-bottom:10px;transition:color .16s}
+  .foot-col a:hover{color:var(--text)}
+  .foot-legal{margin-top:36px;padding-top:24px;border-top:1px solid var(--line);font-size:12.5px;color:var(--text-3);line-height:1.7}
+
+  /* ---- sticky cta bar ---- */
+  .sticky-bar{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;
+    background:rgba(10,12,16,.92);
+    backdrop-filter:saturate(160%) blur(16px);
+    border-top:1px solid var(--line-2);
+  }
+  .sticky-in{max-width:1160px;margin:0 auto;padding:13px 24px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .sticky-tx{display:flex;align-items:center;gap:14px;min-width:0}
+  .sticky-tx .st-t{font-size:15px;font-weight:600;color:var(--text)}
+  .sticky-tx .st-s{font-size:13px;color:var(--text-3)}
+  .sticky-trust{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-3)}
+  .sticky-trust svg{width:14px;height:14px;color:var(--teal)}
+  .sticky-bar .btn-primary{padding:12px 24px;white-space:nowrap}
+
+  /* ---- responsive ---- */
+  @media (max-width:980px){
+    .flow-steps{grid-template-columns:1fr 1fr}
+    .fstep .arrow{display:none}
+    .mech-grid{grid-template-columns:1fr}
+    .badges{grid-template-columns:1fr 1fr}
+    .stats{grid-template-columns:1fr 1fr;gap:32px 16px}
+  }
+  @media (max-width:768px){
+    .nav-links{display:none}
+    .nav-trust{display:none}
+    .hero{padding:54px 0 22px}
+    section{padding:60px 0}
+    .honest{grid-template-columns:1fr}
+    .crit-row{grid-template-columns:1fr;gap:6px}
+    .crit-row .v{padding-left:0}
+    .sticky-trust{display:none}
+    .st-s{display:none}
+  }
+  @media (max-width:420px){
+    .wrap{padding:0 18px}
+    .flow-steps{grid-template-columns:1fr}
+    .badges{grid-template-columns:1fr}
+    .sticky-in{padding:11px 18px}
+    .cta-row{flex-direction:column;align-items:stretch}
+    .cta-row .btn{width:100%}
+    .crit-tabs{flex-direction:column}
+    .crit-tab{justify-content:center}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      랭크스튜디오
+    </div>
+    <nav class="nav-links">
+      <a href="#mechanism">유입 원리</a>
+      <a href="#honest">정직 고지</a>
+      <a href="#criteria">운영 기준</a>
+      <a href="#faq">자주 묻는 질문</a>
+    </nav>
+    <div class="nav-right">
+      <span class="nav-trust">
+        <svg class="shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        실사용자 유입만 운영
+      </span>
+      <button class="btn btn-primary" onclick="document.getElementById('start').scrollIntoView()">광고 만들기</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span> 투명하게 운영하는 셀프 캠페인</span>
+    <h1>유입이 <b>어떻게</b> 이뤄지는지<br>전부 보여드립니다</h1>
+    <p class="sub">무엇을 약속하고, 무엇은 약속하지 않는지까지 솔직하게 공개합니다. 통계 반영 기준·환불 기준·검수 기준을 미리 확인하고 직접 시작하세요.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="document.getElementById('start').scrollIntoView()">광고 만들기</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('mechanism').scrollIntoView()">유입 원리 보기</button>
+    </div>
+    <div class="hero-badges">
+      <span class="hbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> 실사용자 기반 유입</span>
+      <span class="hbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 운영 기준 사전 공개</span>
+      <span class="hbadge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 2"/></svg> 결제 전 비용 전액 표시</span>
+    </div>
+
+    <!-- transparency flow strip -->
+    <div class="flow" aria-label="유입이 이뤄지는 흐름">
+      <div class="flow-bar">
+        <span class="tl"></span><span class="tl"></span><span class="tl"></span>
+        <span class="label">유입 흐름 · 투명 공개</span>
+        <span class="flow-live"><span class="pulse"></span> 실시간 기록</span>
+      </div>
+      <div class="flow-steps">
+        <div class="fstep">
+          <div class="fn">01</div>
+          <h4>캠페인 설정</h4>
+          <p>URL·키워드·기간·유입 규모를 직접 입력합니다.</p>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="fstep">
+          <div class="fn">02</div>
+          <h4>제휴 매체 매칭</h4>
+          <p>리워드에 동의한 실사용자에게 캠페인이 노출됩니다.</p>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="fstep">
+          <div class="fn">03</div>
+          <h4>실사용자 방문</h4>
+          <p>관심 있는 사용자가 직접 페이지를 방문합니다.</p>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="fstep">
+          <div class="fn">04</div>
+          <h4>기록·리포트</h4>
+          <p>유효 방문만 집계해 대시보드와 리포트로 공개합니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MECHANISM DETAIL -->
+<section id="mechanism">
+  <div class="wrap">
+    <div class="sec-head center">
+      <span class="eyebrow"><span class="dot"></span> 유입 원리 상세</span>
+      <h2>"유입"이 정확히 어떻게 만들어지나요</h2>
+      <p>실사용자 리워드와 제휴 매체의 원리를 숨김없이 설명합니다. 각 항목을 펼쳐 더 자세히 확인하세요.</p>
+    </div>
+    <div class="mech-grid">
+      <div class="mech">
+        <div class="mech-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>실사용자 리워드 원리</h3>
+        <p>방문은 자동화 기계적 방식이 아니라, 리워드에 동의한 실제 사람이 만듭니다. 사용자는 관심 분야 캠페인을 보고 직접 페이지를 방문합니다.</p>
+        <div class="more">
+          <details>
+            <summary><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg> 자세히 보기</summary>
+            <div class="body">
+              사용자는 제휴 매체에서 관심 키워드·카테고리에 맞는 캠페인을 받아보고, 본인 의사로 방문 여부를 선택합니다. 강제 클릭이나 자동 반복은 운영 기준상 집계되지 않습니다.
+              <ul>
+                <li>관심 기반 매칭으로 무관한 사용자 노출 최소화</li>
+                <li>동일 사용자의 단시간 반복 방문은 1회로 처리</li>
+                <li>리워드는 방문 행동에 대한 것이며, 구매·후기 작성을 강제하지 않습니다</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="mech">
+        <div class="mech-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+        <h3>제휴 매체 네트워크</h3>
+        <p>캠페인은 검증된 제휴 매체 지면을 통해 실사용자에게 전달됩니다. 어떤 환경에서 노출되는지 운영 기준으로 관리합니다.</p>
+        <div class="more">
+          <details>
+            <summary><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg> 자세히 보기</summary>
+            <div class="body">
+              매체는 사전 검수를 통과한 곳만 사용하며, 캠페인 기간 동안 자연스러운 분산 노출을 유지합니다. 한꺼번에 몰리는 비정상 유입은 기준에서 제외됩니다.
+              <ul>
+                <li>매체별 노출 비중을 기간에 걸쳐 분산</li>
+                <li>비정상 패턴 감지 시 해당 유입 집계 제외</li>
+                <li>설정한 키워드·지역 범위 밖 노출은 운영하지 않음</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="mech">
+        <div class="mech-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+        <h3>발견성에 닿는 방식</h3>
+        <p>실사용자의 자연스러운 방문이 쌓이면, 쇼핑·마켓·로컬 환경에서 해당 페이지의 발견 가능성이 높아지도록 돕습니다.</p>
+        <div class="more">
+          <details>
+            <summary><svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg> 자세히 보기</summary>
+            <div class="body">
+              유입 자체가 순위를 직접 인위적 개입하는 것은 아닙니다. 실제 관심 신호를 만드는 데 초점을 두며, 환경별 노출 변화는 시장 상황에 따라 달라질 수 있습니다.
+              <ul>
+                <li>유입은 발견성을 "돕는" 요소이며 결과를 단정하지 않습니다</li>
+                <li>키워드·기간·경쟁 상황에 따라 체감 효과가 다릅니다</li>
+                <li>변화 추이는 주간 리포트에서 가공 없이 제공</li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HONEST DISCLOSURE -->
+<section id="honest">
+  <div class="wrap narrow">
+    <div class="sec-head center">
+      <span class="eyebrow"><span class="dot"></span> 정직 고지</span>
+      <h2>무엇을 약속하고, 무엇은 약속하지 않나요</h2>
+      <p>의심은 과장이 아니라 솔직함으로 풀린다고 믿습니다. 가능한 것과 가능하지 않은 것을 똑같은 무게로 적었습니다.</p>
+    </div>
+    <div class="honest">
+      <div class="hcol yes">
+        <span class="htag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M20 6 9 17l-5-5"/></svg> 약속하는 것</span>
+        <h3>이건 분명히 합니다</h3>
+        <div class="hsub">운영으로 통제 가능한 영역입니다.</div>
+        <ul class="hlist">
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <div>실사용자 기반 유입만 운영<em>자동 기계적 방식·기계적 방식 유입은 사용하지 않습니다.</em></div>
+          </li>
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <div>설정한 규모만큼 유효 방문 집행<em>유효 기준에 못 미친 분량은 기준에 따라 처리합니다.</em></div>
+          </li>
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <div>비용·진행·집계의 투명 공개<em>결제 전 전액 표시, 진행 중 실시간 대시보드 제공.</em></div>
+          </li>
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <div>기준 미달 시 환불 적용<em>환불 기준에 해당하면 안내 후 처리합니다.</em></div>
+          </li>
+        </ul>
+      </div>
+      <div class="hcol no">
+        <span class="htag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg> 약속하지 않는 것</span>
+        <h3>이건 솔직히 말씀드립니다</h3>
+        <div class="hsub">시장과 환경이 결정하는 영역입니다.</div>
+        <ul class="hlist">
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            <div>특정 순위·노출 위치 확정<em>순위는 외부 환경이 결정하므로 단정하지 않습니다.</em></div>
+          </li>
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            <div>매출·구매 전환 수치<em>방문은 만들지만 구매 결정은 강제할 수 없습니다.</em></div>
+          </li>
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            <div>즉각적·영구적 효과<em>효과 체감 시점과 지속성은 상황에 따라 다릅니다.</em></div>
+          </li>
+          <li>
+            <span class="mk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+            <div>외부 시스템의 동작 통제<em>제3자 플랫폼의 정책·로직은 저희가 책임질 수 없습니다.</em></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p class="honest-note">과장된 수식어 대신 통제 가능한 범위를 분명히 적었습니다. 이 경계가 곧 신뢰의 기준이라고 봅니다.</p>
+  </div>
+</section>
+
+<!-- CRITERIA TABS -->
+<section id="criteria">
+  <div class="wrap narrow">
+    <div class="sec-head center">
+      <span class="eyebrow"><span class="dot"></span> 운영 기준</span>
+      <h2>집계·환불·검수 기준을 미리 공개합니다</h2>
+      <p>시작한 다음에 알게 되는 일이 없도록, 세 가지 기준을 사전에 정리했습니다.</p>
+    </div>
+
+    <div class="crit-tabs" role="tablist" aria-label="운영 기준">
+      <button class="crit-tab" role="tab" aria-selected="true" aria-controls="panel-stat" id="tab-stat" data-tab="stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg>
+        통계 반영 기준
+      </button>
+      <button class="crit-tab" role="tab" aria-selected="false" aria-controls="panel-refund" id="tab-refund" data-tab="refund">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.4 2.6L3 8"/><path d="M3 4v4h4"/></svg>
+        환불 기준
+      </button>
+      <button class="crit-tab" role="tab" aria-selected="false" aria-controls="panel-inspect" id="tab-inspect" data-tab="inspect">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        검수 기준
+      </button>
+    </div>
+
+    <div class="crit-panel active" id="panel-stat" role="tabpanel" aria-labelledby="tab-stat">
+      <div class="crit-card">
+        <h3>어떤 방문이 통계에 반영되나요</h3>
+        <p class="lead">집계는 "유효 방문"만 셉니다. 무엇이 유효하고 무엇이 제외되는지 동일하게 공개합니다.</p>
+        <div class="crit-rows">
+          <div class="crit-row"><div class="k"><span class="num">A</span> 반영 대상</div><div class="v">리워드에 동의한 실사용자가 캠페인을 통해 직접 페이지에 도달한 방문</div></div>
+          <div class="crit-row"><div class="k"><span class="num">B</span> 중복 처리</div><div class="v">동일 사용자의 단시간 반복 방문은 1회로 집계하여 부풀림을 방지</div></div>
+          <div class="crit-row"><div class="k"><span class="num">C</span> 제외 대상</div><div class="v">비정상 패턴·자동화 의심·설정 범위 밖 노출로 발생한 방문은 집계에서 제외</div></div>
+          <div class="crit-row"><div class="k"><span class="num">D</span> 반영 시점</div><div class="v">방문은 실시간 누적, 유효성 검증을 거쳐 대시보드와 주간 리포트에 반영</div></div>
+        </div>
+        <div class="crit-foot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          외부 플랫폼의 자체 통계와는 측정 방식이 달라 수치 차이가 날 수 있습니다. 이 기준은 랭크스튜디오 집계 기준입니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="crit-panel" id="panel-refund" role="tabpanel" aria-labelledby="tab-refund" hidden>
+      <div class="crit-card">
+        <h3>어떤 경우에 환불되나요</h3>
+        <p class="lead">"안 되면 그냥 끝"이 아니라, 환불 적용 경우와 적용되지 않는 경우를 미리 적어둡니다.</p>
+        <div class="crit-rows">
+          <div class="crit-row"><div class="k"><span class="num">A</span> 진행 전 취소</div><div class="v">집행이 시작되기 전 취소 시 결제 금액 전액 환불</div></div>
+          <div class="crit-row"><div class="k"><span class="num">B</span> 분량 미달</div><div class="v">설정한 유효 방문 분량을 기간 내 채우지 못한 경우, 미집행 분량만큼 환불</div></div>
+          <div class="crit-row"><div class="k"><span class="num">C</span> 운영 측 사유</div><div class="v">매체 점검 등 운영 측 사유로 진행이 중단된 경우 해당 구간 환불</div></div>
+          <div class="crit-row"><div class="k"><span class="num">D</span> 적용 제외</div><div class="v">정상 집행 완료 후의 순위·매출 등 외부 결과를 사유로 한 환불은 적용되지 않음</div></div>
+        </div>
+        <div class="crit-foot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          환불은 진행 현황과 집계 기준을 근거로 안내 후 처리되며, 자세한 절차는 결제 화면에 함께 표시됩니다.
+        </div>
+      </div>
+    </div>
+
+    <div class="crit-panel" id="panel-inspect" role="tabpanel" aria-labelledby="tab-inspect" hidden>
+      <div class="crit-card">
+        <h3>유입은 어떻게 검수되나요</h3>
+        <p class="lead">집행 전과 집행 중, 두 단계로 품질을 확인합니다. 통과하지 못한 유입은 집계되지 않습니다.</p>
+        <div class="crit-rows">
+          <div class="crit-row"><div class="k"><span class="num">A</span> 매체 사전 검수</div><div class="v">제휴 매체는 검수를 통과한 곳만 사용하며, 부적격 매체는 운영에서 제외</div></div>
+          <div class="crit-row"><div class="k"><span class="num">B</span> 패턴 모니터링</div><div class="v">집행 중 비정상 트래픽·급증 패턴을 자동 모니터링하고 차단</div></div>
+          <div class="crit-row"><div class="k"><span class="num">C</span> 범위 일치 확인</div><div class="v">설정한 키워드·지역·기간 범위와 일치하는 유입만 유효로 처리</div></div>
+          <div class="crit-row"><div class="k"><span class="num">D</span> 사후 정산</div><div class="v">검수에서 걸러진 분량은 집계에서 빼고 환불·재집행 기준에 따라 조정</div></div>
+        </div>
+        <div class="crit-foot">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          검수 기준은 품질 보호를 위해 세부 알고리즘 일부를 비공개로 두지만, 처리 원칙은 위와 같이 동일하게 적용됩니다.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BADGES + STATS -->
+<section class="stats-band">
+  <div class="wrap">
+    <div class="badges">
+      <div class="badge">
+        <div class="bic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <h4>실사용자 보증</h4>
+        <p>모든 유입은 실사용자 기반으로만 운영합니다.</p>
+      </div>
+      <div class="badge">
+        <div class="bic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h4>기준 사전 공개</h4>
+        <p>집계·환불·검수 기준을 시작 전에 모두 안내합니다.</p>
+      </div>
+      <div class="badge">
+        <div class="bic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <h4>비용 전액 표시</h4>
+        <p>결제 전 예상 비용을 숨김 항목 없이 공개합니다.</p>
+      </div>
+      <div class="badge">
+        <div class="bic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15l2 2 4-4"/></svg></div>
+        <h4>리포트 원본 제공</h4>
+        <p>가공 없는 진행·집계 데이터를 그대로 보여드립니다.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="big"><b id="s1">0</b>+</div><div class="cap">캠페인을 직접 운영하는 셀러</div></div>
+      <div class="stat"><div class="big"><b id="s2">0</b>%</div><div class="cap">집계 기준을 통과한 유효 방문 비율</div></div>
+      <div class="stat"><div class="big"><b id="s3">0</b>%</div><div class="cap">기준 안내 후 환불 처리 만족도</div></div>
+      <div class="stat"><div class="big"><b id="s4">0</b>분</div><div class="cap">캠페인 생성 평균 소요 시간</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head center">
+      <span class="eyebrow"><span class="dot"></span> 자주 묻는 질문</span>
+      <h2>의심되는 부분, 먼저 답해 드립니다</h2>
+      <p>좋은 질문일수록 솔직하게 답하는 게 맞다고 생각합니다.</p>
+    </div>
+    <div class="faq">
+      <div class="faq-group-label">유입과 원리</div>
+      <details class="qa" open>
+        <summary>리워드 트래픽이 정확히 무엇인가요?<span class="plus"></span></summary>
+        <div class="ans">리워드에 동의한 실제 사용자가 관심 캠페인을 보고 직접 페이지를 방문하는 실사용자 유입을 뜻합니다. 자동 프로그램이 만드는 비정상 유입이 아니며, 강제 클릭·반복도 운영 기준상 집계되지 않습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>기계적 방식 트래픽과 무엇이 다른가요?<span class="plus"></span></summary>
+        <div class="ans">기계적 방식 트래픽은 사람이 아닌 프로그램이 만드는 방문입니다. 랭크스튜디오는 이런 자동화 유입을 사용하지 않으며, 비정상 패턴이 감지되면 해당 방문을 집계에서 제외합니다. 검수 기준 항목에서 처리 원칙을 확인하실 수 있습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>유입이 늘면 순위가 무조건 오르나요?<span class="plus"></span></summary>
+        <div class="ans">아니요. 유입은 발견성을 돕는 신호일 뿐, 순위를 직접 정하지 않습니다. 외부 플랫폼의 정책과 경쟁 상황에 따라 결과가 달라지므로, 저희는 특정 순위를 약속하지 않습니다. 정직 고지 섹션에 약속하는 것과 아닌 것을 구분해 두었습니다.</div>
+      </details>
+
+      <div class="faq-group-label">기준과 정산</div>
+      <details class="qa">
+        <summary>방문 통계는 어떤 기준으로 잡히나요?<span class="plus"></span></summary>
+        <div class="ans">실사용자의 유효 방문만 집계합니다. 동일 사용자의 단시간 반복은 1회로 처리하고, 설정 범위 밖이거나 자동화가 의심되는 방문은 제외합니다. 외부 플랫폼 자체 통계와는 측정 방식이 달라 수치 차이가 날 수 있습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>효과가 없으면 환불되나요?<span class="plus"></span></summary>
+        <div class="ans">환불은 "집행" 기준으로 적용됩니다. 진행 전 취소는 전액, 유효 방문 분량 미달은 미집행분만큼, 운영 측 사유 중단은 해당 구간을 환불합니다. 다만 정상 집행이 끝난 뒤의 순위·매출 같은 외부 결과를 이유로 한 환불은 적용되지 않습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>비용은 어떻게 책정되나요?<span class="plus"></span></summary>
+        <div class="ans">설정한 기간과 유입 규모에 따라 예상 비용이 결제 전 화면에 전액 표시됩니다. 원하는 만큼만 선택해 결제하며, 표시되지 않은 추가 비용은 없습니다.</div>
+      </details>
+
+      <div class="faq-group-label">시작과 운영</div>
+      <details class="qa">
+        <summary>대행사 없이 정말 직접 만들 수 있나요?<span class="plus"></span></summary>
+        <div class="ans">네. URL·키워드·기간·유입 규모를 화면에서 설정하면 됩니다. 별도 미팅이나 계약 절차 없이 직접 생성하고 결제할 수 있으며, 평균 5분이면 첫 캠페인을 시작할 수 있습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>진행 상황은 어떻게 확인하나요?<span class="plus"></span></summary>
+        <div class="ans">대시보드에서 진행 현황을 실시간으로 보고, 주간 리포트로 키워드 노출과 유입 추이를 정리해 드립니다. 데이터는 가공 없이 제공되며 언제든 내려받을 수 있습니다.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section id="start" class="final">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span> 지금 시작</span>
+    <h2>숨기지 않는 운영을 직접 확인해 보세요</h2>
+    <p>유입 원리도, 기준도, 비용도 먼저 보여드립니다. 확인하고 나서 시작해도 늦지 않습니다.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="alert('데모 화면입니다.')">광고 만들기</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('criteria').scrollIntoView()">운영 기준 다시 보기</button>
+    </div>
+    <p class="micro">결제 전 비용 전액 표시 · 실사용자 기반 유입 · 기준 사전 공개</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <div class="brand"><div class="logo"><span></span></div>랭크스튜디오</div>
+        <p>대행사 없이 직접 만드는 AI 셀프 캠페인 플랫폼. 유입 원리와 운영 기준을 투명하게 공개합니다.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>투명성</h5>
+          <a href="#mechanism">유입 원리</a>
+          <a href="#honest">정직 고지</a>
+          <a href="#criteria">운영 기준</a>
+        </div>
+        <div class="foot-col">
+          <h5>리소스</h5>
+          <a href="#faq">자주 묻는 질문</a>
+          <a href="https://seller-channel.example">셀러 채널</a>
+          <a href="#start">시작하기</a>
+        </div>
+        <div class="foot-col">
+          <h5>고객지원</h5>
+          <a href="https://seller-channel.example">문의하기</a>
+          <a href="#criteria">기준 안내</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-legal">
+      표시된 수치와 후기는 이해를 돕기 위한 예시입니다. 실제 성과는 시장 상황과 설정에 따라 달라질 수 있으며, 특정 순위·매출을 약속하지 않습니다.<br>
+      © 2026 랭크스튜디오. 모든 유입은 실사용자 기반으로 운영됩니다.
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY CTA BAR -->
+<div class="sticky-bar">
+  <div class="sticky-in">
+    <div class="sticky-tx">
+      <div>
+        <div class="st-t">기준을 먼저 보고 시작하세요</div>
+        <div class="st-s">실사용자 유입 · 비용 전액 표시 · 기준 사전 공개</div>
+      </div>
+      <div class="sticky-trust">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        셀러 4,800팀 운영 중
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('start').scrollIntoView()">광고 만들기</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- count up stats ---- */
+  function countUp(el, target, dur){
+    if(!el) return;
+    if(reduce){ el.textContent = target.toLocaleString(); return; }
+    var start = performance.now();
+    function tick(now){
+      var t = Math.min((now-start)/dur, 1);
+      var e = 1 - Math.pow(1-t, 3);
+      el.textContent = Math.round(target*e).toLocaleString();
+      if(t<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  var ranStats = false;
+  function runStats(){
+    if(ranStats) return; ranStats = true;
+    countUp(document.getElementById('s1'), 4800, 1500);
+    countUp(document.getElementById('s2'), 96, 1300);
+    countUp(document.getElementById('s3'), 94, 1300);
+    countUp(document.getElementById('s4'), 5, 900);
+  }
+  var band = document.querySelector('.stats-band');
+  if('IntersectionObserver' in window && band){
+    var io = new IntersectionObserver(function(en){
+      en.forEach(function(x){ if(x.isIntersecting){ runStats(); io.disconnect(); }});
+    }, {threshold:.3});
+    io.observe(band);
+  } else { runStats(); }
+
+  /* ---- criteria tabs ---- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.crit-tab'));
+  var panels = {
+    stat: document.getElementById('panel-stat'),
+    refund: document.getElementById('panel-refund'),
+    inspect: document.getElementById('panel-inspect')
+  };
+  function selectTab(name){
+    tabs.forEach(function(t){
+      var on = t.getAttribute('data-tab') === name;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    Object.keys(panels).forEach(function(k){
+      var p = panels[k];
+      if(!p) return;
+      if(k === name){ p.classList.add('active'); p.hidden = false; }
+      else { p.classList.remove('active'); p.hidden = true; }
+    });
+  }
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){ selectTab(t.getAttribute('data-tab')); });
+    t.addEventListener('keydown', function(e){
+      var i = tabs.indexOf(t);
+      if(e.key === 'ArrowRight'){ e.preventDefault(); var n = tabs[(i+1)%tabs.length]; n.focus(); selectTab(n.getAttribute('data-tab')); }
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); var pr = tabs[(i-1+tabs.length)%tabs.length]; pr.focus(); selectTab(pr.getAttribute('data-tab')); }
+    });
+  });
+
+  /* ---- single-open FAQ within a group (optional polish) ---- */
+  // leave details independent for accessibility; no forced close
+})();
+</script>
+
+</body>
+</html>
