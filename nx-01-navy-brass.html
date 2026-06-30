@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크스튜디오 — 발견되는 브랜드를 만듭니다</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --ink:#0f1b2e;        /* 잉크 네이비 */
+    --ink-2:#16263e;
+    --ink-3:#1d3252;
+    --brass:#c9a25a;      /* 브라스 골드 */
+    --brass-dim:#a8854332; /* removed - replaced below */
+    --bone:#ece6d8;       /* 본 */
+    --bone-2:#f4f0e7;
+    --bone-3:#fbf9f4;
+    --grayblue:#5a6b82;
+    --grayblue-2:#8794a5;
+    --line:#0f1b2e1f;
+    --line-bone:#ffffff1f;
+    --maxw:1280px;
+    --gut:clamp(20px,5vw,72px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'Pretendard',system-ui,sans-serif;
+    background:var(--bone-3);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--brass);color:var(--ink)}
+  h1,h2,h3{line-height:1.18;letter-spacing:-0.02em;word-break:keep-all;font-weight:700}
+  p{word-break:keep-all}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+  .serif{font-family:'Pretendard',serif}
+  .eyebrow{
+    font-size:12px;letter-spacing:0.32em;text-transform:uppercase;
+    color:var(--brass);font-weight:600;display:inline-flex;align-items:center;gap:12px;
+  }
+  .eyebrow::before{content:"";width:32px;height:1px;background:var(--brass)}
+
+  /* ===== NAV ===== */
+  header.nav{position:absolute;top:0;left:0;right:0;z-index:50}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;padding-top:28px;padding-bottom:28px}
+  .brand{display:flex;align-items:center;gap:12px;color:var(--bone)}
+  .brand .mark{width:34px;height:34px;flex:none}
+  .brand b{font-size:18px;font-weight:700;letter-spacing:-0.01em}
+  .brand small{display:block;font-size:10px;letter-spacing:0.26em;color:var(--brass);font-weight:600;margin-top:1px}
+  nav.links{display:flex;gap:38px;align-items:center}
+  nav.links a{font-size:14px;color:#dfd9cccc;font-weight:500;transition:color .25s}
+  nav.links a:hover{color:var(--brass)}
+  .nav-cta{
+    border:1px solid var(--brass);color:var(--brass);
+    padding:11px 22px;border-radius:2px;font-size:13px;font-weight:600;letter-spacing:0.02em;
+    transition:all .3s;
+  }
+  .nav-cta:hover{background:var(--brass);color:var(--ink)}
+  .burger{display:none;color:var(--bone);background:none;border:0;font-size:26px;cursor:pointer}
+
+  /* ===== HERO SPLIT ===== */
+  .hero{background:var(--ink);color:var(--bone);position:relative;overflow:hidden}
+  .hero-grid{
+    display:grid;grid-template-columns:1.05fr 0.95fr;align-items:stretch;
+    max-width:var(--maxw);margin:0 auto;min-height:100vh;
+  }
+  .hero-left{
+    padding:160px var(--gut) 90px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2;
+  }
+  .hero-num{
+    position:absolute;top:120px;right:-10px;font-size:clamp(120px,16vw,230px);
+    font-weight:800;color:#ffffff08;line-height:.8;letter-spacing:-0.04em;pointer-events:none;user-select:none;
+  }
+  .hero h1{
+    font-size:clamp(40px,5.4vw,76px);line-height:1.06;letter-spacing:-0.03em;margin:26px 0 0;position:relative;
+  }
+  .hero h1 .em{color:var(--brass);font-style:italic;font-weight:700}
+  .hero h1 .thin{display:block;font-weight:300;color:#d7d0c1}
+  .hero-sub{
+    font-size:clamp(15px,1.2vw,17px);color:#c4ccd6;max-width:480px;margin-top:30px;line-height:1.75;
+  }
+  .hero-actions{display:flex;flex-wrap:wrap;gap:16px;margin-top:42px;align-items:center}
+  .btn-primary{
+    background:var(--brass);color:var(--ink);font-weight:700;font-size:15px;
+    padding:17px 34px;border-radius:2px;border:0;cursor:pointer;letter-spacing:0.01em;
+    display:inline-flex;align-items:center;gap:11px;transition:transform .25s, box-shadow .25s, background .25s;
+  }
+  .btn-primary:hover{background:#d8b572;transform:translateY(-2px);box-shadow:0 14px 34px #c9a25a3d}
+  .btn-primary svg{transition:transform .3s}
+  .btn-primary:hover svg{transform:translateX(4px)}
+  .btn-ghost{
+    color:var(--bone);font-weight:600;font-size:15px;padding:17px 8px;
+    display:inline-flex;align-items:center;gap:10px;border-bottom:1px solid #ffffff33;transition:border-color .3s,color .3s;
+  }
+  .btn-ghost:hover{color:var(--brass);border-color:var(--brass)}
+  .hero-meta{display:flex;gap:40px;margin-top:64px;flex-wrap:wrap}
+  .hero-meta .m b{font-size:30px;font-weight:700;color:var(--bone);display:block;letter-spacing:-0.01em}
+  .hero-meta .m b .u{color:var(--brass);font-size:18px}
+  .hero-meta .m span{font-size:12.5px;color:var(--grayblue-2);letter-spacing:0.04em}
+
+  /* hero image */
+  .hero-right{position:relative;overflow:hidden}
+  .hero-photo{
+    position:absolute;inset:0;
+    background-image:url("https://picsum.photos/seed/rankstudio-storefront-93/1100/1500");
+    background-size:cover;background-position:center;
+    filter:grayscale(1) contrast(1.06) brightness(.72);
+  }
+  .hero-photo::after{
+    content:"";position:absolute;inset:0;mix-blend-mode:color;
+    background:linear-gradient(150deg,#0f1b2eee 0%,#1d3252b3 45%,#c9a25a4d 100%);
+  }
+  .hero-photo::before{
+    content:"";position:absolute;inset:0;z-index:2;opacity:.5;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>");
+  }
+  .hero-tag{
+    position:absolute;left:0;bottom:42px;z-index:5;
+    background:var(--ink);border:1px solid var(--brass);border-left:0;
+    padding:18px 26px 18px 22px;border-radius:0 3px 3px 0;max-width:280px;
+  }
+  .hero-tag .k{font-size:11px;letter-spacing:0.2em;color:var(--brass);font-weight:600;text-transform:uppercase}
+  .hero-tag .v{font-size:14px;color:#dcd6c9;margin-top:7px;line-height:1.55}
+  .hero-vert{
+    position:absolute;right:34px;top:50%;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;
+    font-size:11px;letter-spacing:0.4em;color:#ffffff8c;z-index:5;text-transform:uppercase;
+  }
+
+  /* ===== MARQUEE ===== */
+  .strip{background:var(--ink-2);border-top:1px solid var(--line-bone);border-bottom:1px solid var(--line-bone);overflow:hidden}
+  .strip-track{display:flex;gap:64px;padding:20px 0;white-space:nowrap;animation:scroll 32s linear infinite;width:max-content}
+  .strip span{font-size:13px;letter-spacing:0.2em;color:#9fadbe;text-transform:uppercase;display:inline-flex;align-items:center;gap:64px;font-weight:500}
+  .strip span::after{content:"◆";color:var(--brass);font-size:9px}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+
+  /* ===== SECTION SHELL ===== */
+  section{padding:clamp(80px,11vw,150px) 0}
+  .sec-head{max-width:680px}
+  .sec-head h2{font-size:clamp(28px,3.6vw,48px);margin:20px 0 0}
+  .sec-head p{color:var(--grayblue);font-size:16px;margin-top:18px;max-width:560px}
+
+  /* ===== PROBLEM (offset editorial) ===== */
+  .problem{background:var(--bone-3)}
+  .prob-grid{display:grid;grid-template-columns:0.85fr 1.15fr;gap:clamp(30px,6vw,90px);margin-top:64px;align-items:start}
+  .prob-photo{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:4/5;align-self:stretch;margin-top:40px}
+  .prob-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05) brightness(.85)}
+  .prob-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,#0f1b2ecc,#c9a25a40);mix-blend-mode:multiply}
+  .prob-quote{position:absolute;left:22px;bottom:22px;right:22px;color:var(--bone);font-size:15px;font-weight:500;line-height:1.6;z-index:2;border-left:2px solid var(--brass);padding-left:16px}
+  .prob-list{display:flex;flex-direction:column;gap:2px}
+  .prob-item{
+    display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start;
+    padding:30px 4px;border-bottom:1px solid var(--line);transition:padding-left .35s, background .35s;
+  }
+  .prob-item:hover{padding-left:18px;background:var(--bone-2)}
+  .prob-item .no{font-size:13px;font-weight:700;color:var(--brass);letter-spacing:0.1em;padding-top:5px}
+  .prob-item h3{font-size:20px;font-weight:700;letter-spacing:-0.01em}
+  .prob-item p{color:var(--grayblue);font-size:15px;margin-top:8px;max-width:430px}
+
+  /* ===== SOLUTION (asymmetric overlap cards) ===== */
+  .solution{background:var(--ink);color:var(--bone);position:relative}
+  .solution .eyebrow{color:var(--brass)}
+  .solution .sec-head h2{color:var(--bone)}
+  .solution .sec-head p{color:#aab6c4}
+  .sol-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:22px;margin-top:70px}
+  .sol-card{
+    background:var(--ink-2);border:1px solid var(--line-bone);border-radius:3px;padding:36px 32px;
+    display:flex;flex-direction:column;transition:transform .4s, border-color .4s, background .4s;position:relative;overflow:hidden;
+  }
+  .sol-card::before{content:"";position:absolute;top:0;left:0;width:100%;height:2px;background:var(--brass);transform:scaleX(0);transform-origin:left;transition:transform .45s}
+  .sol-card:hover{transform:translateY(-6px);border-color:#c9a25a66;background:var(--ink-3)}
+  .sol-card:hover::before{transform:scaleX(1)}
+  .sol-card .ic{width:46px;height:46px;border:1px solid var(--brass);border-radius:2px;display:flex;align-items:center;justify-content:center;color:var(--brass);margin-bottom:24px}
+  .sol-card .ic svg{width:22px;height:22px}
+  .sol-card h3{font-size:21px;color:var(--bone);margin-bottom:11px}
+  .sol-card p{font-size:14.5px;color:#a9b5c3;line-height:1.7}
+  .sol-card .step{font-size:11px;letter-spacing:0.24em;color:var(--brass);font-weight:600;margin-bottom:20px;text-transform:uppercase}
+  .c-a{grid-column:span 5}
+  .c-b{grid-column:span 4}
+  .c-c{grid-column:span 3}
+  .c-d{grid-column:span 4}
+  .c-e{grid-column:span 4}
+  .c-f{grid-column:span 4}
+  .sol-card.feat{justify-content:flex-end;min-height:340px;background:linear-gradient(155deg,var(--ink-3),var(--ink-2))}
+  .sol-card.feat .big{font-size:clamp(34px,4vw,52px);font-weight:800;color:var(--brass);letter-spacing:-0.02em;line-height:1}
+
+  /* ===== EVIDENCE (split editorial reverse) ===== */
+  .evidence{background:var(--bone-2)}
+  .ev-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,80px);align-items:center}
+  .ev-photo{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:5/6}
+  .ev-photo img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05) brightness(.8)}
+  .ev-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(140deg,#0f1b2ed9,#c9a25a4d);mix-blend-mode:multiply}
+  .ev-badge{position:absolute;top:20px;left:20px;background:var(--brass);color:var(--ink);font-size:12px;font-weight:700;letter-spacing:0.08em;padding:8px 14px;border-radius:2px;z-index:2}
+  .ev-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:3px;overflow:hidden;margin-top:42px}
+  .ev-stat{background:var(--bone-3);padding:26px 24px}
+  .ev-stat b{font-size:34px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;display:block}
+  .ev-stat b .u{color:var(--brass);font-size:20px}
+  .ev-stat span{font-size:13px;color:var(--grayblue);margin-top:4px;display:block}
+  .ev-note{font-size:12.5px;color:var(--grayblue-2);margin-top:20px;line-height:1.6;padding-left:14px;border-left:2px solid var(--brass)}
+
+  /* ===== PROCESS ribbon ===== */
+  .flow{background:var(--bone-3)}
+  .flow-track{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;border-top:1px solid var(--line)}
+  .flow-step{padding:34px 26px 34px 0;border-right:1px solid var(--line);position:relative}
+  .flow-step:last-child{border-right:0}
+  .flow-step .n{font-size:12px;color:var(--brass);font-weight:700;letter-spacing:0.18em}
+  .flow-step h3{font-size:19px;margin:16px 0 9px}
+  .flow-step p{font-size:14px;color:var(--grayblue);padding-right:10px}
+  .flow-step::before{content:"";position:absolute;top:-1px;left:0;width:46px;height:2px;background:var(--brass)}
+
+  /* ===== QUICKSTART CTA ===== */
+  .cta{background:var(--ink);color:var(--bone);position:relative;overflow:hidden}
+  .cta::before{content:"광고 만들기";position:absolute;right:-3%;bottom:-8%;font-size:clamp(90px,15vw,220px);font-weight:800;color:#ffffff06;white-space:nowrap;letter-spacing:-0.03em;pointer-events:none}
+  .cta-grid{display:grid;grid-template-columns:1fr 0.85fr;gap:clamp(36px,6vw,80px);align-items:center;position:relative;z-index:2}
+  .cta h2{font-size:clamp(30px,4.2vw,56px);color:var(--bone);line-height:1.1}
+  .cta h2 .em{color:var(--brass);font-style:italic}
+  .cta p{color:#aeb9c7;font-size:16px;margin-top:20px;max-width:440px}
+  .quickstart{
+    background:var(--ink-2);border:1px solid #c9a25a40;border-radius:4px;padding:34px 32px;
+  }
+  .quickstart .qh{font-size:13px;letter-spacing:0.2em;color:var(--brass);font-weight:600;text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+  .field{margin-bottom:18px}
+  .field label{font-size:12.5px;color:#9fadbe;display:block;margin-bottom:8px;letter-spacing:0.02em}
+  .field input,.field select{
+    width:100%;background:var(--ink);border:1px solid #ffffff1f;color:var(--bone);
+    padding:14px 15px;border-radius:2px;font-size:14px;font-family:inherit;transition:border-color .25s;
+  }
+  .field input::placeholder{color:#5a6b82}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--brass)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .qs-btn{
+    width:100%;background:var(--brass);color:var(--ink);font-weight:700;font-size:15px;
+    padding:16px;border:0;border-radius:2px;cursor:pointer;margin-top:8px;letter-spacing:0.01em;
+    display:flex;align-items:center;justify-content:center;gap:10px;transition:background .25s,transform .2s;
+  }
+  .qs-btn:hover{background:#d8b572;transform:translateY(-1px)}
+  .qs-note{font-size:11.5px;color:#7d8a9b;margin-top:14px;text-align:center;line-height:1.5}
+
+  /* ===== HONEST DISCLOSURE ===== */
+  .honest{background:var(--bone-2);border-top:1px solid var(--line)}
+  .honest-grid{display:grid;grid-template-columns:0.8fr 1.2fr;gap:clamp(30px,6vw,80px);align-items:start}
+  .honest h2{font-size:clamp(24px,3vw,38px)}
+  .honest .disc{display:flex;flex-direction:column;gap:18px;margin-top:10px}
+  .disc-item{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .disc-item:last-child{border-bottom:0}
+  .disc-item .ck{color:var(--brass);flex:none;margin-top:3px}
+  .disc-item b{font-size:15.5px;color:var(--ink);display:block;margin-bottom:4px}
+  .disc-item p{font-size:14px;color:var(--grayblue)}
+
+  /* ===== FOOTER ===== */
+  footer{background:var(--ink);color:#8794a5;padding:70px 0 40px}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:50px;border-bottom:1px solid var(--line-bone)}
+  footer .brand b{color:var(--bone)}
+  footer h4{font-size:12px;letter-spacing:0.16em;color:var(--brass);text-transform:uppercase;margin-bottom:18px;font-weight:600}
+  footer ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  footer ul a{font-size:14px;color:#9fadbe;transition:color .25s}
+  footer ul a:hover{color:var(--brass)}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:28px;flex-wrap:wrap;gap:14px}
+  .foot-bottom p{font-size:12.5px;color:#6b7889}
+  .foot-desc{font-size:14px;color:#9fadbe;margin-top:18px;max-width:300px;line-height:1.65}
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:1024px){
+    .hero-grid{grid-template-columns:1fr 0.8fr}
+    .sol-grid{grid-template-columns:repeat(6,1fr)}
+    .c-a,.c-b,.c-c,.c-d,.c-e,.c-f{grid-column:span 3}
+    .c-a{grid-column:span 6}
+  }
+  @media(max-width:768px){
+    nav.links{display:none}
+    .nav-cta{display:none}
+    .burger{display:block}
+    .hero-grid{grid-template-columns:1fr;min-height:auto}
+    .hero-left{padding:130px var(--gut) 70px}
+    .hero-right{min-height:62vh;order:2}
+    .hero-num{top:90px}
+    .prob-grid,.ev-grid,.cta-grid,.honest-grid{grid-template-columns:1fr}
+    .prob-photo{aspect-ratio:16/10;margin-top:0;order:2}
+    .ev-photo{order:2;aspect-ratio:16/11}
+    .sol-grid{grid-template-columns:1fr}
+    .c-a,.c-b,.c-c,.c-d,.c-e,.c-f{grid-column:span 1}
+    .flow-track{grid-template-columns:1fr 1fr}
+    .flow-step{border-right:0;border-bottom:1px solid var(--line);padding-right:0;padding-bottom:28px}
+    .foot-grid{grid-template-columns:1fr 1fr}
+    .field-row{grid-template-columns:1fr}
+  }
+  @media(max-width:480px){
+    .flow-track{grid-template-columns:1fr}
+    .ev-stats{grid-template-columns:1fr}
+    .hero-meta{gap:26px}
+    .foot-grid{grid-template-columns:1fr}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a href="#" class="brand" aria-label="랭크스튜디오 홈">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="38" height="38" rx="3" stroke="#c9a25a" stroke-width="1.4"/>
+        <path d="M12 28V12h7.5c3 0 5 1.8 5 4.6 0 2.2-1.2 3.7-3.2 4.3L25 28h-3.4l-3.2-6.2H15V28h-3z" fill="#c9a25a"/>
+        <path d="M15 14.6v4.6h4c1.6 0 2.6-.9 2.6-2.3s-1-2.3-2.6-2.3h-4z" fill="#0f1b2e"/>
+      </svg>
+      <div>
+        <b>랭크스튜디오</b>
+        <small>RANK STUDIO</small>
+      </div>
+    </a>
+    <nav class="links">
+      <a href="#problem">왜 필요한가</a>
+      <a href="#solution">작동 방식</a>
+      <a href="#evidence">성과 리포트</a>
+      <a href="#flow">진행 절차</a>
+    </nav>
+    <a href="#start" class="nav-cta">광고 만들기</a>
+    <button class="burger" aria-label="메뉴 열기">☰</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-left">
+      <span class="hero-num" aria-hidden="true">01</span>
+      <span class="eyebrow">셀프 서비스 캠페인 스튜디오</span>
+      <h1>
+        발견되는 브랜드는<br>
+        <span class="em">우연이 아닙니다</span>
+        <span class="thin">대행사 없이, 직접 만드는 캠페인</span>
+      </h1>
+      <p class="hero-sub">
+        상품과 매장의 검색 발견성을 직접 설계하세요. URL·키워드·기간·유입 규모를 정하고
+        결제하면, 진행 상황과 성과를 리포트로 투명하게 확인할 수 있습니다.
+      </p>
+      <div class="hero-actions">
+        <a href="#start" class="btn-primary">
+          광고 만들기
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#solution" class="btn-ghost">작동 방식 보기</a>
+      </div>
+      <div class="hero-meta">
+        <div class="m"><b>3<span class="u">분</span></b><span>캠페인 설정 시간</span></div>
+        <div class="m"><b>100<span class="u">%</span></b><span>진행 과정 리포트 공개</span></div>
+        <div class="m"><b>0<span class="u">원</span></b><span>대행 수수료</span></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-photo" role="img" aria-label="매장과 상품 진열 분위기의 듀오톤 사진"></div>
+      <span class="hero-vert" aria-hidden="true">SELF-MADE VISIBILITY</span>
+      <div class="hero-tag">
+        <div class="k">리워드 트래픽</div>
+        <div class="v">실사용자에게 리워드를 제공하는 제휴 유입 — 투명하게 집계됩니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>쇼핑 상품 발견성</span><span>로컬 매장 검색</span><span>오픈마켓 노출</span>
+    <span>실사용자 리워드 유입</span><span>투명 리포트</span><span>셀프 캠페인</span>
+    <span>쇼핑 상품 발견성</span><span>로컬 매장 검색</span><span>오픈마켓 노출</span>
+    <span>실사용자 리워드 유입</span><span>투명 리포트</span><span>셀프 캠페인</span>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">문제</span>
+      <h2>좋은 상품이 묻히는 데는 이유가 있습니다</h2>
+      <p>발견성은 운에 맡길 영역이 아닙니다. 그런데 대부분의 작은 브랜드는 시작점조차 찾기 어렵습니다.</p>
+    </div>
+    <div class="prob-grid">
+      <div class="prob-photo">
+        <img src="https://picsum.photos/seed/rankstudio-shelf-21/900/1100" alt="진열대에 놓인 상품의 듀오톤 사진">
+        <p class="prob-quote">“만들 줄은 아는데, 어떻게 알려야 할지를 모르겠어요.”</p>
+      </div>
+      <div class="prob-list">
+        <div class="prob-item">
+          <span class="no">I</span>
+          <div>
+            <h3>대행사는 비싸고 불투명합니다</h3>
+            <p>무엇을 했는지 보이지 않고, 수수료는 매달 빠져나갑니다. 통제권은 늘 외부에 있습니다.</p>
+          </div>
+        </div>
+        <div class="prob-item">
+          <span class="no">II</span>
+          <div>
+            <h3>직접 하려니 시작점이 없습니다</h3>
+            <p>키워드, 기간, 유입 규모 — 어디서부터 어떻게 손대야 할지 가늠하기 어렵습니다.</p>
+          </div>
+        </div>
+        <div class="prob-item">
+          <span class="no">III</span>
+          <div>
+            <h3>성과를 믿을 근거가 부족합니다</h3>
+            <p>"올랐다"는 말뿐, 무엇이 어떻게 움직였는지 데이터로 확인할 길이 없습니다.</p>
+          </div>
+        </div>
+        <div class="prob-item">
+          <span class="no">IV</span>
+          <div>
+            <h3>과장 광고에 지쳤습니다</h3>
+            <p>보장한다는 약속은 많지만, 정직하게 한계를 말해주는 곳은 드뭅니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">해결</span>
+      <h2>캠페인을 직접 설계하는 스튜디오</h2>
+      <p>AI가 설정을 돕고, 실사용자 기반 리워드 유입으로 발견성을 키웁니다. 모든 과정은 화면에서 직접 통제합니다.</p>
+    </div>
+    <div class="sol-grid">
+      <div class="sol-card feat c-a">
+        <span class="step">Step 01 — 설계</span>
+        <div class="big">광고 만들기</div>
+        <h3 style="margin-top:18px">목표를 입력하면 AI가 초안을</h3>
+        <p>상품 URL이나 매장만 넣으면 키워드·기간·유입 규모 추천안을 받아볼 수 있습니다. 그대로 쓰거나, 직접 다듬으세요.</p>
+      </div>
+      <div class="sol-card c-b">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <span class="step">Step 02</span>
+        <h3>검색 발견성 설계</h3>
+        <p>쇼핑·오픈마켓 상품과 로컬 매장이 더 잘 발견되도록 키워드와 노출 흐름을 구성합니다.</p>
+      </div>
+      <div class="sol-card c-c">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M5 10l7-7 7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="step">Step 03</span>
+        <h3>유입 규모 설정</h3>
+        <p>기간과 규모를 직접 정하고 결제합니다.</p>
+      </div>
+      <div class="sol-card c-d">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 18V8m6 10V5m6 13v-7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <span class="step">Step 04</span>
+        <h3>실시간 진행 추적</h3>
+        <p>캠페인이 어떻게 진행되는지 대시보드에서 그대로 확인합니다.</p>
+      </div>
+      <div class="sol-card c-e">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="step">Step 05</span>
+        <h3>실사용자 리워드 유입</h3>
+        <p>리워드를 제공받는 실제 사용자의 제휴 유입으로 자연스러운 관심을 모읍니다.</p>
+      </div>
+      <div class="sol-card c-f">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 12h8M8 16h5M8 8h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <span class="step">Step 06</span>
+        <h3>투명한 성과 리포트</h3>
+        <p>무엇이 어떻게 움직였는지 데이터로 정리해 드립니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVIDENCE -->
+<section class="evidence" id="evidence">
+  <div class="wrap">
+    <div class="ev-grid">
+      <div>
+        <span class="eyebrow">증거</span>
+        <h2 style="font-size:clamp(28px,3.6vw,46px);margin-top:18px">보이지 않으면, 믿지 못합니다</h2>
+        <p style="color:var(--grayblue);font-size:16px;margin-top:16px;max-width:480px">
+          그래서 랭크스튜디오는 캠페인의 모든 지표를 숨기지 않습니다. 노출, 유입 경로, 추이를
+          한 화면에 모아 정직하게 보여드립니다.
+        </p>
+        <div class="ev-stats">
+          <div class="ev-stat"><b>실시간</b><span>유입·노출 지표 갱신</span></div>
+          <div class="ev-stat"><b>일<span class="u">/</span>주<span class="u">/</span>월</b><span>기간별 리포트 제공</span></div>
+          <div class="ev-stat"><b>경로<span class="u">별</span></b><span>유입 출처 분해</span></div>
+          <div class="ev-stat"><b>1<span class="u">click</span></b><span>리포트 내보내기</span></div>
+        </div>
+        <p class="ev-note">
+          정직 고지: 검색 발견성은 다양한 외부 요인의 영향을 받으며, 특정 결과나 순위를 보장하지
+          않습니다. 모든 유입은 실사용자 기반의 제휴 트래픽으로, 자동화된 허위 활동을 사용하지 않습니다.
+        </p>
+      </div>
+      <div class="ev-photo">
+        <span class="ev-badge">투명 리포트</span>
+        <img src="https://picsum.photos/seed/rankstudio-report-44/900/1080" alt="데이터를 들여다보는 작업 환경의 듀오톤 사진">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section class="flow" id="flow">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">진행 절차</span>
+      <h2>설정에서 리포트까지, 네 단계</h2>
+    </div>
+    <div class="flow-track">
+      <div class="flow-step">
+        <span class="n">01 / 설정</span>
+        <h3>URL·키워드 입력</h3>
+        <p>상품 URL 또는 매장을 넣고, 키워드와 기간을 정합니다.</p>
+      </div>
+      <div class="flow-step">
+        <span class="n">02 / 결제</span>
+        <h3>유입 규모 선택</h3>
+        <p>원하는 규모를 고르고 안전하게 결제합니다.</p>
+      </div>
+      <div class="flow-step">
+        <span class="n">03 / 진행</span>
+        <h3>실사용자 유입</h3>
+        <p>제휴 리워드 유입이 시작되고, 진행 상황이 갱신됩니다.</p>
+      </div>
+      <div class="flow-step">
+        <span class="n">04 / 리포트</span>
+        <h3>성과 확인</h3>
+        <p>지표를 데이터로 확인하고, 다음 캠페인을 설계합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA + QUICKSTART -->
+<section class="cta" id="start">
+  <div class="wrap cta-grid">
+    <div>
+      <span class="eyebrow">지금 시작</span>
+      <h2 style="margin-top:18px">첫 캠페인을<br><span class="em">3분 안에</span> 설계하세요</h2>
+      <p>상품 URL이나 매장만 있으면 충분합니다. AI가 초안을 제안하고, 나머지는 직접 다듬으면 됩니다.</p>
+    </div>
+    <form class="quickstart" onsubmit="return false">
+      <div class="qh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12l1-9z" stroke="#c9a25a" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        퀵스타트
+      </div>
+      <div class="field">
+        <label for="qurl">상품 URL 또는 매장명</label>
+        <input id="qurl" type="text" placeholder="seller-channel.example/item/0000">
+      </div>
+      <div class="field">
+        <label for="qkw">핵심 키워드</label>
+        <input id="qkw" type="text" placeholder="예: 수제 캔들, 원목 도마">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="qperiod">진행 기간</label>
+          <select id="qperiod">
+            <option>7일</option><option>14일</option><option selected>30일</option><option>60일</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qscale">유입 규모</label>
+          <select id="qscale">
+            <option>라이트</option><option selected>스탠다드</option><option>프로</option>
+          </select>
+        </div>
+      </div>
+      <button class="qs-btn" type="submit">
+        광고 만들기
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <p class="qs-note">입력값은 추천 초안 생성에만 사용됩니다. 결제 전 모든 설정을 다시 확인할 수 있습니다.</p>
+    </form>
+  </div>
+</section>
+
+<!-- HONEST -->
+<section class="honest">
+  <div class="wrap honest-grid">
+    <div>
+      <span class="eyebrow">정직 고지</span>
+      <h2 style="margin-top:16px">약속하지 않는 것까지<br>분명히 말합니다</h2>
+    </div>
+    <div class="disc">
+      <div class="disc-item">
+        <span class="ck"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div><b>실사용자 기반 유입만 사용합니다</b><p>리워드를 제공받는 실제 사용자의 제휴 유입으로 진행하며, 자동화된 허위 활동은 사용하지 않습니다.</p></div>
+      </div>
+      <div class="disc-item">
+        <span class="ck"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div><b>특정 결과를 보장하지 않습니다</b><p>검색 발견성은 여러 외부 요인의 영향을 받습니다. 우리는 과정을 투명하게 보여줄 뿐, 무리한 약속은 하지 않습니다.</p></div>
+      </div>
+      <div class="disc-item">
+        <span class="ck"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div><b>플랫폼 정책을 준수합니다</b><p>각 서비스의 운영 정책과 가이드라인을 존중하는 범위 안에서 캠페인을 설계합니다.</p></div>
+      </div>
+      <div class="disc-item">
+        <span class="ck"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div><b>데이터는 숨기지 않습니다</b><p>모든 지표를 리포트로 공개합니다. 좋은 수치도, 아쉬운 수치도 그대로 보여드립니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <rect x="1" y="1" width="38" height="38" rx="3" stroke="#c9a25a" stroke-width="1.4"/>
+            <path d="M12 28V12h7.5c3 0 5 1.8 5 4.6 0 2.2-1.2 3.7-3.2 4.3L25 28h-3.4l-3.2-6.2H15V28h-3z" fill="#c9a25a"/>
+            <path d="M15 14.6v4.6h4c1.6 0 2.6-.9 2.6-2.3s-1-2.3-2.6-2.3h-4z" fill="#0f1b2e"/>
+          </svg>
+          <div><b style="font-size:18px">랭크스튜디오</b><small style="display:block;font-size:10px;letter-spacing:0.26em;color:#c9a25a;font-weight:600;margin-top:1px">RANK STUDIO</small></div>
+        </div>
+        <p class="foot-desc">대행사 없이 직접 만드는 셀프 캠페인 스튜디오. 발견성을 설계하고, 투명하게 확인하세요.</p>
+      </div>
+      <div>
+        <h4>제품</h4>
+        <ul>
+          <li><a href="#solution">작동 방식</a></li>
+          <li><a href="#flow">진행 절차</a></li>
+          <li><a href="#evidence">리포트</a></li>
+          <li><a href="#start">광고 만들기</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>회사</h4>
+        <ul>
+          <li><a href="#">소개</a></li>
+          <li><a href="#">블로그</a></li>
+          <li><a href="#">고객 사례</a></li>
+          <li><a href="#">문의</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>정책</h4>
+        <ul>
+          <li><a href="#honest">정직 고지</a></li>
+          <li><a href="#">이용약관</a></li>
+          <li><a href="#">개인정보 처리방침</a></li>
+          <li><a href="#">운영 정책</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 랭크스튜디오. 실사용자 기반 제휴 유입 — 정직한 발견성.</p>
+      <p>made for self-service creators</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelector('.burger')?.addEventListener('click',function(){
+    document.querySelector('nav.links')?.scrollIntoView();
+    document.getElementById('start')?.scrollIntoView({behavior:'smooth'});
+  });
+  document.querySelector('.qs-btn')?.addEventListener('click',function(){
+    var u=document.getElementById('qurl').value.trim();
+    this.innerHTML = u ? '초안 생성 준비 완료 ✓' : '상품 URL 또는 매장명을 입력하세요';
+    this.style.background = u ? '#d8b572' : '#3a4a60';
+    this.style.color = u ? '#0f1b2e' : '#dcd6c9';
+    setTimeout(()=>{ this.style.background='#c9a25a'; this.style.color='#0f1b2e';
+      this.innerHTML='광고 만들기 <svg width=17 height=17 viewBox="0 0 24 24" fill=none><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width=2 stroke-linecap=round stroke-linejoin=round/></svg>';
+    },2200);
+  });
+</script>
+</body>
+</html>

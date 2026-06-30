@@ -3,57 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>랭크스튜디오 — 시네마틱 디테일 시안 10종</title>
+    <title>랭크스튜디오 — 신규 디테일 시안 (색·레이아웃·이미지 개선)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-      :root { --bg:#000; --card:#0e1013; --line:rgba(255,255,255,.1); --ink:#f3f4f5; --muted:#8a9099; --accent:#2dd4bf; }
+      :root { --bg:#0c0c0e; --card:#16161a; --line:rgba(255,255,255,.1); --ink:#f2f1ee; --muted:#938e86; --accent:#c9a25a; }
       * { box-sizing:border-box; margin:0; }
       body { background:var(--bg); color:var(--ink); font-family:"Pretendard",sans-serif; padding:clamp(28px,5vw,64px) clamp(16px,4vw,48px) 88px; -webkit-font-smoothing:antialiased; }
-      header { max-width:1280px; margin:0 auto 22px; }
+      header { max-width:1280px; margin:0 auto 20px; }
       .kicker { font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:800; }
       h1 { font-size:clamp(26px,3.6vw,42px); line-height:1.22; margin:12px 0 14px; letter-spacing:-.02em; word-break:keep-all; }
-      header p { color:var(--muted); font-size:15.5px; line-height:1.7; max-width:78ch; }
-      .tabs { max-width:1280px; margin:0 auto 30px; display:flex; gap:8px; flex-wrap:wrap; }
+      header p { color:var(--muted); font-size:15.5px; line-height:1.7; max-width:80ch; }
+      .tabs { max-width:1280px; margin:0 auto 28px; display:flex; gap:8px; flex-wrap:wrap; }
       .tabs a { font-size:13px; font-weight:700; color:var(--muted); border:1px solid var(--line); padding:8px 14px; border-radius:999px; text-decoration:none; }
       .tabs a.on { color:#000; background:var(--accent); border-color:var(--accent); }
       .tabs a:hover { color:var(--ink); }
-      .grid { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; }
-      @media (max-width:820px){ .grid{ grid-template-columns:1fr; } }
+      .sec { max-width:1280px; margin:0 auto 12px; font-size:13px; font-weight:800; letter-spacing:.04em; color:var(--muted); text-transform:uppercase; }
+      .grid { max-width:1280px; margin:0 auto 36px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; }
+      @media (max-width:1000px){ .grid{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+      @media (max-width:640px){ .grid{ grid-template-columns:1fr; } }
       .card { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); display:flex; flex-direction:column; transition:transform .16s ease, border-color .16s ease; }
       .card:hover { transform:translateY(-4px); border-color:var(--accent); }
-      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1040; object-fit:cover; object-position:top; background:#111; }
-      .meta { padding:18px 20px 20px; display:flex; flex-direction:column; gap:6px; }
-      .num { font-size:12px; color:var(--accent); font-weight:800; letter-spacing:.08em; }
-      .meta h2 { font-size:19px; word-break:keep-all; }
-      .meta p { color:var(--muted); font-size:13.5px; line-height:1.55; }
-      .open { margin-top:11px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#000; font-weight:800; font-size:13.5px; padding:10px 17px; border-radius:9px; }
-      footer { max-width:1280px; margin:48px auto 0; color:var(--muted); font-size:13px; line-height:1.8; }
+      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1100; object-fit:cover; object-position:top; background:#111; }
+      .meta { padding:16px 18px 18px; display:flex; flex-direction:column; gap:5px; }
+      .num { font-size:11.5px; color:var(--accent); font-weight:800; letter-spacing:.06em; }
+      .meta h2 { font-size:17px; word-break:keep-all; }
+      .meta p { color:var(--muted); font-size:12.5px; line-height:1.5; }
+      .open { margin-top:10px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#000; font-weight:800; font-size:13px; padding:9px 15px; border-radius:8px; }
+      footer { max-width:1280px; margin:40px auto 0; color:var(--muted); font-size:13px; line-height:1.8; }
     </style>
   </head>
   <body>
     <header>
-      <div class="kicker">RANKSTUDIO · 시네마틱 디테일 (the.pullimad 결) · 10 CONCEPTS</div>
-      <h1>시네마틱 디테일 시안 10종</h1>
-      <p>실제 the.pullimad.com을 캡처·분석해 그 디테일 언어 — 순흑 시네마틱 배경·분위기 조명(파티클·라디얼 글로우·호라이즌)·스크롤 안무(커넥터→점→글로우)·주석 달린 실사 목업·비교표·신화 깨기·거대 여백 — 를 적용했습니다. 자가전환 "광고 만들기" 인라인 퀵스타트 포함. 전부 Pretendard·정상 사이징, 각 시안은 자가 스크린샷→비평→수정 루프를 거쳤습니다. 카드를 열면 실제 스크롤 연출이 동작합니다.</p>
+      <div class="kicker">RANKSTUDIO · 신규 디테일 (색·레이아웃·이미지 정조준)</div>
+      <h1>신규 시안 — 지적해주신 3가지를 정조준</h1>
+      <p><b>① 색감</b>: 단일 네온 폐기 → 세련된 다색 디자이너 팔레트. <b>② 레이아웃</b>: 템플릿 폐기 → 비대칭·에디토리얼·그리드 브레이킹. <b>③ 이미지</b>: 가짜 CSS 대시보드 폐기 → 팔레트 매칭 듀오톤 실사 + 맞춤 SVG 아트. 전부 Pretendard·정상 사이징, 각 시안이 자가 스크린샷→비평→수정 루프를 거쳤습니다. (nx-11~30은 추가 제작 중 — 완성되면 이 페이지에 더해집니다.)</p>
     </header>
     <nav class="tabs">
-      <a class="on" href="index.html">시네마틱 디테일 10종</a>
-      <a href="dp-gallery.html">다크 프리미엄 10종</a>
-      <a href="cv-gallery.html">전환형 10종</a>
-      <a href="award-gallery.html">어워즈 10종</a>
+      <a class="on" href="index.html">신규 디테일</a>
+      <a href="ps-gallery.html">시네마틱</a>
+      <a href="dp-gallery.html">다크 프리미엄</a>
+      <a href="cv-gallery.html">전환형</a>
+      <a href="award-gallery.html">어워즈</a>
     </nav>
+
+    <div class="sec">고도화 · 클론</div>
     <main class="grid">
-      <article class="card"><a href="ps-10-flagship.html" target="_blank"><img class="shot" src="previews/g-ps-10-flagship.png" alt=""/></a><div class="meta"><span class="num">10 · 추천(플래그십)</span><h2>결정판 (틸+레드)</h2><p>시네마틱 디테일 총합 + 동작하는 인라인 퀵스타트. 자가비평 2회+.</p><a class="open" href="ps-10-flagship.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-01-cinematic-red.html" target="_blank"><img class="shot" src="previews/g-ps-01-cinematic-red.png" alt=""/></a><div class="meta"><span class="num">01 · 추천</span><h2>정통 시네마틱 (레드)</h2><p>풀림애드 정수에 가장 가까운 결. 별자리·호라이즌 글로우.</p><a class="open" href="ps-01-cinematic-red.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-05-cinematic-teal.html" target="_blank"><img class="shot" src="previews/g-ps-05-cinematic-teal.png" alt=""/></a><div class="meta"><span class="num">05 · 추천</span><h2>시네마틱 (틸)</h2><p>가장 선호하신 틸을 시네마틱 절제+스토리텔링으로.</p><a class="open" href="ps-05-cinematic-teal.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-02-cinematic-amber.html" target="_blank"><img class="shot" src="previews/g-ps-02-cinematic-amber.png" alt=""/></a><div class="meta"><span class="num">02</span><h2>시네마틱 (앰버) + 실사 사진</h2><p>풀블리드 그레인 사진 히어로 + 골드 악센트.</p><a class="open" href="ps-02-cinematic-amber.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-03-cinematic-blue.html" target="_blank"><img class="shot" src="previews/g-ps-03-cinematic-blue.png" alt=""/></a><div class="meta"><span class="num">03</span><h2>시네마틱 (블루) + 데이터</h2><p>스크롤에 차오르는 증거 차트, 데이터 저널리즘 톤.</p><a class="open" href="ps-03-cinematic-blue.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-04-cinematic-lime.html" target="_blank"><img class="shot" src="previews/g-ps-04-cinematic-lime.png" alt=""/></a><div class="meta"><span class="num">04</span><h2>시네마틱 (라임) + 베엔토</h2><p>여백 큰 다크 베엔토를 시네마틱하게.</p><a class="open" href="ps-04-cinematic-lime.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-06-cinematic-coral.html" target="_blank"><img class="shot" src="previews/g-ps-06-cinematic-coral.png" alt=""/></a><div class="meta"><span class="num">06</span><h2>시네마틱 (코랄) + 제품 시어터</h2><p>핀 스크롤 제품 시어터 + 콜아웃 주석.</p><a class="open" href="ps-06-cinematic-coral.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-07-warm-editorial.html" target="_blank"><img class="shot" src="previews/g-ps-07-warm-editorial.png" alt=""/></a><div class="meta"><span class="num">07</span><h2>웜 오프블랙 에디토리얼</h2><p>따뜻한 오프블랙+크림+머스타드. 고급 에디토리얼.</p><a class="open" href="ps-07-warm-editorial.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-08-monochrome.html" target="_blank"><img class="shot" src="previews/g-ps-08-monochrome.png" alt=""/></a><div class="meta"><span class="num">08</span><h2>모노크롬 미니멀</h2><p>흑백+단일 레드. 극단적 절제와 거대 여백.</p><a class="open" href="ps-08-monochrome.html" target="_blank">열기 →</a></div></article>
-      <article class="card"><a href="ps-09-green-trust.html" target="_blank"><img class="shot" src="previews/g-ps-09-green-trust.png" alt=""/></a><div class="meta"><span class="num">09</span><h2>딥 그린 + 투명성/신뢰</h2><p>유입 원리·약속 O/X·기준 탭. 투명성으로 전환.</p><a class="open" href="ps-09-green-trust.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="ps-05-pro.html" target="_blank"><img class="shot" src="previews/g-ps-05-pro.png" alt=""/></a><div class="meta"><span class="num">PRO · 추천</span><h2>ps-05 틸 — 집중 고도화</h2><p>가장 선호하신 틸을 색·레이아웃·이미지 전면 개선(청록 잉크+샴페인, 비대칭, 듀오톤 실사).</p><a class="open" href="ps-05-pro.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="clone-pullim.html" target="_blank"><img class="shot" src="previews/g-clone-pullim.png" alt=""/></a><div class="meta"><span class="num">CLONE</span><h2>풀림애드 1:1 클론</h2><p>레퍼런스 구조·연출 그대로 셀프 '광고 만들기'로 재구성.</p><a class="open" href="clone-pullim.html" target="_blank">열기 →</a></div></article>
     </main>
-    <footer>10종 모두 시네마틱 디테일 언어 · Pretendard · 정상 글자크기/간격 · 자가전환 "광고 만들기" · 외부 플랫폼 실명/금지표현 0(부정문 포함) · 320/768/1440 반응형 · prefers-reduced-motion 정지.</footer>
+
+    <div class="sec">신규 팔레트 시안 (nx-01~10)</div>
+    <main class="grid">
+      <article class="card"><a href="nx-01-navy-brass.html" target="_blank"><img class="shot" src="previews/g-nx-01-navy-brass.png" alt=""/></a><div class="meta"><span class="num">01 · 추천</span><h2>네이비 + 브라스</h2><p>헤리티지 럭셔리 스플릿 에디토리얼.</p><a class="open" href="nx-01-navy-brass.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-02-espresso-terracotta.html" target="_blank"><img class="shot" src="previews/g-nx-02-espresso-terracotta.png" alt=""/></a><div class="meta"><span class="num">02</span><h2>에스프레소 + 테라코타</h2><p>매거진 비대칭·드롭캡, 따뜻한 듀오톤.</p><a class="open" href="nx-02-espresso-terracotta.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-03-charcoal-sage.html" target="_blank"><img class="shot" src="previews/g-nx-03-charcoal-sage.png" alt=""/></a><div class="meta"><span class="num">03</span><h2>차콜 + 세이지</h2><p>풀블리드 자연 텍스처, 웰니스 톤.</p><a class="open" href="nx-03-charcoal-sage.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-04-midnight-copper.html" target="_blank"><img class="shot" src="previews/g-nx-04-midnight-copper.png" alt=""/></a><div class="meta"><span class="num">04</span><h2>미드나잇 틸 + 코퍼</h2><p>앱 셸형 사이드바, 고급 테크.</p><a class="open" href="nx-04-midnight-copper.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-05-oxblood-rose.html" target="_blank"><img class="shot" src="previews/g-nx-05-oxblood-rose.png" alt=""/></a><div class="meta"><span class="num">05</span><h2>옥스블러드 + 로즈</h2><p>패션 매거진, 타입+인물 오버랩.</p><a class="open" href="nx-05-oxblood-rose.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-06-forest-mustard.html" target="_blank"><img class="shot" src="previews/g-nx-06-forest-mustard.png" alt=""/></a><div class="meta"><span class="num">06</span><h2>포레스트 + 머스타드</h2><p>그리드 브레이킹, 헤리티지+생기.</p><a class="open" href="nx-06-forest-mustard.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-07-slate-apricot.html" target="_blank"><img class="shot" src="previews/g-nx-07-slate-apricot.png" alt=""/></a><div class="meta"><span class="num">07</span><h2>슬레이트 + 살구</h2><p>GSAP 가로 스크롤 쇼케이스.</p><a class="open" href="nx-07-slate-apricot.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-08-plum-gold.html" target="_blank"><img class="shot" src="previews/g-nx-08-plum-gold.png" alt=""/></a><div class="meta"><span class="num">08</span><h2>플럼 + 골드</h2><p>좌고정+우 스티키 스토리, 럭셔리.</p><a class="open" href="nx-08-plum-gold.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-09-burnt-orange.html" target="_blank"><img class="shot" src="previews/g-nx-09-burnt-orange.png" alt=""/></a><div class="meta"><span class="num">09</span><h2>번트 오렌지 + 잉크</h2><p>비대칭 2단, 따뜻한 모던 에디토리얼.</p><a class="open" href="nx-09-burnt-orange.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="nx-10-burgundy-champagne.html" target="_blank"><img class="shot" src="previews/g-nx-10-burgundy-champagne.png" alt=""/></a><div class="meta"><span class="num">10</span><h2>버건디 + 샴페인</h2><p>럭셔리 센터드 미니멀, 골드 헤어라인.</p><a class="open" href="nx-10-burgundy-champagne.html" target="_blank">열기 →</a></div></article>
+    </main>
+    <footer>전부 외부 플랫폼 실명/금지표현 0(부정문 포함) · 자가전환 "광고 만들기" · Pretendard · 320/768/1440 반응형. nx-11~30 추가 제작 중.</footer>
   </body>
 </html>
