@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크 스튜디오 — 직접 만드는 셀프 캠페인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --slate:#20262b;
+    --slate-2:#2b333a;
+    --slate-3:#39424a;
+    --mint:#8fd0c0;
+    --mint-deep:#5fa593;
+    --mint-ink:#1d3f37;
+    --bone:#eceae3;
+    --bone-soft:#f5f4ee;
+    --paper:#fbfaf6;
+    --ink:#20262b;
+    --ink-soft:#5b646b;
+    --ink-faint:#8a929a;
+    --line:rgba(32,38,43,.12);
+    --line-soft:rgba(32,38,43,.07);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Pretendard Variable",Pretendard,-apple-system,sans-serif;
+    background:var(--paper);color:var(--ink);
+    font-size:16px;line-height:1.7;word-break:keep-all;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    font-feature-settings:"tnum" 1,"ss01" 1;
+  }
+  h1,h2,h3,h4{line-height:1.16;letter-spacing:-.022em;font-weight:700}
+  h1{font-size:clamp(28px,3.6vw,48px)}
+  h2{font-size:clamp(24px,2.9vw,38px)}
+  h3{font-size:clamp(18px,1.5vw,22px)}
+  p{font-size:clamp(15px,1.05vw,16px);color:var(--ink-soft)}
+  a{color:inherit;text-decoration:none}
+  .num{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .wrap{width:min(1200px,92vw);margin-inline:auto}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;
+    font-weight:600;color:var(--mint-deep);
+  }
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--mint-deep);display:inline-block}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:14px 26px;border-radius:12px;font-weight:600;font-size:15px;
+    transition:transform .25s ease,background .25s,color .25s,box-shadow .25s;
+    cursor:pointer;border:none;
+  }
+  .btn-primary{background:var(--slate);color:var(--bone-soft)}
+  .btn-primary:hover{transform:translateY(-2px);background:#11161a;box-shadow:0 12px 30px -14px rgba(32,38,43,.6)}
+  .btn-mint{background:var(--mint);color:var(--mint-ink)}
+  .btn-mint:hover{background:var(--mint-deep);color:#fff;transform:translateY(-2px)}
+  .btn-ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:var(--slate);transform:translateY(-2px)}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:saturate(150%) blur(14px);
+    background:rgba(251,250,246,.8);border-bottom:1px solid var(--line-soft)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;padding:15px 0}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.02em;font-size:18px}
+  .logo .mark{width:30px;height:30px;border-radius:9px;background:var(--slate);display:grid;place-items:center}
+  .nav-links{display:flex;align-items:center;gap:30px}
+  .nav-links a:not(.btn){font-size:14.5px;color:var(--ink-soft);font-weight:500;transition:color .2s}
+  .nav-links a:not(.btn):hover{color:var(--ink)}
+  @media(max-width:860px){.nav-links a:not(.btn){display:none}}
+
+  /* HERO — asymmetric grid */
+  .hero{padding:clamp(48px,7vw,92px) 0 clamp(40px,5vw,64px)}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(32px,4vw,64px);align-items:center}
+  @media(max-width:900px){.hero-grid{grid-template-columns:1fr;gap:36px}}
+  .hero h1{margin:18px 0 0}
+  .hero h1 em{font-style:normal;color:var(--mint-deep)}
+  .hero .lead{margin-top:20px;max-width:30em;font-size:clamp(15px,1.15vw,17px)}
+  .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+  .hero-meta{display:flex;gap:28px;margin-top:34px;flex-wrap:wrap}
+  .hero-meta .k{font-size:clamp(22px,2.4vw,30px);font-weight:700;letter-spacing:-.03em}
+  .hero-meta .l{font-size:13px;color:var(--ink-faint);margin-top:2px}
+  .hero-art{position:relative}
+
+  /* QUICKSTART inline card */
+  .quick{
+    margin-top:clamp(24px,3vw,40px);background:var(--slate);color:var(--bone-soft);
+    border-radius:20px;padding:clamp(22px,2.4vw,30px);position:relative;overflow:hidden;
+  }
+  .quick::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
+    border-radius:50%;border:1px solid rgba(143,208,192,.22)}
+  .quick-h{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;color:var(--mint)}
+  .quick-form{display:grid;grid-template-columns:1.4fr .8fr .8fr auto;gap:10px;margin-top:16px}
+  @media(max-width:760px){.quick-form{grid-template-columns:1fr 1fr}}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:11.5px;letter-spacing:.04em;color:rgba(236,234,227,.6);font-weight:500}
+  .field input,.field select{
+    background:var(--slate-2);border:1px solid var(--slate-3);color:var(--bone-soft);
+    border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;width:100%;
+    transition:border-color .2s;
+  }
+  .field input:focus,.field select:focus{outline:none;border-color:var(--mint)}
+  .field input::placeholder{color:rgba(236,234,227,.4)}
+  .quick .go{align-self:end}
+  .quick .go .btn{width:100%;justify-content:center}
+  .quick-note{margin-top:13px;font-size:12px;color:rgba(236,234,227,.55);display:flex;align-items:center;gap:7px}
+
+  /* SECTION shell */
+  section{padding:clamp(56px,7vw,104px) 0}
+  .sec-head{max-width:46em}
+  .sec-head h2{margin:14px 0 12px}
+  .sec-head p{font-size:clamp(15px,1.1vw,17px)}
+
+  /* STEPS — asymmetric */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:48px;
+    background:var(--line-soft);border:1px solid var(--line-soft);border-radius:20px;overflow:hidden}
+  @media(max-width:880px){.steps{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--paper);padding:28px 24px;transition:background .3s}
+  .step:hover{background:var(--bone-soft)}
+  .step .n{font-size:13px;font-weight:700;color:var(--mint-deep);letter-spacing:.04em}
+  .step h4{font-size:17px;margin:14px 0 8px;font-weight:700}
+  .step p{font-size:14px}
+  .step .ic{width:38px;height:38px;border-radius:11px;background:var(--bone);display:grid;place-items:center;margin-bottom:4px}
+
+  /* DATA ART band */
+  .band{background:var(--slate);color:var(--bone-soft);border-radius:28px;overflow:hidden;position:relative}
+  .band .wrap{padding:clamp(40px,5vw,72px) clamp(24px,4vw,56px);width:auto}
+  .band-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(28px,4vw,56px);align-items:center}
+  @media(max-width:900px){.band-grid{grid-template-columns:1fr;gap:36px}}
+  .band .eyebrow{color:var(--mint)}
+  .band h2{color:#fff;margin:14px 0 14px}
+  .band p{color:rgba(236,234,227,.72)}
+  .band .stat-row{display:flex;gap:30px;margin-top:26px;flex-wrap:wrap}
+  .band .stat-row .k{font-size:clamp(24px,2.6vw,34px);font-weight:700;color:var(--mint);letter-spacing:-.03em}
+  .band .stat-row .l{font-size:12.5px;color:rgba(236,234,227,.6);margin-top:3px}
+
+  /* FEATURE split */
+  .feat{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,3.5vw,64px);align-items:center;margin-top:30px}
+  @media(max-width:880px){.feat{grid-template-columns:1fr;gap:32px}}
+  .feat.rev .feat-art{order:2}
+  @media(max-width:880px){.feat.rev .feat-art{order:0}}
+  .feat-list{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:16px}
+  .feat-list li{display:flex;gap:14px;align-items:flex-start}
+  .feat-list .tick{flex:none;width:26px;height:26px;border-radius:8px;background:var(--mint);color:var(--mint-ink);
+    display:grid;place-items:center;font-size:14px;font-weight:700}
+  .feat-list b{font-weight:700;font-size:15.5px}
+  .feat-list span{display:block;font-size:14px;color:var(--ink-soft);margin-top:2px}
+  .card-soft{border:1px solid var(--line);border-radius:20px;padding:8px;background:var(--bone-soft)}
+
+  /* DUOTONE photo */
+  .duo{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:4/3;background:var(--slate-2)}
+  .duo img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.06) brightness(.92);mix-blend-mode:luminosity;opacity:.92}
+  .duo::before{content:"";position:absolute;inset:0;background:linear-gradient(140deg,var(--slate) 0%,var(--mint-deep) 130%);mix-blend-mode:color;z-index:1}
+  .duo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(32,38,43,.5) 100%);z-index:2}
+  .duo .cap{position:absolute;left:18px;bottom:16px;z-index:3;color:var(--bone-soft);font-size:13px;font-weight:600;letter-spacing:.02em;display:flex;align-items:center;gap:8px}
+  .duo .cap .dot{width:7px;height:7px;border-radius:50%;background:var(--mint)}
+
+  /* PRICING / FLOW table */
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px}
+  @media(max-width:880px){.flow{grid-template-columns:1fr 1fr}}
+  @media(max-width:480px){.flow{grid-template-columns:1fr}}
+  .flow-card{border:1px solid var(--line);border-radius:16px;padding:24px 22px;background:var(--paper);position:relative;transition:transform .25s,border-color .25s}
+  .flow-card:hover{transform:translateY(-3px);border-color:var(--mint-deep)}
+  .flow-card .ph{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+  .flow-card h4{font-size:18px;margin:10px 0 8px}
+  .flow-card p{font-size:13.5px}
+  .flow-card .arrow{position:absolute;right:-12px;top:50%;transform:translateY(-50%);z-index:2;color:var(--mint-deep);font-size:18px;background:var(--paper)}
+  @media(max-width:880px){.flow-card .arrow{display:none}}
+
+  /* CTA final */
+  .final{background:linear-gradient(155deg,var(--slate) 0%,var(--slate-2) 100%);border-radius:28px;color:var(--bone-soft);text-align:center;padding:clamp(48px,6vw,84px) clamp(24px,4vw,56px);position:relative;overflow:hidden}
+  .final h2{color:#fff;max-width:18em;margin:16px auto 14px}
+  .final p{color:rgba(236,234,227,.7);max-width:34em;margin:0 auto}
+  .final .hero-cta{justify-content:center;margin-top:30px}
+  .final .btn-ghost{border-color:rgba(236,234,227,.3);color:var(--bone-soft)}
+  .final .btn-ghost:hover{border-color:var(--mint)}
+
+  /* FOOTER */
+  footer{padding:48px 0 64px;border-top:1px solid var(--line-soft);margin-top:clamp(56px,7vw,96px)}
+  .foot-in{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .foot-in p{font-size:13px;color:var(--ink-faint);max-width:38em}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot-links a{font-size:13.5px;color:var(--ink-soft)}
+  .foot-links a:hover{color:var(--ink)}
+  .compliance{margin-top:18px;font-size:12px;color:var(--ink-faint);line-height:1.6;max-width:60em}
+
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    *{scroll-behavior:auto!important}
+    .reveal{opacity:1!important;transform:none!important;transition:none!important}
+    .btn:hover,.flow-card:hover,.step:hover{transform:none!important}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap nav-in">
+    <a href="#" class="logo">
+      <span class="mark">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="9" width="3" height="6" rx="1" fill="#8fd0c0"/><rect x="6.5" y="5" width="3" height="10" rx="1" fill="#eceae3"/><rect x="12" y="1.5" width="3" height="13.5" rx="1" fill="#8fd0c0"/></svg>
+      </span>
+      랭크 스튜디오
+    </a>
+    <div class="nav-links">
+      <a href="#how">작동 방식</a>
+      <a href="#engine">캠페인 엔진</a>
+      <a href="#flow">진행 흐름</a>
+      <a href="#start" class="btn btn-mint">광고 만들기</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">AI 셀프 캠페인 스튜디오</span>
+      <h1>직접 만드는 광고,<br><em>발견되는</em> 비즈니스로.</h1>
+      <p class="lead">URL과 키워드, 기간, 유입 규모만 정하면 됩니다. 쇼핑·오픈마켓·로컬에서의 발견 가능성을 끌어올리는 셀프 캠페인을 직접 설계하고, 결제하고, 리포트로 확인하세요.</p>
+      <div class="hero-cta">
+        <a href="#start" class="btn btn-primary">광고 만들기 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h9M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a href="#how" class="btn btn-ghost">작동 방식 보기</a>
+      </div>
+      <div class="hero-meta">
+        <div><div class="k num">4단계</div><div class="l">설정 → 결제 → 진행 → 리포트</div></div>
+        <div><div class="k num">실사용자</div><div class="l">리워드 기반 유입</div></div>
+        <div><div class="k num">투명</div><div class="l">일자별 성과 리포트</div></div>
+      </div>
+    </div>
+
+    <div class="hero-art reveal">
+      <svg viewBox="0 0 520 460" width="100%" role="img" aria-label="키워드 발견성이 캠페인 기간 동안 상승하는 데이터 라인 아트">
+        <defs>
+          <clipPath id="cp"><rect x="0" y="0" width="520" height="460" rx="20"/></clipPath>
+        </defs>
+        <g clip-path="url(#cp)">
+          <rect x="0" y="0" width="520" height="460" fill="#f5f4ee"/>
+          <g stroke="rgba(32,38,43,.07)" stroke-width="1">
+            <line x1="48" y1="60" x2="48" y2="372"/>
+            <line x1="48" y1="372" x2="488" y2="372"/>
+            <line x1="48" y1="294" x2="488" y2="294" stroke-dasharray="2 5"/>
+            <line x1="48" y1="216" x2="488" y2="216" stroke-dasharray="2 5"/>
+            <line x1="48" y1="138" x2="488" y2="138" stroke-dasharray="2 5"/>
+          </g>
+          <!-- baseline area -->
+          <path d="M48 332 C140 320 200 322 270 310 C340 298 420 300 488 292 L488 372 L48 372 Z" fill="rgba(32,38,43,.05)"/>
+          <path d="M48 332 C140 320 200 322 270 310 C340 298 420 300 488 292" fill="none" stroke="#8a929a" stroke-width="2" stroke-dasharray="4 4"/>
+          <!-- campaign area -->
+          <path d="M48 330 C130 312 180 256 250 214 C322 170 398 142 488 104 L488 372 L48 372 Z" fill="rgba(143,208,192,.18)"/>
+          <path d="M48 330 C130 312 180 256 250 214 C322 170 398 142 488 104" fill="none" stroke="#5fa593" stroke-width="3" stroke-linecap="round"/>
+          <!-- node dots -->
+          <g fill="#5fa593">
+            <circle cx="48" cy="330" r="4.5" fill="#20262b"/>
+            <circle cx="180" cy="256" r="4.5"/>
+            <circle cx="320" cy="172" r="4.5"/>
+            <circle cx="488" cy="104" r="5.5" fill="#20262b"/>
+          </g>
+          <circle cx="488" cy="104" r="11" fill="none" stroke="#8fd0c0" stroke-width="2"/>
+          <!-- floating chip -->
+          <g transform="translate(300,70)">
+            <rect x="0" y="0" width="170" height="58" rx="12" fill="#20262b"/>
+            <text x="16" y="24" fill="#8fd0c0" font-family="Pretendard, sans-serif" font-size="11" font-weight="600" letter-spacing=".06em">발견 가능성</text>
+            <text x="16" y="46" fill="#eceae3" font-family="Pretendard, sans-serif" font-size="20" font-weight="700">상승 추세 ↗</text>
+          </g>
+          <!-- x labels -->
+          <g fill="#8a929a" font-family="Pretendard, sans-serif" font-size="11" text-anchor="middle">
+            <text x="48" y="392">시작</text>
+            <text x="180" y="392">3일</text>
+            <text x="320" y="392">7일</text>
+            <text x="488" y="392">14일</text>
+          </g>
+          <!-- bottom legend -->
+          <g font-family="Pretendard, sans-serif" font-size="11.5" font-weight="500">
+            <rect x="48" y="416" width="22" height="3" rx="1.5" fill="#5fa593"/>
+            <text x="78" y="421" fill="#5b646b">캠페인 진행</text>
+            <rect x="190" y="416" width="22" height="3" rx="1.5" fill="#8a929a"/>
+            <text x="220" y="421" fill="#5b646b">미진행 기준선</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- QUICKSTART -->
+  <div class="wrap" id="start">
+    <div class="quick reveal">
+      <div class="quick-h">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="#8fd0c0" stroke-width="1.6" stroke-linecap="round"/></svg>
+        퀵스타트 — 30초 안에 캠페인 초안 만들기
+      </div>
+      <form class="quick-form" onsubmit="return false;">
+        <div class="field">
+          <label for="q-url">대상 URL</label>
+          <input id="q-url" type="url" placeholder="https://seller-channel.example/item/2048" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="q-kw">대표 키워드</label>
+          <input id="q-kw" type="text" placeholder="예: 캠핑 의자" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="q-day">진행 기간</label>
+          <select id="q-day">
+            <option>7일</option><option>14일</option><option>30일</option>
+          </select>
+        </div>
+        <div class="field go">
+          <label>&nbsp;</label>
+          <a href="#how" class="btn btn-mint">초안 생성</a>
+        </div>
+      </form>
+      <div class="quick-note">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 4v4m0 3h.01" stroke="rgba(236,234,227,.6)" stroke-width="1.4" stroke-linecap="round"/></svg>
+        결제 전 초안 단계 — 설정과 예상 유입 규모를 먼저 확인한 뒤 진행 여부를 정합니다.
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- HOW -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">작동 방식</span>
+      <h2>설정부터 리포트까지, 한 흐름으로.</h2>
+      <p>복잡한 절차 없이 네 단계만 거칩니다. 각 단계는 직접 확인하고 조정할 수 있으며, 진행 상황은 언제든 리포트로 열어볼 수 있습니다.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="3" width="15" height="11" rx="2" stroke="#20262b" stroke-width="1.5"/><path d="M2.5 7h15" stroke="#20262b" stroke-width="1.5"/></svg></div>
+        <div class="n">01</div>
+        <h4>캠페인 설정</h4>
+        <p>대상 URL, 키워드, 진행 기간과 목표 유입 규모를 직접 입력해 초안을 만듭니다.</p>
+      </div>
+      <div class="step">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2.5" y="4" width="15" height="12" rx="2" stroke="#20262b" stroke-width="1.5"/><path d="M2.5 8h15M6 12h4" stroke="#20262b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="n">02</div>
+        <h4>확인 후 결제</h4>
+        <p>예상 규모와 비용을 미리 검토하고, 동의한 범위 안에서만 결제가 진행됩니다.</p>
+      </div>
+      <div class="step">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#20262b" stroke-width="1.5"/><path d="M10 6v4l3 2" stroke="#20262b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="n">03</div>
+        <h4>캠페인 진행</h4>
+        <p>설정한 기간 동안 실사용자 유입이 진행되며, 상태를 실시간에 가깝게 추적합니다.</p>
+      </div>
+      <div class="step">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 16V8M8 16V4M13 16v-6M17 16h-1" stroke="#20262b" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <div class="n">04</div>
+        <h4>성과 리포트</h4>
+        <p>일자별 유입과 키워드 변화를 정리한 리포트를 받아 다음 캠페인에 반영합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA ART BAND -->
+<section id="engine">
+  <div class="wrap">
+    <div class="band reveal">
+      <div class="wrap band-grid">
+        <div>
+          <span class="eyebrow">캠페인 엔진</span>
+          <h2>리워드로 모이는 실사용자 유입.</h2>
+          <p>리워드 트래픽은 실제 사람들이 자발적으로 참여하는 유입입니다. 키워드와 대상 페이지를 중심으로, 발견 가능성을 자연스럽게 넓혀 갑니다.</p>
+          <div class="stat-row">
+            <div><div class="k num">실사용자</div><div class="l">자발적 참여 기반</div></div>
+            <div><div class="k num">키워드 중심</div><div class="l">발견 경로 최적화</div></div>
+            <div><div class="k num">일자별</div><div class="l">투명한 진행 기록</div></div>
+          </div>
+        </div>
+        <div class="band-art">
+          <svg viewBox="0 0 560 360" width="100%" role="img" aria-label="키워드 노드를 중심으로 실사용자 유입이 확산되는 네트워크 데이터 아트">
+            <g stroke="rgba(143,208,192,.45)" stroke-width="1.3" fill="none">
+              <path d="M280 180 L120 78"/><path d="M280 180 L96 196"/><path d="M280 180 L150 300"/>
+              <path d="M280 180 L300 56"/><path d="M280 180 L440 96"/><path d="M280 180 L468 220"/>
+              <path d="M280 180 L400 308"/><path d="M280 180 L250 320"/>
+            </g>
+            <g stroke="rgba(236,234,227,.14)" stroke-width="1" fill="none">
+              <path d="M120 78 L300 56"/><path d="M440 96 L468 220"/><path d="M150 300 L400 308"/>
+            </g>
+            <!-- satellite nodes -->
+            <g>
+              <circle cx="120" cy="78" r="9" fill="#8fd0c0"/>
+              <circle cx="96" cy="196" r="7" fill="#5fa593"/>
+              <circle cx="150" cy="300" r="8" fill="#8fd0c0"/>
+              <circle cx="300" cy="56" r="6" fill="#5fa593"/>
+              <circle cx="440" cy="96" r="9" fill="#8fd0c0"/>
+              <circle cx="468" cy="220" r="7" fill="#5fa593"/>
+              <circle cx="400" cy="308" r="8" fill="#8fd0c0"/>
+              <circle cx="250" cy="320" r="6" fill="#5fa593"/>
+            </g>
+            <!-- central keyword node -->
+            <circle cx="280" cy="180" r="42" fill="none" stroke="rgba(143,208,192,.3)" stroke-width="1.5"/>
+            <circle cx="280" cy="180" r="30" fill="#20262b" stroke="#8fd0c0" stroke-width="2"/>
+            <text x="280" y="176" text-anchor="middle" fill="#8fd0c0" font-family="Pretendard, sans-serif" font-size="13" font-weight="700">키워드</text>
+            <text x="280" y="192" text-anchor="middle" fill="rgba(236,234,227,.7)" font-family="Pretendard, sans-serif" font-size="10">대상 페이지</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE: report + duotone -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">투명한 리포트</span>
+      <h2>지금 무슨 일이 일어나는지, 숨김 없이.</h2>
+    </div>
+    <div class="feat">
+      <div class="feat-copy reveal">
+        <ul class="feat-list">
+          <li><span class="tick">✓</span><div><b>일자별 유입 추이</b><span>날짜별 유입 규모와 키워드 노출 변화를 한 화면에서 비교합니다.</span></div></li>
+          <li><span class="tick">✓</span><div><b>키워드별 분해</b><span>어떤 키워드가 발견 경로를 넓혔는지 항목별로 확인합니다.</span></div></li>
+          <li><span class="tick">✓</span><div><b>예산 소진 현황</b><span>결제한 범위 안에서 진행 상황과 잔여 규모를 투명하게 표시합니다.</span></div></li>
+          <li><span class="tick">✓</span><div><b>다음 캠페인 제안</b><span>이번 결과를 바탕으로 조정 포인트를 정리해 드립니다.</span></div></li>
+        </ul>
+      </div>
+      <div class="feat-art reveal">
+        <div class="card-soft">
+          <svg viewBox="0 0 480 320" width="100%" role="img" aria-label="일자별 유입 막대와 키워드 추이를 보여주는 리포트 데이터 아트">
+            <rect x="0" y="0" width="480" height="320" rx="14" fill="#fbfaf6"/>
+            <text x="24" y="36" fill="#20262b" font-family="Pretendard, sans-serif" font-size="14" font-weight="700">일자별 유입 리포트</text>
+            <text x="24" y="54" fill="#8a929a" font-family="Pretendard, sans-serif" font-size="11">진행 14일 · 키워드 3종</text>
+            <g stroke="rgba(32,38,43,.08)"><line x1="24" y1="250" x2="456" y2="250"/></g>
+            <!-- bars -->
+            <g>
+              <rect x="40" y="190" width="20" height="60" rx="4" fill="#cdd6d2"/>
+              <rect x="78" y="168" width="20" height="82" rx="4" fill="#cdd6d2"/>
+              <rect x="116" y="150" width="20" height="100" rx="4" fill="#a9cabf"/>
+              <rect x="154" y="124" width="20" height="126" rx="4" fill="#a9cabf"/>
+              <rect x="192" y="110" width="20" height="140" rx="4" fill="#8fd0c0"/>
+              <rect x="230" y="96" width="20" height="154" rx="4" fill="#8fd0c0"/>
+              <rect x="268" y="82" width="20" height="168" rx="4" fill="#5fa593"/>
+              <rect x="306" y="70" width="20" height="180" rx="4" fill="#5fa593"/>
+              <rect x="344" y="58" width="20" height="192" rx="4" fill="#20262b"/>
+              <rect x="382" y="48" width="20" height="202" rx="4" fill="#20262b"/>
+            </g>
+            <!-- trend line over bars -->
+            <path d="M50 196 L88 176 L126 160 L164 134 L202 120 L240 106 L278 92 L316 80 L354 68 L392 58" fill="none" stroke="#5fa593" stroke-width="2" stroke-dasharray="3 4" opacity=".7"/>
+            <g fill="#8a929a" font-family="Pretendard, sans-serif" font-size="10" text-anchor="middle">
+              <text x="50" y="270">1일</text><text x="202" y="270">7일</text><text x="392" y="270">14일</text>
+            </g>
+            <!-- callout -->
+            <g transform="translate(300,150)">
+              <rect x="0" y="0" width="150" height="44" rx="10" fill="#20262b"/>
+              <text x="14" y="19" fill="#8fd0c0" font-family="Pretendard, sans-serif" font-size="10" font-weight="600">누적 유입</text>
+              <text x="14" y="36" fill="#eceae3" font-family="Pretendard, sans-serif" font-size="15" font-weight="700">우상향 추이</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE rev: duotone photo -->
+<section>
+  <div class="wrap">
+    <div class="feat rev">
+      <div class="feat-art reveal">
+        <div class="duo">
+          <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1100&q=70" alt="작업 공간에서 캠페인을 직접 설계하는 모습" loading="lazy">
+          <div class="cap"><span class="dot"></span> 직접 설계하는 셀프 캠페인</div>
+        </div>
+      </div>
+      <div class="feat-copy reveal">
+        <span class="eyebrow">셀프 컨트롤</span>
+        <h2>대행이 아니라,<br>내가 직접 만드는 광고.</h2>
+        <p>키워드 선택부터 진행 규모, 기간까지 모든 결정을 직접 내립니다. 랭크 스튜디오는 설계를 돕고 결과를 정리할 뿐, 캠페인의 방향은 언제나 당신의 몫입니다.</p>
+        <ul class="feat-list">
+          <li><span class="tick">✓</span><div><b>쇼핑·오픈마켓 발견성</b><span>상품 페이지가 더 많은 검색 경로에 닿도록 설계합니다.</span></div></li>
+          <li><span class="tick">✓</span><div><b>로컬 발견성</b><span>지역 기반 비즈니스가 가까운 사용자에게 노출되도록 돕습니다.</span></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FLOW -->
+<section id="flow">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">진행 흐름</span>
+      <h2>결제에서 리포트까지의 경로.</h2>
+      <p>각 단계가 어떻게 이어지는지 한눈에 확인하세요. 모든 과정은 동의한 범위 안에서만 진행됩니다.</p>
+    </div>
+    <div class="flow">
+      <div class="flow-card reveal">
+        <div class="ph">단계 01</div><h4>입력</h4>
+        <p>URL · 키워드 · 기간 · 유입 규모를 정해 초안을 만듭니다.</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="flow-card reveal">
+        <div class="ph">단계 02</div><h4>결제</h4>
+        <p>예상 규모와 비용을 확인하고 동의 범위 안에서 결제합니다.</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="flow-card reveal">
+        <div class="ph">단계 03</div><h4>진행</h4>
+        <p>설정 기간 동안 실사용자 유입이 진행됩니다.</p>
+        <span class="arrow">→</span>
+      </div>
+      <div class="flow-card reveal">
+        <div class="ph">단계 04</div><h4>리포트</h4>
+        <p>일자별 성과를 정리해 다음 캠페인에 반영합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section>
+  <div class="wrap">
+    <div class="final reveal">
+      <span class="eyebrow" style="color:var(--mint);justify-content:center">지금 시작하기</span>
+      <h2>당신의 비즈니스, 더 잘 발견되도록.</h2>
+      <p>지금 첫 캠페인 초안을 만들어 보세요. 결제 전에 규모와 비용을 먼저 확인하고, 진행할지 직접 결정할 수 있습니다.</p>
+      <div class="hero-cta">
+        <a href="#start" class="btn btn-mint">광고 만들기</a>
+        <a href="#how" class="btn btn-ghost">작동 방식 다시 보기</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <div>
+      <a href="#" class="logo" style="margin-bottom:12px">
+        <span class="mark"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="9" width="3" height="6" rx="1" fill="#8fd0c0"/><rect x="6.5" y="5" width="3" height="10" rx="1" fill="#eceae3"/><rect x="12" y="1.5" width="3" height="13.5" rx="1" fill="#8fd0c0"/></svg></span>
+        랭크 스튜디오
+      </a>
+      <p class="compliance">랭크 스튜디오는 사용자가 직접 캠페인을 설계하는 셀프 광고 도구입니다. 리워드 트래픽은 실제 사용자의 자발적 참여로 이루어지며, 발견 가능성을 높이기 위한 정상적인 유입을 지향합니다.</p>
+    </div>
+    <div class="foot-links">
+      <a href="#how">작동 방식</a>
+      <a href="#engine">캠페인 엔진</a>
+      <a href="#flow">진행 흐름</a>
+      <a href="#start">광고 만들기</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+    document.querySelectorAll('.reveal').forEach(function(e){e.classList.add('in');});
+    return;
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(e){io.observe(e);});
+})();
+</script>
+</body>
+</html>
