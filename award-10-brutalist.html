@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 초고도화 리워드 트래픽 셀프 생성</title>
+<meta name="description" content="랭크스튜디오는 AI 기반 셀프 캠페인 플랫폼입니다. URL·키워드·기간·유입규모를 직접 설정하고 결제 후 진행과 리포트를 받아보세요." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --paper:#f4f1ea;
+  --ink:#0d0d0c;
+  --ink-2:#1a1a18;
+  --acid:#c8f135;
+  --coral:#ff4d2e;
+  --line:rgba(13,13,12,.18);
+  --line-strong:rgba(13,13,12,.42);
+  --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --grotesk:"Archivo","Pretendard",system-ui,sans-serif;
+  --kr:"Pretendard",system-ui,sans-serif;
+  --maxw:1440px;
+  --gut:clamp(16px,4vw,64px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--kr);
+  font-weight:400;
+  line-height:1.5;
+  overflow-x:hidden;
+  cursor:none;
+  -webkit-font-smoothing:antialiased;
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+::selection{background:var(--acid);color:var(--ink)}
+
+/* grain overlay */
+.grain{
+  position:fixed;inset:-150%;z-index:9000;pointer-events:none;
+  opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grainShift 1.2s steps(3) infinite;
+}
+@keyframes grainShift{
+  0%{transform:translate(0,0)}33%{transform:translate(-3%,2%)}66%{transform:translate(2%,-3%)}100%{transform:translate(0,0)}
+}
+
+/* custom cursor */
+.cur,.cur-dot{position:fixed;top:0;left:0;z-index:9500;pointer-events:none;border-radius:50%;will-change:transform}
+.cur{width:34px;height:34px;border:1.5px solid var(--ink);margin:-17px 0 0 -17px;transition:width .25s cubic-bezier(.2,.7,.3,1),height .25s cubic-bezier(.2,.7,.3,1),background .25s,border-color .25s}
+.cur-dot{width:5px;height:5px;background:var(--ink);margin:-2.5px 0 0 -2.5px}
+.cur.hov{width:60px;height:60px;margin:-30px 0 0 -30px;background:var(--acid);border-color:var(--acid);mix-blend-mode:normal}
+
+/* layout helpers */
+.wrap{max-width:var(--maxw);margin:0 auto;padding-left:var(--gut);padding-right:var(--gut)}
+.hair{border:0;border-top:1px solid var(--line)}
+.hair-strong{border:0;border-top:1.5px solid var(--ink)}
+.mono{font-family:var(--mono);font-weight:400;letter-spacing:.02em}
+.up{text-transform:uppercase}
+.tag{font-family:var(--mono);font-size:clamp(11px,1vw,13px);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+
+/* ===== Header ===== */
+header.nav{position:fixed;top:0;left:0;width:100%;z-index:8000;background:rgba(244,241,234,.78);backdrop-filter:blur(8px);border-bottom:1px solid var(--ink)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:62px}
+.brand{display:flex;align-items:baseline;gap:10px;font-family:var(--grotesk);font-weight:800;font-size:18px;letter-spacing:-.02em}
+.brand .sq{display:inline-block;width:11px;height:11px;background:var(--coral)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-family:var(--mono);font-size:13px;letter-spacing:.04em}
+.nav-links a span{color:var(--line-strong);margin-right:6px}
+.nav-cta{font-family:var(--mono);font-size:13px;border:1.5px solid var(--ink);padding:9px 16px;background:var(--ink);color:var(--paper);transition:background .2s,color .2s}
+.nav-cta:hover{background:var(--acid);color:var(--ink);border-color:var(--acid)}
+.burger{display:none;font-family:var(--mono);font-size:13px;border:1.5px solid var(--ink);padding:9px 14px}
+@media(max-width:768px){.nav-links{display:none}.burger{display:block}}
+
+/* ===== Hero ===== */
+.hero{padding-top:130px;position:relative;overflow:hidden}
+.hero-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-bottom:18px}
+.hero-h{font-family:var(--grotesk);font-weight:900;line-height:.86;letter-spacing:-.035em;font-size:clamp(52px,13.5vw,210px);text-transform:uppercase}
+.hero-h .ln{display:block;overflow:hidden}
+.hero-h .acid{color:var(--coral)}
+.hero-h .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+.hero-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hero-row .star{font-family:var(--grotesk);font-weight:900;color:var(--acid);-webkit-text-stroke:1.5px var(--ink)}
+.hero-grid{display:grid;grid-template-columns:1.4fr .9fr;gap:var(--gut);align-items:end;padding:38px 0 60px;border-top:1px solid var(--ink);margin-top:34px}
+.hero-lead{font-size:clamp(16px,1.5vw,20px);line-height:1.55;max-width:46ch;color:var(--ink-2)}
+.hero-lead b{font-weight:600;background:var(--acid);padding:0 4px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hero-cta-wrap{display:flex;flex-direction:column;gap:14px}
+.btn-acid{font-family:var(--mono);font-size:15px;letter-spacing:.02em;background:var(--coral);color:var(--paper);border:1.5px solid var(--ink);padding:18px 22px;display:flex;justify-content:space-between;align-items:center;transition:transform .18s,box-shadow .18s}
+.btn-acid:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--ink)}
+.btn-ghost{font-family:var(--mono);font-size:13px;letter-spacing:.04em;border:1.5px solid var(--ink);padding:14px 18px;text-align:center;transition:background .2s}
+.btn-ghost:hover{background:var(--ink);color:var(--paper)}
+@media(max-width:768px){.hero-grid{grid-template-columns:1fr;gap:28px;align-items:start}}
+
+/* halftone portrait block */
+.halftone{position:relative;aspect-ratio:4/5;border:1.5px solid var(--ink);background:
+  radial-gradient(circle at 30% 25%, var(--coral) 0 1.4px, transparent 1.6px) 0 0/9px 9px,
+  radial-gradient(circle at 30% 25%, var(--ink) 0 1.1px, transparent 1.3px) 4px 4px/9px 9px,
+  var(--paper);
+  display:flex;align-items:flex-end;padding:14px;overflow:hidden}
+.halftone .ht-cap{font-family:var(--mono);font-size:11px;letter-spacing:.1em;background:var(--paper);border:1px solid var(--ink);padding:6px 9px}
+
+/* ticker / marquee */
+.ticker{border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;padding:12px 0}
+.ticker-track{display:inline-flex;gap:42px;will-change:transform;font-family:var(--grotesk);font-weight:800;font-size:clamp(18px,2.4vw,30px);text-transform:uppercase;letter-spacing:-.01em}
+.ticker-track .dot{color:var(--acid)}
+
+/* section heading rows */
+.sec{padding:clamp(70px,9vw,140px) 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;border-bottom:1.5px solid var(--ink);padding-bottom:18px;margin-bottom:clamp(34px,5vw,64px)}
+.sec-num{font-family:var(--mono);font-size:13px;letter-spacing:.12em}
+.sec-title{font-family:var(--grotesk);font-weight:800;font-size:clamp(30px,5.5vw,76px);line-height:.92;letter-spacing:-.03em;text-transform:uppercase}
+
+/* campaign types */
+.types{display:grid;grid-template-columns:repeat(3,1fr);border-left:1px solid var(--ink);border-top:1px solid var(--ink)}
+@media(max-width:768px){.types{grid-template-columns:1fr}}
+.type{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:30px 26px 34px;min-height:330px;display:flex;flex-direction:column;justify-content:space-between;position:relative;transition:background .25s,color .25s;background:var(--paper)}
+.type:hover{background:var(--ink);color:var(--paper)}
+.type:hover .type-idx{color:var(--acid)}
+.type:hover .type-tag{border-color:var(--paper);color:var(--paper)}
+.type-idx{font-family:var(--grotesk);font-weight:900;font-size:64px;line-height:1;letter-spacing:-.04em;color:var(--coral)}
+.type-name{font-family:var(--grotesk);font-weight:700;font-size:clamp(22px,2.4vw,30px);letter-spacing:-.02em;margin-top:14px}
+.type-desc{font-size:14.5px;line-height:1.6;margin-top:12px;max-width:34ch;opacity:.92}
+.type-tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;border:1px solid var(--line-strong);padding:5px 9px;align-self:flex-start;margin-top:20px}
+
+/* how it works */
+.steps{display:grid;gap:0}
+.step{display:grid;grid-template-columns:120px 1fr 1fr;gap:var(--gut);align-items:start;padding:34px 0;border-top:1px solid var(--ink)}
+.step:last-child{border-bottom:1px solid var(--ink)}
+.step-n{font-family:var(--grotesk);font-weight:900;font-size:clamp(40px,6vw,90px);line-height:.85;letter-spacing:-.04em;-webkit-text-stroke:1.5px var(--ink);color:transparent}
+.step.on .step-n{color:var(--acid);-webkit-text-stroke:1.5px var(--ink)}
+.step-t{font-family:var(--grotesk);font-weight:700;font-size:clamp(20px,2.2vw,30px);letter-spacing:-.02em}
+.step-d{font-size:15px;line-height:1.65;color:var(--ink-2);max-width:40ch}
+.step-mono{font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:var(--line-strong);margin-top:10px}
+@media(max-width:768px){.step{grid-template-columns:64px 1fr;gap:18px}.step-d{grid-column:2}}
+
+/* stats */
+.stats-sec{background:var(--ink);color:var(--paper)}
+.stats-sec .sec-head{border-color:var(--paper)}
+.stats-sec .sec-title,.stats-sec .sec-num{color:var(--paper)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid rgba(244,241,234,.3)}
+@media(max-width:768px){.stats{grid-template-columns:1fr 1fr}}
+.stat{padding:34px 22px 38px;border-bottom:1px solid rgba(244,241,234,.3)}
+.stat:not(:last-child){border-right:1px solid rgba(244,241,234,.3)}
+.stat-n{font-family:var(--grotesk);font-weight:900;font-size:clamp(46px,7vw,96px);line-height:.9;letter-spacing:-.04em;color:var(--acid)}
+.stat-l{font-family:var(--mono);font-size:12px;letter-spacing:.06em;margin-top:14px;color:var(--paper)}
+.stat-s{font-size:13px;color:rgba(244,241,234,.62);margin-top:6px;line-height:1.5}
+
+/* faq teaser */
+.faq{border-top:1.5px solid var(--ink)}
+.faq-item{border-bottom:1px solid var(--ink);padding:0}
+.faq-q{width:100%;display:flex;justify-content:space-between;align-items:center;gap:20px;background:none;border:0;cursor:none;text-align:left;padding:26px 0;font-family:var(--grotesk);font-weight:700;font-size:clamp(18px,2.2vw,28px);letter-spacing:-.02em;color:inherit}
+.faq-q .ic{font-family:var(--mono);font-size:24px;flex:none;transition:transform .3s}
+.faq-item.open .faq-q .ic{transform:rotate(45deg);color:var(--coral)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.faq-a .inner{padding:0 0 28px;font-size:15.5px;line-height:1.7;color:var(--ink-2);max-width:62ch}
+
+/* CTA */
+.cta{position:relative;padding:clamp(90px,13vw,200px) 0;border-top:1.5px solid var(--ink);overflow:hidden}
+.cta-h{font-family:var(--grotesk);font-weight:900;font-size:clamp(46px,13vw,200px);line-height:.84;letter-spacing:-.04em;text-transform:uppercase}
+.cta-h .out{-webkit-text-stroke:2px var(--ink);color:transparent}
+.cta-sub{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:32px}
+.cta-mono{font-family:var(--mono);font-size:13px;letter-spacing:.05em;color:var(--ink-2);max-width:40ch;line-height:1.6}
+
+/* footer */
+footer{background:var(--ink);color:var(--paper);padding:64px 0 30px}
+.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:var(--gut)}
+@media(max-width:768px){.foot-grid{grid-template-columns:1fr;gap:34px}}
+.foot-brand{font-family:var(--grotesk);font-weight:900;font-size:clamp(34px,5vw,64px);letter-spacing:-.03em;line-height:.9}
+.foot-col h4{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--acid);margin-bottom:16px;font-weight:400}
+.foot-col a,.foot-col p{display:block;font-size:14px;color:rgba(244,241,234,.78);padding:5px 0}
+.foot-col a:hover{color:var(--acid)}
+.foot-bot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-top:54px;padding-top:22px;border-top:1px solid rgba(244,241,234,.25);font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;color:rgba(244,241,234,.6)}
+
+/* reveal defaults */
+.rv{opacity:1}
+@media (prefers-reduced-motion: no-preference){
+  .rv{opacity:0}
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important;transition:none !important}
+  body{cursor:auto}
+  .cur,.cur-dot,.grain{display:none}
+  .rv{opacity:1 !important;transform:none !important}
+  .faq-q{cursor:pointer}
+}
+</style>
+</head>
+<body>
+<h2 class="sr-only">랭크스튜디오 — AI 기반 셀프 캠페인 플랫폼 랜딩 페이지. 캠페인 유형, 작동 방식, 신뢰 통계, 자주 묻는 질문, 시작하기 안내가 포함되어 있습니다.</h2>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cur" id="cur" aria-hidden="true"></div>
+<div class="cur-dot" id="curDot" aria-hidden="true"></div>
+
+<!-- HEADER -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" data-hov>RANK<span class="sq"></span>STUDIO</a>
+    <nav class="nav-links" aria-label="주요 메뉴">
+      <a href="#types" data-hov><span>01</span>캠페인</a>
+      <a href="#how" data-hov><span>02</span>작동방식</a>
+      <a href="#stats" data-hov><span>03</span>신뢰</a>
+      <a href="#faq" data-hov><span>04</span>FAQ</a>
+    </nav>
+    <a class="nav-cta" href="#start" data-hov>캠페인 시작 →</a>
+    <button class="burger" aria-label="메뉴 열기" data-hov>MENU ≡</button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-meta">
+      <span class="tag">[ AI 기반 셀프 캠페인 플랫폼 ]</span>
+      <span class="tag">EST. 2026 — SEOUL / KR</span>
+      <span class="tag" id="clock">— : — : —</span>
+    </div>
+    <h1 class="hero-h" id="heroH">
+      <span class="ln">AI 기반</span>
+      <span class="ln"><span class="acid">초고도화</span></span>
+      <span class="ln"><span class="out">리워드</span> 트래픽</span>
+      <span class="hero-row"><span class="star">✸</span><span>셀프 생성</span></span>
+    </h1>
+
+    <div class="hero-grid">
+      <p class="hero-lead rv" data-rv>
+        검색에서 더 잘 발견되고 싶은 상품과 매장을 위한 <b>셀프 광고·유입 캠페인</b>.
+        URL·키워드·기간·유입규모를 직접 설정하고, 결제 후 진행 상황과 리포트를 한곳에서 확인하세요.
+        리워드 트래픽은 실사용자 리워드/제휴 기반 유입입니다.
+      </p>
+      <div class="hero-cta-wrap rv" data-rv>
+        <a class="btn-acid" href="#start" data-hov>지금 캠페인 만들기 <span>↗</span></a>
+        <a class="btn-ghost" href="#how" data-hov>작동 방식 먼저 보기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="ticker">
+    <span>AI 기반 캠페인 설계</span><span class="dot">✸</span>
+    <span>리워드 트래픽</span><span class="dot">✸</span>
+    <span>셀프 설정 · 셀프 운영</span><span class="dot">✸</span>
+    <span>실시간 리포트</span><span class="dot">✸</span>
+    <span>키워드 · 기간 · 규모</span><span class="dot">✸</span>
+    <span>AI 기반 캠페인 설계</span><span class="dot">✸</span>
+    <span>리워드 트래픽</span><span class="dot">✸</span>
+    <span>셀프 설정 · 셀프 운영</span><span class="dot">✸</span>
+    <span>실시간 리포트</span><span class="dot">✸</span>
+    <span>키워드 · 기간 · 규모</span><span class="dot">✸</span>
+  </div>
+</div>
+
+<!-- CAMPAIGN TYPES -->
+<section class="sec" id="types">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num rv" data-rv>01 / 캠페인 유형</span>
+      <h2 class="sec-title rv" data-rv>무엇을<br/>키울까</h2>
+    </div>
+    <div class="types">
+      <article class="type rv" data-rv data-hov>
+        <div><div class="type-idx">01</div>
+          <h3 class="type-name">상품 발견 캠페인</h3>
+          <p class="type-desc">쇼핑·마켓에 올린 상품이 관련 검색에서 더 자주 노출되도록 AI가 유입 흐름을 설계합니다.</p>
+        </div>
+        <span class="type-tag">PRODUCT / SHOP</span>
+      </article>
+      <article class="type rv" data-rv data-hov>
+        <div><div class="type-idx">02</div>
+          <h3 class="type-name">로컬 매장 캠페인</h3>
+          <p class="type-desc">동네에서 찾는 사람에게 매장이 먼저 떠오르도록, 지역 기반 유입 캠페인을 직접 운영합니다.</p>
+        </div>
+        <span class="type-tag">LOCAL / STORE</span>
+      </article>
+      <article class="type rv" data-rv data-hov>
+        <div><div class="type-idx">03</div>
+          <h3 class="type-name">키워드 집중 캠페인</h3>
+          <p class="type-desc">핵심 키워드와 기간·유입규모를 직접 지정해, 원하는 구간에 캠페인 강도를 모읍니다.</p>
+        </div>
+        <span class="type-tag">KEYWORD / FOCUS</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="sec" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num rv" data-rv>02 / 작동 방식</span>
+      <h2 class="sec-title rv" data-rv>4단계,<br/>셀프 운영</h2>
+    </div>
+    <div class="steps">
+      <div class="step" data-step>
+        <div class="step-n">01</div>
+        <div><h3 class="step-t">설정한다</h3><p class="step-mono">URL · KEYWORD · 기간 · 유입규모</p></div>
+        <p class="step-d">캠페인의 목적지 URL과 키워드, 운영 기간, 원하는 유입 규모를 직접 입력합니다. 처음이라면 AI 추천값을 그대로 써도 됩니다.</p>
+      </div>
+      <div class="step" data-step>
+        <div class="step-n">02</div>
+        <div><h3 class="step-t">AI가 설계한다</h3><p class="step-mono">AI CAMPAIGN ENGINE</p></div>
+        <p class="step-d">입력값을 바탕으로 AI 기반 엔진이 유입 흐름과 분배를 초고도화해 설계하고, 예상 결과를 미리 보여줍니다.</p>
+      </div>
+      <div class="step" data-step>
+        <div class="step-n">03</div>
+        <div><h3 class="step-t">결제하고 진행</h3><p class="step-mono">PAY → RUN</p></div>
+        <p class="step-d">설계안을 확인하고 결제하면 캠페인이 시작됩니다. 실사용자 리워드/제휴 기반 리워드 트래픽이 설정한 기간에 맞춰 유입됩니다.</p>
+      </div>
+      <div class="step" data-step>
+        <div class="step-n">04</div>
+        <div><h3 class="step-t">리포트로 본다</h3><p class="step-mono">LIVE REPORT</p></div>
+        <p class="step-d">진행 상황과 유입 추이를 실시간 리포트로 확인합니다. 기간·규모는 캠페인 중에도 조정할 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="sec stats-sec" id="stats">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num rv" data-rv>03 / 신뢰 통계</span>
+      <h2 class="sec-title rv" data-rv>숫자로<br/>본 운영</h2>
+    </div>
+    <div class="stats">
+      <div class="stat rv" data-rv>
+        <div class="stat-n"><span class="cnt" data-to="12800">0</span></div>
+        <div class="stat-l">운영된 캠페인 (건)</div>
+        <p class="stat-s">셀프 설정으로 시작된 누적 캠페인</p>
+      </div>
+      <div class="stat rv" data-rv>
+        <div class="stat-n"><span class="cnt" data-to="98">0</span>%</div>
+        <div class="stat-l">리포트 정시 제공률</div>
+        <p class="stat-s">진행 현황을 약속한 주기에 제공</p>
+      </div>
+      <div class="stat rv" data-rv>
+        <div class="stat-n"><span class="cnt" data-to="24">0</span>/7</div>
+        <div class="stat-l">대시보드 가동</div>
+        <p class="stat-s">언제든 진행 상황 확인 가능</p>
+      </div>
+      <div class="stat rv" data-rv>
+        <div class="stat-n"><span class="cnt" data-to="3">0</span>분</div>
+        <div class="stat-l">평균 캠페인 설정 시간</div>
+        <p class="stat-s">AI 추천값 기준 첫 캠페인 생성</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ TEASER -->
+<section class="sec" id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-num rv" data-rv>04 / 자주 묻는 질문</span>
+      <h2 class="sec-title rv" data-rv>궁금한<br/>것들</h2>
+    </div>
+    <div class="faq">
+      <div class="faq-item rv" data-rv>
+        <button class="faq-q" data-hov>리워드 트래픽이 정확히 무엇인가요?<span class="ic">+</span></button>
+        <div class="faq-a"><div class="inner">실사용자에게 리워드와 제휴 혜택을 제공하고, 그 대가로 자연스러운 유입을 만드는 방식입니다. 캠페인의 목적지와 키워드를 기준으로 관심 있는 사용자가 방문하도록 설계합니다.</div></div>
+      </div>
+      <div class="faq-item rv" data-rv>
+        <button class="faq-q" data-hov>제가 직접 설정해야 하나요?<span class="ic">+</span></button>
+        <div class="faq-a"><div class="inner">네, 셀프 플랫폼입니다. URL·키워드·기간·유입규모를 직접 정하되, AI 기반 엔진이 추천값과 예상 결과를 함께 제시해 처음에도 어렵지 않게 시작할 수 있습니다.</div></div>
+      </div>
+      <div class="faq-item rv" data-rv>
+        <button class="faq-q" data-hov>진행 상황은 어떻게 확인하나요?<span class="ic">+</span></button>
+        <div class="faq-a"><div class="inner">결제 후 대시보드에서 실시간 리포트를 제공합니다. 유입 추이와 캠페인 진행률을 보고, 기간이나 규모를 운영 중에도 조정할 수 있습니다.</div></div>
+      </div>
+      <div class="faq-item rv" data-rv>
+        <button class="faq-q" data-hov>어떤 상품이나 매장에 적합한가요?<span class="ic">+</span></button>
+        <div class="faq-a"><div class="inner">쇼핑·마켓에 등록된 상품, 그리고 지역에서 찾게 되는 로컬 매장 모두 사용할 수 있습니다. 셀러 채널 가이드는 <a href="https://seller-channel.example/guide" data-hov style="color:var(--coral);text-decoration:underline">seller-channel.example</a>에서 확인하세요.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="start">
+  <div class="wrap">
+    <h2 class="cta-h">
+      <span class="ln">지금</span>
+      <span class="ln"><span class="out">캠페인을</span></span>
+      <span class="ln">시작하세요</span>
+    </h2>
+    <div class="cta-sub">
+      <a class="btn-acid" href="#start" data-hov style="min-width:280px">무료로 첫 캠페인 설계하기 <span>↗</span></a>
+      <p class="cta-mono">설정 3분, AI 추천값 제공. 결제 전까지 비용은 발생하지 않습니다.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">RANK<br/>STUDIO<span style="color:var(--coral)">.</span></div>
+        <p style="font-family:var(--mono);font-size:12px;letter-spacing:.05em;color:rgba(244,241,234,.6);margin-top:18px;max-width:34ch">AI 기반 셀프 캠페인 플랫폼. 검색에서 더 잘 발견되는 가장 직관적인 방법.</p>
+      </div>
+      <div class="foot-col">
+        <h4>제품</h4>
+        <a href="#types" data-hov>캠페인 유형</a>
+        <a href="#how" data-hov>작동 방식</a>
+        <a href="#stats" data-hov>신뢰 통계</a>
+        <a href="#faq" data-hov>자주 묻는 질문</a>
+      </div>
+      <div class="foot-col">
+        <h4>연결</h4>
+        <a href="#start" data-hov>캠페인 시작</a>
+        <a href="https://seller-channel.example/contact" data-hov>문의하기</a>
+        <p>SEOUL · KR</p>
+        <p id="clock2" class="mono">— : — : —</p>
+      </div>
+    </div>
+    <div class="foot-bot">
+      <span>© 2026 RANK STUDIO — ALL RIGHTS RESERVED</span>
+      <span>BUILT WITH AI / DESIGNED IN SEOUL</span>
+      <span>v10 — BRUTALIST EDITION</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- live clock (KST) ---- */
+  function pad(n){return String(n).padStart(2,"0")}
+  function tick(){
+    var d=new Date();
+    var t=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+    var a=document.getElementById("clock"),b=document.getElementById("clock2");
+    if(a)a.textContent=t+" LOCAL";
+    if(b)b.textContent=t;
+  }
+  tick(); setInterval(tick,1000);
+
+  /* ---- FAQ accordion (works without motion libs) ---- */
+  document.querySelectorAll(".faq-item").forEach(function(item){
+    var q=item.querySelector(".faq-q"), a=item.querySelector(".faq-a");
+    q.addEventListener("click",function(){
+      var open=item.classList.contains("open");
+      document.querySelectorAll(".faq-item.open").forEach(function(o){
+        if(o!==item){o.classList.remove("open");o.querySelector(".faq-a").style.maxHeight="0"}
+      });
+      if(open){item.classList.remove("open");a.style.maxHeight="0"}
+      else{item.classList.add("open");a.style.maxHeight=a.scrollHeight+"px"}
+    });
+  });
+
+  /* ---- custom cursor ---- */
+  if(!reduce && window.matchMedia("(hover:hover)").matches){
+    var cur=document.getElementById("cur"),dot=document.getElementById("curDot");
+    var mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
+    window.addEventListener("mousemove",function(e){mx=e.clientX;my=e.clientY;dot.style.transform="translate("+mx+"px,"+my+"px)"});
+    (function loop(){cx+=(mx-cx)*.18;cy+=(my-cy)*.18;cur.style.transform="translate("+cx+"px,"+cy+"px)";requestAnimationFrame(loop)})();
+    document.querySelectorAll("[data-hov]").forEach(function(el){
+      el.addEventListener("mouseenter",function(){cur.classList.add("hov")});
+      el.addEventListener("mouseleave",function(){cur.classList.remove("hov")});
+    });
+  }
+
+  if(reduce || !window.gsap){ document.querySelectorAll(".rv").forEach(function(e){e.style.opacity=1}); return; }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ---- Lenis smooth scroll ---- */
+  if(window.Lenis){
+    var lenis=new Lenis({lerp:.09,wheelMultiplier:1});
+    function raf(t){lenis.raf(t);ScrollTrigger.update();requestAnimationFrame(raf)}
+    requestAnimationFrame(raf);
+    document.querySelectorAll('a[href^="#"]').forEach(function(a){
+      a.addEventListener("click",function(e){
+        var id=a.getAttribute("href");if(id.length>1){var t=document.querySelector(id);if(t){e.preventDefault();lenis.scrollTo(t,{offset:-62})}}
+      });
+    });
+  }
+
+  /* ---- hero headline split reveal ---- */
+  if(window.SplitType){
+    var lines=document.querySelectorAll("#heroH .ln, #heroH .hero-row");
+    gsap.set(lines,{yPercent:118});
+    gsap.to(lines,{yPercent:0,duration:1.05,ease:"expo.out",stagger:.09,delay:.15});
+  }
+
+  /* ---- generic reveal ---- */
+  gsap.utils.toArray("[data-rv]").forEach(function(el){
+    gsap.fromTo(el,{opacity:0,y:34},{opacity:1,y:0,duration:.9,ease:"power3.out",
+      scrollTrigger:{trigger:el,start:"top 88%"}});
+  });
+
+  /* ---- ticker marquee ---- */
+  var track=document.getElementById("ticker");
+  if(track){
+    var w=track.scrollWidth/2;
+    var tk=gsap.to(track,{x:-w,duration:18,ease:"none",repeat:-1});
+    ScrollTrigger.create({trigger:"body",start:"top top",end:"bottom bottom",
+      onUpdate:function(s){ tk.timeScale(1 + Math.abs(s.getVelocity()/2600)); }});
+  }
+
+  /* ---- step highlight on scroll ---- */
+  gsap.utils.toArray("[data-step]").forEach(function(st){
+    ScrollTrigger.create({trigger:st,start:"top 70%",end:"bottom 60%",
+      onEnter:function(){st.classList.add("on")},
+      onEnterBack:function(){st.classList.add("on")}});
+  });
+
+  /* ---- count up ---- */
+  document.querySelectorAll(".cnt").forEach(function(el){
+    var to=parseInt(el.getAttribute("data-to"),10);
+    var obj={v:0};
+    ScrollTrigger.create({trigger:el,start:"top 90%",once:true,onEnter:function(){
+      gsap.to(obj,{v:to,duration:1.6,ease:"power2.out",onUpdate:function(){
+        el.textContent=Math.round(obj.v).toLocaleString("ko-KR");
+      }});
+    }});
+  });
+
+  /* ---- hero parallax on headline ---- */
+  gsap.to("#heroH",{yPercent:-12,ease:"none",scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:.6}});
+
+  /* ---- CTA outline word shift ---- */
+  gsap.utils.toArray(".cta-h .ln").forEach(function(ln,i){
+    gsap.fromTo(ln,{xPercent:i%2?6:-6,opacity:0},{xPercent:0,opacity:1,duration:1,ease:"power3.out",
+      scrollTrigger:{trigger:".cta",start:"top 80%"}});
+  });
+
+})();
+</script>
+</body>
+</html>

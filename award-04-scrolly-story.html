@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 셀프 캠페인 플랫폼</title>
+<meta name="description" content="AI 기반 초고도화 리워드 트래픽 셀프 생성. URL·키워드·기간·유입규모를 직접 설정하고, 상품과 매장이 검색에서 더 잘 발견되게 만드는 셀프 캠페인 플랫폼." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" />
+
+<style>
+:root{
+  --paper:#F4F0E8;
+  --paper-2:#EBE5D8;
+  --ink:#16140F;
+  --ink-soft:#3A352B;
+  --muted:#8A8270;
+  --line:#D8D1C0;
+  --signal:#E2552B;
+  --signal-deep:#B23E18;
+  --teal:#1D6E5A;
+  --gold:#C8902A;
+  --ff-serif:"Fraunces", Georgia, serif;
+  --ff-grotesk:"Space Grotesk", system-ui, sans-serif;
+  --ff-kr:"Pretendard", system-ui, sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--ff-kr);
+  line-height:1.65;
+  overflow-x:hidden;
+  font-feature-settings:"ss01","cv01";
+}
+body.dark-mode{ --paper:#15130E; --paper-2:#1E1B14; --ink:#F4F0E8; --ink-soft:#D6CFBE; --muted:#8A8270; --line:#33301F; }
+
+/* ===== Grain ===== */
+.grain{position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.42;mix-blend-mode:multiply}
+body.dark-mode .grain{mix-blend-mode:screen;opacity:.16}
+
+/* ===== Loader ===== */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;transition:opacity .7s ease,visibility .7s}
+#loader.done{opacity:0;visibility:hidden}
+#loader .mark{font-family:var(--ff-serif);font-weight:300;font-size:clamp(2rem,6vw,4rem);letter-spacing:-.02em;overflow:hidden}
+#loader .bar{width:min(220px,50vw);height:2px;background:var(--line);position:relative;overflow:hidden}
+#loader .bar i{position:absolute;inset:0;background:var(--signal);transform-origin:left;transform:scaleX(0)}
+#loader .pct{font-family:var(--ff-grotesk);font-size:12px;letter-spacing:.3em;color:var(--muted)}
+
+/* ===== Progress rail (left) ===== */
+.rail{position:fixed;left:clamp(14px,2.4vw,36px);top:50%;transform:translateY(-50%);z-index:600;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.rail .seg{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:0;padding:0;color:inherit}
+.rail .dot{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--muted);background:transparent;transition:all .4s cubic-bezier(.2,.7,.2,1)}
+.rail .seg.on .dot{background:var(--signal);border-color:var(--signal);transform:scale(1.25);box-shadow:0 0 0 4px rgba(226,85,43,.14)}
+.rail .lbl{font-family:var(--ff-grotesk);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);opacity:0;transform:translateX(-6px);transition:all .4s;white-space:nowrap}
+.rail .seg.on .lbl,.rail .seg:hover .lbl{opacity:1;transform:translateX(0);color:var(--ink-soft)}
+@media(max-width:860px){.rail{display:none}}
+
+/* top scroll meter */
+.meter{position:fixed;top:0;left:0;height:3px;width:0;background:var(--signal);z-index:700}
+
+/* ===== Header ===== */
+header{position:fixed;top:0;left:0;right:0;z-index:650;display:flex;align-items:center;justify-content:space-between;padding:clamp(16px,2.4vw,30px) clamp(18px,4vw,56px);mix-blend-mode:difference;color:#fff}
+header.solid{mix-blend-mode:normal}
+.logo{font-family:var(--ff-serif);font-weight:500;font-size:clamp(18px,1.5vw,22px);letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+.logo .glyph{width:11px;height:11px;background:var(--signal);border-radius:2px;mix-blend-mode:normal}
+nav{display:flex;align-items:center;gap:clamp(18px,2.4vw,34px)}
+nav a{color:inherit;text-decoration:none;font-family:var(--ff-grotesk);font-size:13px;letter-spacing:.02em;opacity:.85;transition:opacity .3s}
+nav a:hover{opacity:1}
+nav .nav-cta{border:1px solid currentColor;border-radius:100px;padding:8px 18px;opacity:1;font-weight:500}
+@media(max-width:680px){nav a:not(.nav-cta){display:none}}
+
+/* ===== Generic section ===== */
+section{position:relative}
+.wrap{max-width:1320px;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
+.eyebrow{font-family:var(--ff-grotesk);font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--signal);font-weight:500;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--signal)}
+
+/* ===== HERO ===== */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:14vh;padding-bottom:8vh;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;z-index:0;opacity:.5;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:clamp(48px,7vw,96px) clamp(48px,7vw,96px);mask-image:radial-gradient(circle at 70% 38%,#000,transparent 72%);-webkit-mask-image:radial-gradient(circle at 70% 38%,#000,transparent 72%)}
+.hero .wrap{position:relative;z-index:2}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:clamp(28px,5vh,64px)}
+.hero h1{font-family:var(--ff-serif);font-weight:400;font-size:clamp(2.6rem,8.4vw,8.2rem);line-height:.94;letter-spacing:-.03em;max-width:15ch}
+.hero h1 .it{font-style:italic;font-weight:300;color:var(--signal)}
+.hero h1 .blk{display:block}
+.hero-meta{font-family:var(--ff-grotesk);font-size:13px;color:var(--muted);text-align:right;line-height:1.8;max-width:240px}
+.hero-sub{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-top:clamp(30px,5vh,64px)}
+.hero-sub p{max-width:46ch;font-size:clamp(15px,1.2vw,18px);color:var(--ink-soft);line-height:1.75}
+.btn{display:inline-flex;align-items:center;gap:12px;background:var(--ink);color:var(--paper);text-decoration:none;font-family:var(--ff-grotesk);font-weight:500;font-size:15px;padding:16px 28px;border-radius:100px;border:0;cursor:pointer;transition:transform .35s cubic-bezier(.2,.7,.2,1),background .3s;white-space:nowrap}
+.btn:hover{transform:translateY(-3px);background:var(--signal)}
+.btn .arr{transition:transform .35s}
+.btn:hover .arr{transform:translate(4px,-1px)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{background:transparent;border-color:var(--ink)}
+.scroll-cue{position:absolute;bottom:clamp(20px,4vh,40px);left:50%;transform:translateX(-50%);z-index:3;font-family:var(--ff-grotesk);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+.scroll-cue .ln{width:1px;height:42px;background:var(--line);position:relative;overflow:hidden}
+.scroll-cue .ln::after{content:"";position:absolute;inset:0;background:var(--signal);transform:translateY(-100%);animation:cue 2.1s infinite}
+@keyframes cue{0%{transform:translateY(-100%)}45%{transform:translateY(0)}100%{transform:translateY(100%)}}
+
+/* ===== SCROLLY STORY ===== */
+.story{position:relative}
+.story-pin{height:100vh;display:flex;align-items:center;overflow:hidden;position:relative}
+.story .panel{position:absolute;inset:0;opacity:0;visibility:hidden}
+.story-track{height:520vh}
+.scene-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,5vw,72px);align-items:center;width:100%}
+@media(max-width:860px){.scene-grid{grid-template-columns:1fr;gap:28px}}
+.scene-num{font-family:var(--ff-grotesk);font-size:13px;letter-spacing:.3em;color:var(--signal);font-weight:600;margin-bottom:18px}
+.scene-h{font-family:var(--ff-serif);font-weight:400;font-size:clamp(2rem,4.6vw,4.4rem);line-height:1.02;letter-spacing:-.02em;margin-bottom:22px}
+.scene-h em{font-style:italic;color:var(--signal);font-weight:300}
+.scene-p{font-size:clamp(15px,1.15vw,17.5px);color:var(--ink-soft);max-width:42ch;line-height:1.8}
+.scene-stat{margin-top:30px;display:flex;gap:40px;flex-wrap:wrap}
+.scene-stat .num{font-family:var(--ff-serif);font-weight:500;font-size:clamp(2.4rem,5vw,3.8rem);line-height:1;letter-spacing:-.02em}
+.scene-stat .cap{font-family:var(--ff-grotesk);font-size:12px;letter-spacing:.04em;color:var(--muted);margin-top:6px;text-transform:uppercase}
+
+/* visual stage */
+.stage{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--paper-2)}
+@media(max-width:860px){.stage{aspect-ratio:16/12;max-height:42vh}}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(.18) contrast(1.04)}
+.stage .scrim{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(22,20,15,.55))}
+.stage .tag{position:absolute;font-family:var(--ff-grotesk);font-size:12px;letter-spacing:.06em;color:#fff;background:rgba(22,20,15,.6);backdrop-filter:blur(6px);padding:7px 13px;border-radius:100px;border:1px solid rgba(255,255,255,.18)}
+.stage .signalcard{position:absolute;bottom:18px;left:18px;right:18px;background:var(--paper);border-radius:10px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 18px 40px -18px rgba(0,0,0,.4)}
+.stage .signalcard .k{font-family:var(--ff-grotesk);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.stage .signalcard .v{font-family:var(--ff-serif);font-size:26px;font-weight:500;letter-spacing:-.01em}
+.pulse{position:absolute;top:50%;left:50%;width:14px;height:14px;border-radius:50%;background:var(--signal);transform:translate(-50%,-50%)}
+.pulse::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid var(--signal);animation:pls 2.4s infinite}
+@keyframes pls{0%{transform:scale(.6);opacity:.9}100%{transform:scale(3.4);opacity:0}}
+
+/* line connector svg in scene 2 */
+.weave{position:absolute;inset:0;width:100%;height:100%}
+.weave path{fill:none;stroke:var(--signal);stroke-width:1.4;stroke-dasharray:6 5;opacity:.7}
+
+/* ===== TYPES ===== */
+.types{padding:clamp(80px,12vh,160px) 0}
+.types-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;margin-bottom:clamp(40px,7vh,80px)}
+.types-head h2{font-family:var(--ff-serif);font-weight:400;font-size:clamp(2.2rem,5vw,4.6rem);line-height:1;letter-spacing:-.025em;max-width:14ch}
+.types-head h2 em{font-style:italic;color:var(--signal)}
+.type-list{border-top:1px solid var(--line)}
+.type-row{display:grid;grid-template-columns:80px 1fr 1.3fr auto;gap:clamp(16px,3vw,48px);align-items:center;padding:clamp(26px,3.4vw,42px) 6px;border-bottom:1px solid var(--line);cursor:pointer;transition:padding-left .5s cubic-bezier(.2,.7,.2,1),background .4s}
+.type-row:hover{padding-left:24px;background:var(--paper-2)}
+.type-row .idx{font-family:var(--ff-grotesk);font-size:13px;color:var(--muted)}
+.type-row .name{font-family:var(--ff-serif);font-size:clamp(1.4rem,2.6vw,2.3rem);font-weight:400;letter-spacing:-.01em;transition:color .35s}
+.type-row:hover .name{color:var(--signal)}
+.type-row .desc{font-size:14.5px;color:var(--ink-soft);line-height:1.7;max-width:48ch}
+.type-row .go{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .4s}
+.type-row:hover .go{background:var(--signal);border-color:var(--signal);color:#fff;transform:rotate(-45deg)}
+@media(max-width:860px){.type-row{grid-template-columns:40px 1fr auto;}.type-row .desc{display:none}}
+
+/* ===== STATS ===== */
+.stats{padding:clamp(80px,12vh,160px) 0;background:var(--ink);color:var(--paper)}
+body.dark-mode .stats{background:var(--paper-2)}
+.stats .eyebrow{color:var(--signal)}
+.stats h2{font-family:var(--ff-serif);font-weight:300;font-size:clamp(2rem,4.4vw,4rem);line-height:1.1;letter-spacing:-.02em;max-width:20ch;margin:22px 0 clamp(48px,8vh,90px)}
+.stats h2 em{font-style:italic;color:var(--gold)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,3vw,40px)}
+@media(max-width:860px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.stat-grid{grid-template-columns:1fr}}
+.stat-cell{border-top:1px solid rgba(244,240,232,.22);padding-top:22px}
+.stat-cell .big{font-family:var(--ff-serif);font-weight:400;font-size:clamp(3rem,6vw,5.4rem);line-height:.9;letter-spacing:-.03em;display:flex;align-items:baseline;gap:2px}
+.stat-cell .big .u{font-size:.42em;color:var(--signal);font-style:italic}
+.stat-cell .lbl{font-size:14px;color:rgba(244,240,232,.66);margin-top:14px;line-height:1.6}
+
+/* ===== FAQ ===== */
+.faq{padding:clamp(80px,12vh,150px) 0}
+.faq-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(30px,5vw,70px);align-items:start}
+@media(max-width:860px){.faq-grid{grid-template-columns:1fr;gap:30px}}
+.faq h2{font-family:var(--ff-serif);font-weight:400;font-size:clamp(2rem,4vw,3.4rem);line-height:1.04;letter-spacing:-.02em;position:sticky;top:120px}
+.faq h2 em{font-style:italic;color:var(--signal)}
+.qa{border-bottom:1px solid var(--line)}
+.qa button{width:100%;background:none;border:0;padding:26px 4px;display:flex;justify-content:space-between;align-items:center;gap:20px;cursor:pointer;text-align:left;color:inherit;font-family:var(--ff-kr)}
+.qa .q{font-size:clamp(16px,1.5vw,20px);font-weight:500;letter-spacing:-.01em}
+.qa .ic{flex-shrink:0;width:30px;height:30px;position:relative;transition:transform .4s}
+.qa .ic::before,.qa .ic::after{content:"";position:absolute;background:var(--signal);left:50%;top:50%}
+.qa .ic::before{width:14px;height:1.5px;transform:translate(-50%,-50%)}
+.qa .ic::after{width:1.5px;height:14px;transform:translate(-50%,-50%);transition:transform .4s}
+.qa.open .ic::after{transform:translate(-50%,-50%) scaleY(0)}
+.qa .a{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.2,.7,.2,1)}
+.qa .a p{padding:0 4px 28px;color:var(--ink-soft);font-size:15.5px;line-height:1.8;max-width:60ch}
+
+/* ===== CTA ===== */
+.cta{padding:clamp(90px,16vh,200px) 0;text-align:center;position:relative;overflow:hidden}
+.cta-img{position:absolute;inset:0;z-index:0;opacity:.16;filter:grayscale(1)}
+.cta-img img{width:100%;height:100%;object-fit:cover}
+.cta .wrap{position:relative;z-index:2}
+.cta h2{font-family:var(--ff-serif);font-weight:400;font-size:clamp(2.6rem,9vw,8rem);line-height:.96;letter-spacing:-.03em;margin-bottom:clamp(28px,5vh,52px)}
+.cta h2 em{font-style:italic;color:var(--signal);font-weight:300}
+.cta p{max-width:48ch;margin:0 auto 40px;color:var(--ink-soft);font-size:clamp(15px,1.3vw,18px)}
+.cta-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+
+/* ===== FOOTER ===== */
+footer{padding:clamp(50px,8vh,90px) 0 40px;border-top:1px solid var(--line)}
+.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:50px}
+.foot-grid .big{font-family:var(--ff-serif);font-weight:400;font-size:clamp(1.8rem,3.4vw,3rem);letter-spacing:-.02em;max-width:16ch;line-height:1.05}
+.foot-col{display:flex;flex-direction:column;gap:11px}
+.foot-col .h{font-family:var(--ff-grotesk);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.foot-col a{color:var(--ink-soft);text-decoration:none;font-size:14.5px;transition:color .3s}
+.foot-col a:hover{color:var(--signal)}
+.foot-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:28px;border-top:1px solid var(--line);font-family:var(--ff-grotesk);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.foot-bottom .legal{max-width:62ch;line-height:1.7}
+
+/* reveal helpers */
+.r-up{opacity:0;transform:translateY(26px)}
+.no-anim .r-up,.no-anim .panel{opacity:1 !important;transform:none !important;visibility:visible !important}
+</style>
+</head>
+<body>
+
+<!-- grain -->
+<svg class="grain" xmlns="http://www.w3.org/2000/svg">
+  <filter id="gr"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter>
+  <rect width="100%" height="100%" filter="url(#gr)"/>
+</svg>
+
+<!-- loader -->
+<div id="loader">
+  <div class="mark" id="lmark">랭크스튜디오</div>
+  <div class="bar"><i id="lbar"></i></div>
+  <div class="pct" id="lpct">000</div>
+</div>
+
+<div class="meter" id="meter"></div>
+
+<!-- progress rail -->
+<nav class="rail" id="rail" aria-label="섹션 진행">
+  <button class="seg" data-go="#hero"><span class="dot"></span><span class="lbl">시작</span></button>
+  <button class="seg" data-go="#story"><span class="dot"></span><span class="lbl">발견의 여정</span></button>
+  <button class="seg" data-go="#types"><span class="dot"></span><span class="lbl">캠페인 유형</span></button>
+  <button class="seg" data-go="#stats"><span class="dot"></span><span class="lbl">신뢰 지표</span></button>
+  <button class="seg" data-go="#faq"><span class="dot"></span><span class="lbl">자주 묻는 질문</span></button>
+  <button class="seg" data-go="#cta"><span class="dot"></span><span class="lbl">시작하기</span></button>
+</nav>
+
+<!-- HEADER -->
+<header id="hdr">
+  <a class="logo" href="#hero"><span class="glyph"></span>랭크스튜디오</a>
+  <nav>
+    <a href="#story">작동 방식</a>
+    <a href="#types">캠페인</a>
+    <a href="#faq">FAQ</a>
+    <a href="#cta" class="nav-cta">캠페인 만들기</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-grid"></div>
+  <div class="wrap">
+    <div class="hero-top">
+      <div class="eyebrow">AI 기반 셀프 캠페인 플랫폼</div>
+      <div class="hero-meta">실사용자 리워드·제휴 유입<br/>URL · 키워드 · 기간 · 규모<br/>직접 설계하는 발견 캠페인</div>
+    </div>
+    <h1 id="heroH1">
+      <span class="blk">묻혀 있던 상품을</span>
+      <span class="blk"><span class="it">발견</span>의 흐름으로.</span>
+    </h1>
+    <div class="hero-sub">
+      <p id="heroP">AI 기반 초고도화 리워드 트래픽 셀프 생성. 검색 속에 묻혀 있던 상품과 로컬 매장이 진짜 사용자에게 자연스럽게 닿도록, 유입의 신호를 직접 설계하고 결과를 리포트로 확인하세요.</p>
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <a href="#cta" class="btn">캠페인 시작하기 <span class="arr">→</span></a>
+        <a href="#story" class="btn btn-ghost">작동 방식 보기</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-cue">스크롤<div class="ln"></div></div>
+</section>
+
+<!-- SCROLLY STORY -->
+<section class="story" id="story">
+  <div class="story-track" id="storyTrack">
+    <div class="story-pin" id="storyPin">
+      <div class="wrap" style="width:100%">
+
+        <!-- Scene 1 -->
+        <div class="panel" data-scene="0">
+          <div class="scene-grid">
+            <div>
+              <div class="scene-num">씬 01 — 묻힘</div>
+              <h2 class="scene-h">좋은 상품이<br/><em>보이지 않는다.</em></h2>
+              <p class="scene-p">수많은 상품과 매장이 검색의 깊은 곳에 가라앉아 있습니다. 품질이 부족해서가 아니라, 발견될 신호가 아직 만들어지지 않았기 때문입니다.</p>
+              <div class="scene-stat">
+                <div><div class="num" data-count="92" data-suffix="%">0%</div><div class="cap">첫 페이지 밖 노출</div></div>
+                <div><div class="num" data-count="3" data-suffix="초">0초</div><div class="cap">평균 탐색 인내</div></div>
+              </div>
+            </div>
+            <div class="stage">
+              <img src="https://picsum.photos/id/1080/900/1100" alt="진열대에 가려진 상품" />
+              <div class="scrim"></div>
+              <span class="tag" style="top:18px;left:18px">검색 결과 · 하단</span>
+              <div class="signalcard"><div><div class="k">현재 발견율</div></div><div class="v">낮음</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 2 -->
+        <div class="panel" data-scene="1">
+          <div class="scene-grid">
+            <div>
+              <div class="scene-num">씬 02 — 신호 설계</div>
+              <h2 class="scene-h">AI가 유입의<br/><em>신호를 그린다.</em></h2>
+              <p class="scene-p">대상 URL과 키워드, 기간과 유입 규모를 직접 설정하면, AI 기반 엔진이 자연스러운 탐색 흐름에 맞춰 실사용자 리워드·제휴 유입 캠페인을 초고도화 설계합니다.</p>
+              <div class="scene-stat">
+                <div><div class="num" data-count="4" data-suffix="">0</div><div class="cap">직접 설정 변수</div></div>
+                <div><div class="num" data-count="100" data-suffix="%">0%</div><div class="cap">실사용자 기반</div></div>
+              </div>
+            </div>
+            <div class="stage" style="background:var(--ink)">
+              <svg class="weave" viewBox="0 0 400 500" preserveAspectRatio="none">
+                <path d="M40,460 C140,360 60,240 200,200 C340,160 280,80 360,40"/>
+                <path d="M40,460 C160,420 120,300 240,250 C360,200 320,120 360,40" style="opacity:.4"/>
+              </svg>
+              <div class="pulse" style="top:62%;left:14%"></div>
+              <div class="pulse" style="top:42%;left:52%;animation-delay:.6s"></div>
+              <div class="pulse" style="top:14%;left:88%;animation-delay:1.2s"></div>
+              <span class="tag" style="top:18px;left:18px;background:rgba(226,85,43,.85);border-color:transparent">AI 신호 생성 중</span>
+              <div class="signalcard"><div><div class="k">설계된 유입 경로</div></div><div class="v" data-count="248" data-suffix="" style="color:var(--signal)">0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 3 -->
+        <div class="panel" data-scene="2">
+          <div class="scene-grid">
+            <div>
+              <div class="scene-num">씬 03 — 도달</div>
+              <h2 class="scene-h">진짜 사용자에게<br/><em>닿기 시작한다.</em></h2>
+              <p class="scene-p">리워드 트래픽은 실제 사람이 만드는 자연스러운 방문입니다. 제휴 네트워크의 실사용자가 보상을 받으며 캠페인 대상을 탐색하고, 그 흐름이 발견의 맥락을 쌓아갑니다.</p>
+              <div class="scene-stat">
+                <div><div class="num" data-count="3" data-suffix="배">0배</div><div class="cap">탐색 노출 증가</div></div>
+                <div><div class="num" data-count="48" data-suffix="시간">0시간</div><div class="cap">평균 첫 반응</div></div>
+              </div>
+            </div>
+            <div class="stage">
+              <img src="https://picsum.photos/id/1059/900/1100" alt="모바일로 탐색하는 실사용자" />
+              <div class="scrim"></div>
+              <span class="tag" style="top:18px;left:18px">실사용자 유입 · 진행</span>
+              <div class="pulse" style="top:30%;left:30%"></div>
+              <div class="pulse" style="top:52%;left:64%;animation-delay:.5s"></div>
+              <div class="signalcard"><div><div class="k">누적 방문</div></div><div class="v" data-count="1240" data-suffix="" style="color:var(--signal)">0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene 4 -->
+        <div class="panel" data-scene="3">
+          <div class="scene-grid">
+            <div>
+              <div class="scene-num">씬 04 — 발견</div>
+              <h2 class="scene-h">발견되는 상품이<br/><em>된다.</em></h2>
+              <p class="scene-p">탐색의 맥락이 쌓이면, 상품과 매장은 검색 속에서 더 잘 드러납니다. 진행 상황과 유입 추이는 실시간 리포트로 투명하게 확인할 수 있습니다.</p>
+              <div class="scene-stat">
+                <div><div class="num" data-count="24" data-suffix="/7">0/7</div><div class="cap">실시간 리포트</div></div>
+                <div><div class="num" data-count="86" data-suffix="%">0%</div><div class="cap">재설계 만족도</div></div>
+              </div>
+            </div>
+            <div class="stage">
+              <img src="https://picsum.photos/id/1015/900/1100" alt="발견되어 빛나는 상품 풍경" />
+              <div class="scrim"></div>
+              <span class="tag" style="top:18px;left:18px;background:rgba(29,110,90,.85);border-color:transparent">발견율 · 상승</span>
+              <div class="signalcard"><div><div class="k">현재 발견율</div></div><div class="v" style="color:var(--teal)">높음 ↗</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPES -->
+<section class="types" id="types">
+  <div class="wrap">
+    <div class="types-head">
+      <h2 class="r-up">목적에 맞춰<br/>설계하는 <em>캠페인.</em></h2>
+      <p class="scene-p r-up" style="color:var(--muted)">상품, 매장, 키워드 — 발견시키고 싶은 대상에 맞는 캠페인 유형을 고르고, 변수를 직접 조정하세요.</p>
+    </div>
+    <div class="type-list">
+      <div class="type-row r-up" data-q="쇼핑 상품 발견 캠페인이 어떻게 작동하는지 알려줘">
+        <span class="idx">/ 01</span>
+        <span class="name">상품 발견 캠페인</span>
+        <span class="desc">마켓·쇼핑에 등록한 상품 URL과 핵심 키워드를 연결해, 실사용자 리워드 유입으로 탐색 노출을 끌어올립니다.</span>
+        <span class="go">→</span>
+      </div>
+      <div class="type-row r-up" data-q="로컬 매장 발견 캠페인이 어떻게 작동하는지 알려줘">
+        <span class="idx">/ 02</span>
+        <span class="name">로컬 매장 캠페인</span>
+        <span class="desc">지역 기반 매장이 동네 검색에서 자연스럽게 노출되도록, 위치·업종 키워드 중심의 유입 흐름을 설계합니다.</span>
+        <span class="go">→</span>
+      </div>
+      <div class="type-row r-up" data-q="키워드 집중 캠페인이 어떻게 작동하는지 알려줘">
+        <span class="idx">/ 03</span>
+        <span class="name">키워드 집중 캠페인</span>
+        <span class="desc">특정 키워드 묶음에 유입 규모와 기간을 집중 배분해, 시즌·신상품 시점에 맞춰 발견 신호를 강화합니다.</span>
+        <span class="go">→</span>
+      </div>
+      <div class="type-row r-up" data-q="브랜드 유입 캠페인이 어떻게 작동하는지 알려줘">
+        <span class="idx">/ 04</span>
+        <span class="name">브랜드 유입 캠페인</span>
+        <span class="desc">여러 상품·페이지를 하나의 캠페인으로 묶어 브랜드 전반의 탐색 흐름을 만들고, 통합 리포트로 추적합니다.</span>
+        <span class="go">→</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats" id="stats">
+  <div class="wrap">
+    <div class="eyebrow r-up">신뢰의 근거</div>
+    <h2 class="r-up">숫자가 아니라 <em>흐름</em>을 만듭니다.<br/>측정 가능한 발견, 투명한 리포트.</h2>
+    <div class="stat-grid">
+      <div class="stat-cell r-up"><div class="big"><span data-count="12800">0</span><span class="u">+</span></div><div class="lbl">누적 셀프 캠페인 집행</div></div>
+      <div class="stat-cell r-up"><div class="big"><span data-count="3" >0</span><span class="u">.4×</span></div><div class="lbl">평균 탐색 노출 증가폭</div></div>
+      <div class="stat-cell r-up"><div class="big"><span data-count="100">0</span><span class="u">%</span></div><div class="lbl">실사용자 리워드 기반 유입</div></div>
+      <div class="stat-cell r-up"><div class="big"><span data-count="24">0</span><span class="u">/7</span></div><div class="lbl">실시간 진행·결과 리포트</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <div class="faq-grid">
+      <h2>먼저<br/>궁금할<br/><em>이야기.</em></h2>
+      <div>
+        <div class="qa">
+          <button><span class="q">리워드 트래픽이 정확히 무엇인가요?</span><span class="ic"></span></button>
+          <div class="a"><p>제휴 네트워크에 참여한 실제 사용자가 보상을 받으며 캠페인 대상을 직접 탐색하고 방문하는 유입입니다. 자동화 도구가 아닌 사람이 만드는 자연스러운 방문이라는 점이 핵심입니다.</p></div>
+        </div>
+        <div class="qa">
+          <button><span class="q">무엇을 직접 설정할 수 있나요?</span><span class="ic"></span></button>
+          <div class="a"><p>대상 URL, 핵심 키워드, 진행 기간, 그리고 유입 규모를 직접 설정합니다. 설정값을 바탕으로 AI 엔진이 자연스러운 탐색 흐름에 맞는 캠페인 구성을 제안하고, 결제 후 진행됩니다.</p></div>
+        </div>
+        <div class="qa">
+          <button><span class="q">결과는 어떻게 확인하나요?</span><span class="ic"></span></button>
+          <div class="a"><p>캠페인 진행 상황과 누적 유입, 기간별 추이를 대시보드 리포트에서 실시간으로 확인할 수 있습니다. 캠페인 종료 후에는 요약 리포트가 함께 제공됩니다.</p></div>
+        </div>
+        <div class="qa">
+          <button><span class="q">어떤 사업자에게 적합한가요?</span><span class="ic"></span></button>
+          <div class="a"><p>마켓·쇼핑에 상품을 등록한 판매자, 그리고 지역 기반 로컬 매장 모두에 적합합니다. 노출이 아쉬운 신상품이나 시즌 상품의 발견 흐름을 직접 설계하고 싶은 분께 특히 잘 맞습니다.</p></div>
+        </div>
+        <div class="qa">
+          <button><span class="q">시작하려면 무엇이 필요한가요?</span><span class="ic"></span></button>
+          <div class="a"><p>발견시키고 싶은 페이지 URL과 키워드만 있으면 됩니다. 가입 후 캠페인 유형을 고르고 변수를 설정하면, 몇 분 안에 첫 캠페인을 구성할 수 있습니다.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="cta">
+  <div class="cta-img"><img src="https://picsum.photos/id/1043/1600/900" alt="" /></div>
+  <div class="wrap">
+    <div class="eyebrow r-up" style="justify-content:center">지금 설계하세요</div>
+    <h2 class="r-up">발견은<br/><em>설계</em>입니다.</h2>
+    <p class="r-up">묻혀 있던 상품이 사용자에게 닿는 흐름을, 직접 만드세요. AI 기반 초고도화 리워드 트래픽 셀프 생성.</p>
+    <div class="cta-actions r-up">
+      <a href="https://seller-channel.example/start" class="btn">무료로 캠페인 만들기 <span class="arr">→</span></a>
+      <a href="https://seller-channel.example/demo" class="btn btn-ghost">리포트 샘플 보기</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="big">랭크스튜디오 — 발견의 흐름을 설계하는 셀프 캠페인 플랫폼.</div>
+      <div style="display:flex;gap:clamp(36px,6vw,90px);flex-wrap:wrap">
+        <div class="foot-col">
+          <span class="h">제품</span>
+          <a href="#story">작동 방식</a>
+          <a href="#types">캠페인 유형</a>
+          <a href="#stats">신뢰 지표</a>
+        </div>
+        <div class="foot-col">
+          <span class="h">회사</span>
+          <a href="https://seller-channel.example/about">소개</a>
+          <a href="https://seller-channel.example/contact">문의</a>
+          <a href="https://seller-channel.example/blog">인사이트</a>
+        </div>
+        <div class="foot-col">
+          <span class="h">정책</span>
+          <a href="https://seller-channel.example/terms">이용약관</a>
+          <a href="https://seller-channel.example/privacy">개인정보</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 랭크스튜디오</span>
+      <span class="legal">리워드 트래픽은 제휴 실사용자의 자발적 탐색에 기반한 유입 서비스입니다. 캠페인 결과는 시장 상황과 콘텐츠에 따라 달라질 수 있습니다.</span>
+      <span>Designed in Seoul</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+<script>
+(function(){
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasGSAP = window.gsap && window.ScrollTrigger;
+
+  /* ---- Loader ---- */
+  var loader=document.getElementById("loader"), lbar=document.getElementById("lbar"), lpct=document.getElementById("lpct");
+  var p=0;
+  var li=setInterval(function(){
+    p+=Math.random()*16+6; if(p>=100){p=100;clearInterval(li);finish();}
+    if(lbar)lbar.style.transform="scaleX("+(p/100)+")";
+    if(lpct)lpct.textContent=String(Math.round(p)).padStart(3,"0");
+  },130);
+  function finish(){ setTimeout(function(){ if(loader)loader.classList.add("done"); init(); },420); }
+
+  /* fallback: never trap behind loader */
+  setTimeout(function(){ if(loader && !loader.classList.contains("done")){loader.classList.add("done"); init();} }, 4200);
+
+  function init(){
+    if(reduced || !hasGSAP){ staticMode(); return; }
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ---- Lenis smooth scroll ---- */
+    var lenis=null;
+    if(window.Lenis){
+      lenis=new Lenis({duration:1.15,easing:function(t){return Math.min(1,1.001-Math.pow(2,-10*t));}});
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add(function(time){ lenis.raf(time*1000); });
+      gsap.ticker.lagSmoothing(0);
+    }
+
+    /* ---- Hero intro ---- */
+    if(window.SplitType){
+      try{
+        var st=new SplitType("#heroH1",{types:"lines,chars"});
+        gsap.from(st.chars,{yPercent:115,opacity:0,duration:1,ease:"power4.out",stagger:0.012,delay:0.1});
+      }catch(e){ gsap.from("#heroH1",{y:40,opacity:0,duration:1}); }
+    }
+    gsap.from("#heroP",{y:24,opacity:0,duration:1,delay:0.5,ease:"power3.out"});
+    gsap.from(".hero-top .eyebrow,.hero-meta,.hero-sub .btn",{y:18,opacity:0,duration:.9,delay:.55,stagger:.08,ease:"power3.out"});
+
+    /* ---- Header solid on scroll ---- */
+    ScrollTrigger.create({trigger:"#story",start:"top 80%",
+      onEnter:function(){document.getElementById("hdr").classList.add("solid");},
+      onLeaveBack:function(){document.getElementById("hdr").classList.remove("solid");}});
+
+    /* ---- top meter + rail ---- */
+    var meter=document.getElementById("meter");
+    var segs=document.querySelectorAll("#rail .seg");
+    var ids=["#hero","#story","#types","#stats","#faq","#cta"];
+    ScrollTrigger.create({start:0,end:"max",onUpdate:function(self){ meter.style.width=(self.progress*100)+"%"; }});
+    ids.forEach(function(id,i){
+      ScrollTrigger.create({trigger:id,start:"top 55%",end:"bottom 45%",
+        onToggle:function(self){ if(self.isActive){ segs.forEach(function(s){s.classList.remove("on");}); if(segs[i])segs[i].classList.add("on"); } }});
+    });
+    segs.forEach(function(s){ s.addEventListener("click",function(){ var t=document.querySelector(s.dataset.go); if(lenis)lenis.scrollTo(t); else t.scrollIntoView({behavior:"smooth"}); }); });
+
+    /* ---- SCROLLY STORY pinned scenes ---- */
+    var panels=gsap.utils.toArray(".story .panel");
+    var pin=document.getElementById("storyPin");
+    var track=document.getElementById("storyTrack");
+
+    var stStory=ScrollTrigger.create({
+      trigger:track, start:"top top", end:"bottom bottom",
+      pin:pin, pinSpacing:false, scrub:true
+    });
+
+    panels.forEach(function(panel,i){
+      var nums=panel.querySelectorAll("[data-count]");
+      gsap.set(panel,{opacity:0,visibility:"hidden"});
+      ScrollTrigger.create({
+        trigger:track,
+        start:"top top",
+        end:"bottom bottom",
+        scrub:true,
+        onUpdate:function(self){
+          var seg=1/panels.length;
+          var lo=i*seg, hi=(i+1)*seg;
+          var prog=self.progress;
+          var active = prog>=lo-0.001 && prog<hi+ (i===panels.length-1?0.05:0.001);
+          if(active){
+            var local=Math.min(1,Math.max(0,(prog-lo)/seg));
+            var op = local<0.18 ? local/0.18 : (local>0.82 && i<panels.length-1 ? (1-local)/0.18 : 1);
+            gsap.set(panel,{opacity:Math.max(0,Math.min(1,op)),visibility:"visible",y:(0.5-local)*40});
+            if(!panel._counted){ panel._counted=true; runCounts(nums); }
+          } else {
+            gsap.set(panel,{opacity:0,visibility:"hidden"});
+            panel._counted=false;
+          }
+        }
+      });
+    });
+    /* show first immediately */
+    gsap.set(panels[0],{opacity:1,visibility:"visible"});
+    runCounts(panels[0].querySelectorAll("[data-count]"));
+
+    /* ---- counters ---- */
+    function runCounts(nodes){
+      nodes.forEach(function(n){
+        var end=parseFloat(n.dataset.count), suf=n.dataset.suffix||"";
+        var obj={v:0};
+        gsap.to(obj,{v:end,duration:1.2,ease:"power2.out",onUpdate:function(){
+          n.textContent=Math.round(obj.v).toLocaleString("ko-KR")+suf;
+        }});
+      });
+    }
+
+    /* ---- reveal r-up (types, stats, faq, cta) ---- */
+    gsap.utils.toArray(".r-up").forEach(function(el){
+      gsap.to(el,{opacity:1,y:0,duration:1,ease:"power3.out",
+        scrollTrigger:{trigger:el,start:"top 88%"}});
+    });
+    /* stat counters */
+    ScrollTrigger.create({trigger:".stat-grid",start:"top 78%",once:true,onEnter:function(){
+      runCounts(document.querySelectorAll(".stat-grid [data-count]"));
+    }});
+
+    /* ---- type rows -> sendPrompt ---- */
+    document.querySelectorAll(".type-row").forEach(function(row){
+      row.addEventListener("click",function(){
+        var q=row.dataset.q; if(typeof sendPrompt==="function"&&q)sendPrompt(q);
+      });
+    });
+
+    ScrollTrigger.refresh();
+  }
+
+  /* ---- FAQ accordion (works always) ---- */
+  document.querySelectorAll(".qa button").forEach(function(b){
+    b.addEventListener("click",function(){
+      var qa=b.parentElement, a=qa.querySelector(".a"), open=qa.classList.contains("open");
+      document.querySelectorAll(".qa").forEach(function(o){o.classList.remove("open");o.querySelector(".a").style.maxHeight=null;});
+      if(!open){qa.classList.add("open");a.style.maxHeight=a.scrollHeight+"px";}
+    });
+  });
+
+  /* ---- reduced-motion / no-gsap static fallback ---- */
+  function staticMode(){
+    document.body.classList.add("no-anim");
+    var panels=document.querySelectorAll(".story .panel");
+    var track=document.getElementById("storyTrack"), pin=document.getElementById("storyPin");
+    /* unpin: stack all scenes vertically, fully visible */
+    if(track){track.style.height="auto";}
+    if(pin){pin.style.height="auto";pin.style.display="block";pin.style.overflow="visible";}
+    panels.forEach(function(p){p.style.position="relative";p.style.opacity="1";p.style.visibility="visible";p.style.padding="6vh 0";});
+    /* fill counters to final */
+    document.querySelectorAll("[data-count]").forEach(function(n){
+      var end=parseFloat(n.dataset.count),suf=n.dataset.suffix||"";
+      n.textContent=Math.round(end).toLocaleString("ko-KR")+suf;
+    });
+    document.getElementById("hdr").classList.add("solid");
+  }
+})();
+</script>
+</body>
+</html>

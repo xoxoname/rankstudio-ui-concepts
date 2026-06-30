@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 셀프 캠페인 플랫폼</title>
+<meta name="description" content="AI 기반 초고도화 리워드 트래픽 셀프 생성. URL·키워드·기간·유입규모를 직접 설정하는 셀프 광고·유입 캠페인 플랫폼." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --coral:#ff6a3d;
+  --gold:#ffc24b;
+  --amber:#ff8b2e;
+  --ink:#0c0a09;
+  --ink-2:#14110f;
+  --paper:#fbf6ef;
+  --paper-dim:#e9ddcd;
+  --muted:#b9a896;
+  --line:rgba(251,246,239,.10);
+  --glass:rgba(251,246,239,.04);
+  --grad:linear-gradient(100deg,var(--coral),var(--gold));
+  --max:1240px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{
+  font-family:"Pretendard","Bricolage Grotesque",system-ui,sans-serif;
+  background:var(--ink);
+  color:var(--paper);
+  overflow-x:hidden;
+  line-height:1.5;
+  letter-spacing:-.01em;
+}
+::selection{background:var(--coral);color:var(--ink)}
+
+/* ===== grain + canvas backdrop ===== */
+#bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block}
+.grain{
+  position:fixed;inset:-50%;width:200%;height:200%;z-index:-1;pointer-events:none;
+  opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 7s steps(6) infinite;
+}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)}10%{transform:translate(-4%,-4%)}30%{transform:translate(3%,-2%)}
+  50%{transform:translate(-2%,4%)}70%{transform:translate(4%,2%)}90%{transform:translate(-3%,3%)}
+}
+.veil{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% -10%,transparent 40%,rgba(12,10,9,.55) 100%)}
+
+/* ===== shell ===== */
+.wrap{width:min(92%,var(--max));margin-inline:auto}
+section{position:relative}
+
+/* ===== header ===== */
+header{position:fixed;top:0;left:0;right:0;z-index:50;
+  transition:background .4s var(--ease),backdrop-filter .4s,border-color .4s;
+  border-bottom:1px solid transparent}
+header.scrolled{background:rgba(12,10,9,.55);backdrop-filter:blur(14px) saturate(140%);border-color:var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{display:flex;align-items:center;gap:11px;font-family:"Unbounded";font-weight:700;font-size:18px;letter-spacing:-.02em}
+.brand .dot{width:13px;height:13px;border-radius:4px;background:var(--grad);box-shadow:0 0 22px rgba(255,138,46,.7);animation:pulse 3.4s var(--ease) infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(.78);border-radius:50%}}
+.nav-links{display:flex;gap:34px;align-items:center}
+.nav-links a{color:var(--paper-dim);text-decoration:none;font-size:14.5px;font-weight:500;opacity:.78;transition:opacity .25s}
+.nav-links a:hover{opacity:1}
+.nav-cta{padding:11px 21px;border-radius:99px;background:var(--paper);color:var(--ink);
+  font-weight:700;font-size:14px;text-decoration:none;transition:transform .3s var(--ease),box-shadow .3s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 10px 34px rgba(255,138,46,.35)}
+.burger{display:none;flex-direction:column;gap:5px;background:none;border:0;cursor:pointer}
+.burger span{width:24px;height:2px;background:var(--paper);border-radius:2px}
+
+/* ===== hero ===== */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 70px}
+.pill{display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border:1px solid var(--line);
+  border-radius:99px;background:var(--glass);backdrop-filter:blur(6px);font-size:13px;font-weight:600;
+  color:var(--paper-dim);width:fit-content;margin-bottom:30px}
+.pill .live{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(255,194,75,.6);animation:live 2s infinite}
+@keyframes live{0%{box-shadow:0 0 0 0 rgba(255,194,75,.55)}70%{box-shadow:0 0 0 9px rgba(255,194,75,0)}100%{box-shadow:0 0 0 0 rgba(255,194,75,0)}}
+h1.hero-title{
+  font-family:"Unbounded","Pretendard";font-weight:800;
+  font-size:clamp(2.6rem,8.4vw,7.2rem);line-height:.96;letter-spacing:-.035em;
+  margin-bottom:30px}
+h1.hero-title .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+h1.hero-title .ln{display:block;overflow:hidden}
+.hero-sub{font-size:clamp(1.02rem,1.6vw,1.32rem);color:var(--paper-dim);max-width:560px;
+  line-height:1.65;margin-bottom:40px;font-weight:400;opacity:.9}
+.hero-actions{display:flex;gap:15px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;border-radius:99px;
+  font-weight:700;font-size:15.5px;text-decoration:none;cursor:pointer;border:0;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.btn-primary{background:var(--grad);color:var(--ink);box-shadow:0 8px 38px rgba(255,106,61,.35)}
+.btn-primary:hover{transform:translateY(-3px) scale(1.01);box-shadow:0 14px 50px rgba(255,138,46,.5)}
+.btn-ghost{background:transparent;color:var(--paper);border:1px solid var(--line)}
+.btn-ghost:hover{transform:translateY(-3px);border-color:var(--paper-dim)}
+.btn .arrow{transition:transform .35s var(--ease)}
+.btn:hover .arrow{transform:translateX(5px)}
+.hero-foot{margin-top:64px;display:flex;gap:42px;flex-wrap:wrap;opacity:.85}
+.hero-foot .it{display:flex;flex-direction:column;gap:3px}
+.hero-foot .n{font-family:"Unbounded";font-weight:700;font-size:1.6rem;letter-spacing:-.02em}
+.hero-foot .l{font-size:12.5px;color:var(--muted);letter-spacing:.02em}
+.scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-size:11px;
+  letter-spacing:.32em;color:var(--muted);text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:9px}
+.scroll-hint .bar{width:1px;height:36px;background:linear-gradient(var(--gold),transparent);animation:drop 1.9s var(--ease) infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* ===== section heads ===== */
+.eyebrow{font-family:"Unbounded";font-size:12.5px;font-weight:600;letter-spacing:.06em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:11px}
+.eyebrow::before{content:"";width:30px;height:1px;background:var(--gold);opacity:.6}
+.sec-title{font-family:"Unbounded","Pretendard";font-weight:700;
+  font-size:clamp(2rem,4.6vw,3.7rem);line-height:1.04;letter-spacing:-.03em;max-width:16ch}
+.sec-lead{color:var(--paper-dim);max-width:48ch;margin-top:20px;font-size:1.06rem;line-height:1.7;opacity:.88}
+
+/* ===== bento ===== */
+.bento-sec{padding:130px 0}
+.bento-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:54px}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:minmax(168px,auto);gap:18px}
+.card{position:relative;border:1px solid var(--line);border-radius:24px;padding:30px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(251,246,239,.045),rgba(251,246,239,.012));
+  transition:transform .5s var(--ease),border-color .5s,box-shadow .5s;will-change:transform}
+.card:hover{transform:translateY(-6px);border-color:rgba(255,138,46,.4);box-shadow:0 24px 60px rgba(0,0,0,.4)}
+.card .glow{position:absolute;inset:0;opacity:0;transition:opacity .5s;
+  background:radial-gradient(60% 60% at var(--mx,50%) var(--my,30%),rgba(255,138,46,.16),transparent 70%)}
+.card:hover .glow{opacity:1}
+.card .idx{font-family:"Unbounded";font-size:12px;color:var(--gold);opacity:.7;letter-spacing:.08em}
+.card h3{font-family:"Bricolage Grotesque","Pretendard";font-weight:700;font-size:1.42rem;margin:14px 0 10px;letter-spacing:-.02em}
+.card p{color:var(--paper-dim);font-size:.97rem;line-height:1.62;opacity:.86}
+.card .tag{position:absolute;top:26px;right:26px;font-size:11px;font-weight:600;color:var(--ink);
+  background:var(--gold);padding:4px 10px;border-radius:99px}
+.c-lg{grid-column:span 6;grid-row:span 2}
+.c-md{grid-column:span 6}
+.c-sm{grid-column:span 4}
+.c-wide{grid-column:span 8}
+.glyph{font-family:"Unbounded";font-weight:800;font-size:clamp(2.4rem,5vw,4rem);
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-size:12.5px;font-weight:600;color:var(--paper-dim);border:1px solid var(--line);
+  padding:6px 12px;border-radius:99px;background:var(--glass)}
+
+/* ===== how it works ===== */
+.how{padding:120px 0;border-top:1px solid var(--line)}
+.steps{margin-top:60px;display:grid;gap:0}
+.step{display:grid;grid-template-columns:auto 1fr;gap:34px;padding:38px 0;border-top:1px solid var(--line);align-items:start}
+.step:last-child{border-bottom:1px solid var(--line)}
+.step .num{font-family:"Unbounded";font-weight:800;font-size:clamp(2rem,5vw,3.4rem);
+  -webkit-text-stroke:1px var(--gold);color:transparent;line-height:1;transition:color .4s,-webkit-text-stroke .4s}
+.step:hover .num{color:var(--gold);-webkit-text-stroke:1px transparent}
+.step h4{font-family:"Bricolage Grotesque","Pretendard";font-weight:700;font-size:1.55rem;margin-bottom:9px;letter-spacing:-.02em}
+.step p{color:var(--paper-dim);max-width:60ch;line-height:1.7;opacity:.86}
+.step .meta{margin-top:12px;font-size:13px;color:var(--gold);font-weight:600;opacity:.85}
+
+/* ===== stats ===== */
+.stats{padding:140px 0;text-align:center;border-top:1px solid var(--line)}
+.stats .sec-title{margin:0 auto}
+.stat-grid{margin-top:70px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.stat{padding:36px 22px;border:1px solid var(--line);border-radius:22px;background:var(--glass)}
+.stat .v{font-family:"Unbounded";font-weight:800;font-size:clamp(2.4rem,5vw,3.8rem);
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.03em;line-height:1}
+.stat .k{margin-top:13px;color:var(--paper-dim);font-size:14px;opacity:.85}
+
+/* ===== faq ===== */
+.faq{padding:120px 0;border-top:1px solid var(--line)}
+.faq-grid{margin-top:50px;display:grid;gap:14px;max-width:880px}
+.qa{border:1px solid var(--line);border-radius:18px;background:var(--glass);overflow:hidden;transition:border-color .35s}
+.qa:hover{border-color:rgba(255,138,46,.35)}
+.qa button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:20px;
+  padding:24px 26px;background:none;border:0;color:var(--paper);cursor:pointer;text-align:left;
+  font-family:"Pretendard";font-weight:600;font-size:1.08rem}
+.qa .sign{flex:none;width:24px;height:24px;position:relative;transition:transform .4s var(--ease)}
+.qa .sign::before,.qa .sign::after{content:"";position:absolute;background:var(--gold);border-radius:2px}
+.qa .sign::before{top:11px;left:3px;width:18px;height:2px}
+.qa .sign::after{top:3px;left:11px;width:2px;height:18px;transition:transform .4s var(--ease)}
+.qa.open .sign{transform:rotate(180deg)}
+.qa.open .sign::after{transform:scaleY(0)}
+.qa .ans{max-height:0;overflow:hidden;transition:max-height .45s var(--ease)}
+.qa .ans p{padding:0 26px 24px;color:var(--paper-dim);line-height:1.7;opacity:.86;max-width:64ch}
+
+/* ===== CTA ===== */
+.cta{padding:150px 0;text-align:center;position:relative}
+.cta-box{position:relative;border:1px solid var(--line);border-radius:34px;padding:clamp(48px,7vw,96px);overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,106,61,.10),rgba(255,194,75,.04))}
+.cta-box::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,138,46,.28),transparent 65%);top:-30%;right:-8%;filter:blur(20px)}
+.cta h2{font-family:"Unbounded","Pretendard";font-weight:800;font-size:clamp(2.2rem,5.5vw,4.4rem);
+  line-height:1.02;letter-spacing:-.035em;position:relative}
+.cta h2 .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cta p{color:var(--paper-dim);margin:24px auto 38px;max-width:46ch;font-size:1.1rem;position:relative;opacity:.9}
+.cta .hero-actions{justify-content:center;position:relative}
+
+/* ===== footer ===== */
+footer{border-top:1px solid var(--line);padding:64px 0 40px}
+.foot-top{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:48px}
+.foot-brand{max-width:320px}
+.foot-brand .brand{margin-bottom:16px}
+.foot-brand p{color:var(--muted);font-size:14px;line-height:1.6}
+.foot-cols{display:flex;gap:64px;flex-wrap:wrap}
+.foot-col h5{font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-family:"Unbounded";font-weight:600}
+.foot-col a{display:block;color:var(--paper-dim);text-decoration:none;font-size:14px;margin-bottom:11px;opacity:.8;transition:opacity .25s}
+.foot-col a:hover{opacity:1}
+.foot-bot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:30px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+.disclaimer{margin-top:18px;color:var(--muted);font-size:11.5px;line-height:1.6;max-width:760px;opacity:.7}
+
+/* ===== reveal ===== */
+.reveal{opacity:0;transform:translateY(28px)}
+.line-mask{display:inline-block;overflow:hidden;vertical-align:top}
+
+/* ===== responsive ===== */
+@media(max-width:900px){
+  .nav-links{display:none}
+  .burger{display:flex}
+  .c-lg,.c-md,.c-sm,.c-wide{grid-column:span 12;grid-row:auto}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .step{grid-template-columns:1fr;gap:14px}
+  .foot-top{flex-direction:column}
+}
+@media(max-width:480px){
+  .hero-foot{gap:26px}
+  .stat-grid{grid-template-columns:1fr}
+  .hero-actions .btn{width:100%;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="veil" aria-hidden="true"></div>
+
+<!-- HEADER -->
+<header id="hdr">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="랭크스튜디오 홈"><span class="dot"></span>RANK&nbsp;STUDIO</a>
+    <nav class="nav-links" aria-label="주요 메뉴">
+      <a href="#types">캠페인 유형</a>
+      <a href="#how">작동 방식</a>
+      <a href="#stats">성과</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="nav-cta" href="#cta">캠페인 시작</a>
+    <button class="burger" aria-label="메뉴 열기"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero wrap" aria-labelledby="hero-h">
+  <span class="pill reveal"><span class="live"></span>AI 기반 셀프 캠페인 엔진 · 실시간 가동중</span>
+  <h1 class="hero-title" id="hero-h">
+    <span class="ln">AI 기반 초고도화</span>
+    <span class="ln"><span class="grad">리워드 트래픽</span></span>
+    <span class="ln">셀프 생성</span>
+  </h1>
+  <p class="hero-sub reveal">URL·키워드·기간·유입규모를 직접 설정하고, 결제 후 바로 진행. 실사용자 기반 리워드·제휴 유입을 AI가 정교하게 설계해 당신의 상품과 매장이 검색에서 더 잘 발견되도록 돕습니다.</p>
+  <div class="hero-actions reveal">
+    <a class="btn btn-primary" href="#cta">무료로 캠페인 설계 <span class="arrow">→</span></a>
+    <a class="btn btn-ghost" href="#how">작동 방식 보기</a>
+  </div>
+  <div class="hero-foot reveal">
+    <div class="it"><span class="n" data-count="4" data-suffix="단계">0</span><span class="l">설정 → 결제 → 진행 → 리포트</span></div>
+    <div class="it"><span class="n" data-count="100" data-suffix="%">0</span><span class="l">실사용자 리워드·제휴 유입</span></div>
+    <div class="it"><span class="n" data-count="24" data-suffix="/7">0</span><span class="l">진행 현황 실시간 모니터링</span></div>
+  </div>
+  <div class="scroll-hint" aria-hidden="true"><span>SCROLL</span><span class="bar"></span></div>
+</section>
+
+<!-- BENTO: campaign types -->
+<section class="bento-sec wrap" id="types" aria-labelledby="types-h">
+  <div class="bento-head">
+    <div>
+      <p class="eyebrow reveal">CAMPAIGN TYPES</p>
+      <h2 class="sec-title reveal" id="types-h">하나의 콘솔에서<br>설계하는 셀프 캠페인</h2>
+    </div>
+    <p class="sec-lead reveal">쇼핑·마켓 상품부터 로컬 매장까지. 목표에 맞는 캠페인 유형을 고르고, 변수를 직접 조정하세요.</p>
+  </div>
+  <div class="bento">
+    <article class="card c-lg reveal" data-glow>
+      <span class="glow"></span><span class="tag">대표 유형</span>
+      <span class="idx">01</span>
+      <div class="glyph">상품 유입</div>
+      <h3>쇼핑·마켓 상품 발견 캠페인</h3>
+      <p>상품 URL과 핵심 키워드를 등록하면 AI가 자연스러운 탐색 흐름을 설계합니다. 기간과 유입 규모를 직접 조절해, 검색 노출 경쟁이 치열한 상품이 더 많은 실사용자에게 발견되도록 합니다.</p>
+      <div class="chips"><span class="chip">URL 등록</span><span class="chip">키워드 매칭</span><span class="chip">기간 설정</span><span class="chip">유입 규모 조절</span></div>
+    </article>
+    <article class="card c-md reveal" data-glow>
+      <span class="glow"></span><span class="idx">02</span>
+      <h3>로컬 매장 방문 유도</h3>
+      <p>지역 기반 검색에서 매장이 상위 후보로 떠오르도록 설계. 실제 동선과 관심 키워드를 반영한 유입으로 오프라인 발견성을 높입니다.</p>
+    </article>
+    <article class="card c-sm reveal" data-glow>
+      <span class="glow"></span><span class="idx">03</span>
+      <h3>제휴 리워드 유입</h3>
+      <p>제휴 네트워크의 실사용자가 리워드를 받고 자발적으로 탐색·유입합니다.</p>
+    </article>
+    <article class="card c-sm reveal" data-glow>
+      <span class="glow"></span><span class="idx">04</span>
+      <h3>키워드 클러스터</h3>
+      <p>연관 키워드를 묶어 검색 의도 전반을 폭넓게 커버합니다.</p>
+    </article>
+    <article class="card c-wide reveal" data-glow>
+      <span class="glow"></span><span class="idx">05</span>
+      <h3>리포트 &amp; 인사이트</h3>
+      <p>유입 추이·키워드 성과·구간별 변화를 대시보드와 리포트로 투명하게 제공합니다. 다음 캠페인 설계에 바로 반영할 수 있는 데이터 중심 피드백 루프입니다.</p>
+      <div class="chips"><span class="chip">실시간 추이</span><span class="chip">키워드별 성과</span><span class="chip">구간 리포트</span><span class="chip">CSV 내보내기</span></div>
+    </article>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how wrap" id="how" aria-labelledby="how-h">
+  <p class="eyebrow reveal">HOW IT WORKS</p>
+  <h2 class="sec-title reveal" id="how-h">네 단계면 캠페인이 살아납니다</h2>
+  <div class="steps">
+    <div class="step reveal"><span class="num">01</span>
+      <div><h4>변수 직접 설정</h4>
+        <p>대상 URL, 핵심 키워드, 진행 기간, 목표 유입 규모를 콘솔에서 직접 입력합니다. AI가 입력값을 분석해 가장 자연스러운 유입 시나리오를 제안합니다.</p>
+        <p class="meta">URL · 키워드 · 기간 · 유입 규모</p></div></div>
+    <div class="step reveal"><span class="num">02</span>
+      <div><h4>결제 후 즉시 진행</h4>
+        <p>설계가 확정되면 결제 한 번으로 캠페인이 가동됩니다. 별도 영업·상담 대기 없이 셀프 서비스로 바로 시작합니다.</p>
+        <p class="meta">셀프 결제 · 즉시 가동</p></div></div>
+    <div class="step reveal"><span class="num">03</span>
+      <div><h4>실사용자 유입 진행</h4>
+        <p>리워드·제휴 네트워크의 실사용자가 자연스러운 탐색 흐름으로 유입됩니다. AI가 시간대와 분포를 조율해 일정하고 안정적인 진행을 유지합니다.</p>
+        <p class="meta">실사용자 기반 · AI 분산 제어</p></div></div>
+    <div class="step reveal"><span class="num">04</span>
+      <div><h4>리포트로 검증</h4>
+        <p>진행 현황과 성과를 실시간 대시보드로 확인하고, 종료 후 상세 리포트로 결과를 검증합니다. 데이터를 기반으로 다음 캠페인을 더 정교하게 설계하세요.</p>
+        <p class="meta">실시간 모니터링 · 종료 리포트</p></div></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats wrap" id="stats" aria-labelledby="stats-h">
+  <p class="eyebrow reveal" style="justify-content:center">BY THE NUMBERS</p>
+  <h2 class="sec-title reveal" id="stats-h" style="text-align:center;max-width:20ch">셀러들이 신뢰하는<br>셀프 캠페인 인프라</h2>
+  <div class="stat-grid">
+    <div class="stat reveal"><div class="v" data-count="12800" data-suffix="+">0</div><div class="k">누적 캠페인 집행</div></div>
+    <div class="stat reveal"><div class="v" data-count="98" data-suffix="%">0</div><div class="k">진행 완료 정시 달성률</div></div>
+    <div class="stat reveal"><div class="v" data-count="3400" data-suffix="+">0</div><div class="k">활성 셀프 운영 셀러</div></div>
+    <div class="stat reveal"><div class="v" data-count="24" data-suffix="/7">0</div><div class="k">실시간 진행 모니터링</div></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq wrap" id="faq" aria-labelledby="faq-h">
+  <p class="eyebrow reveal">FAQ</p>
+  <h2 class="sec-title reveal" id="faq-h">자주 묻는 질문</h2>
+  <div class="faq-grid">
+    <div class="qa reveal"><button aria-expanded="false"><span>리워드 트래픽이 정확히 무엇인가요?</span><span class="sign" aria-hidden="true"></span></button>
+      <div class="ans"><p>실사용자가 리워드나 제휴 혜택을 받고 자발적으로 상품·매장을 탐색하며 발생시키는 유입입니다. 자동화된 가짜 유입이 아니라, 실제 사람이 관심 기반으로 움직이는 트래픽입니다.</p></div></div>
+    <div class="qa reveal"><button aria-expanded="false"><span>어떤 변수를 직접 설정할 수 있나요?</span><span class="sign" aria-hidden="true"></span></button>
+      <div class="ans"><p>대상 URL, 핵심 키워드, 진행 기간, 목표 유입 규모를 콘솔에서 직접 조정합니다. AI가 입력값을 바탕으로 자연스러운 유입 분포를 설계해 제안합니다.</p></div></div>
+    <div class="qa reveal"><button aria-expanded="false"><span>결과는 어떻게 확인하나요?</span><span class="sign" aria-hidden="true"></span></button>
+      <div class="ans"><p>진행 중에는 실시간 대시보드로 유입 추이를 확인하고, 캠페인 종료 후에는 키워드별 성과와 구간 리포트를 제공합니다. CSV로 내보내 자체 분석에도 활용할 수 있습니다.</p></div></div>
+    <div class="qa reveal"><button aria-expanded="false"><span>특정 성과를 보장하나요?</span><span class="sign" aria-hidden="true"></span></button>
+      <div class="ans"><p>저희는 발견성과 유입 흐름을 설계하는 캠페인 플랫폼입니다. 검색 결과는 다양한 외부 요인에 따라 달라지므로 특정 결과를 약속드리지 않으며, 투명한 데이터와 리포트로 진행 과정을 정직하게 공유합니다.</p></div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta wrap" id="cta" aria-labelledby="cta-h">
+  <div class="cta-box">
+    <h2 id="cta-h">지금, <span class="grad">발견될</span><br>차례입니다</h2>
+    <p>변수를 직접 설정하고 첫 캠페인을 설계해 보세요. 영업 상담 없이 셀프로 바로 시작합니다.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#top">무료로 캠페인 설계 <span class="arrow">→</span></a>
+      <a class="btn btn-ghost" href="#how">데모 살펴보기</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer aria-label="사이트 정보">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="#top"><span class="dot"></span>RANK&nbsp;STUDIO</a>
+        <p>AI 기반 셀프 캠페인 플랫폼. 쇼핑·마켓 상품과 로컬 매장의 검색 발견성을 실사용자 리워드·제휴 유입으로 높입니다.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col"><h5>제품</h5>
+          <a href="#types">캠페인 유형</a><a href="#how">작동 방식</a><a href="#stats">성과</a><a href="#cta">시작하기</a></div>
+        <div class="foot-col"><h5>리소스</h5>
+          <a href="#faq">FAQ</a><a href="https://seller-channel.example/guide">가이드</a><a href="https://seller-channel.example/report">샘플 리포트</a></div>
+        <div class="foot-col"><h5>회사</h5>
+          <a href="https://seller-channel.example/about">소개</a><a href="https://seller-channel.example/contact">문의</a><a href="https://seller-channel.example/terms">이용약관</a></div>
+      </div>
+    </div>
+    <p class="disclaimer">랭크스튜디오는 실사용자 기반 리워드·제휴 유입 캠페인을 설계·운영하는 셀프 광고 플랫폼입니다. 검색 결과는 다수의 외부 요인에 의해 변동될 수 있으며, 본 서비스는 특정 검색 결과를 약속하지 않습니다. 모든 캠페인은 각 플랫폼 정책과 관련 법령을 준수하는 범위에서 진행됩니다.</p>
+    <div class="foot-bot">
+      <span>© 2026 RANK STUDIO. All rights reserved.</span>
+      <span>Crafted with intent · Seoul</span>
+    </div>
+  </div>
+</footer>
+
+<!-- libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/split-type@0.3.4/umd/index.min.js"></script>
+<script>
+const RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ===== Animated grainy gradient mesh canvas ===== */
+(function(){
+  const c = document.getElementById('bg-canvas');
+  const ctx = c.getContext('2d');
+  let w,h,t=0,raf;
+  const blobs=[
+    {x:.22,y:.28,r:.55,col:[255,106,61]},   // coral
+    {x:.78,y:.32,r:.5,col:[255,194,75]},     // gold
+    {x:.5,y:.78,r:.6,col:[255,139,46]},      // amber
+    {x:.15,y:.7,r:.42,col:[255,170,70]}
+  ];
+  function size(){
+    w=c.width=innerWidth*Math.min(devicePixelRatio,1.6);
+    h=c.height=innerHeight*Math.min(devicePixelRatio,1.6);
+  }
+  function draw(){
+    ctx.globalCompositeOperation='source-over';
+    ctx.fillStyle='#0c0a09';ctx.fillRect(0,0,w,h);
+    ctx.globalCompositeOperation='lighter';
+    blobs.forEach((b,i)=>{
+      const ox=Math.sin(t*.00022 + i*1.7)*.14;
+      const oy=Math.cos(t*.00019 + i*2.3)*.14;
+      const cx=(b.x+ox)*w, cy=(b.y+oy)*h, rad=b.r*Math.max(w,h);
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,rad);
+      const a=0.42;
+      g.addColorStop(0,`rgba(${b.col[0]},${b.col[1]},${b.col[2]},${a})`);
+      g.addColorStop(1,`rgba(${b.col[0]},${b.col[1]},${b.col[2]},0)`);
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.fill();
+    });
+    t+=16;
+    raf=requestAnimationFrame(draw);
+  }
+  size();addEventListener('resize',size);
+  if(RM){draw();cancelAnimationFrame(raf);} else {draw();}
+})();
+
+/* ===== header scroll ===== */
+const hdr=document.getElementById('hdr');
+addEventListener('scroll',()=>hdr.classList.toggle('scrolled',scrollY>30),{passive:true});
+
+/* ===== Lenis smooth scroll + GSAP ===== */
+let lenis;
+if(!RM && window.Lenis){
+  lenis=new Lenis({duration:1.1,easing:t=>Math.min(1,1.001-Math.pow(2,-10*t))});
+  function raf(t){lenis.raf(t);requestAnimationFrame(raf);}
+  requestAnimationFrame(raf);
+  if(window.ScrollTrigger){lenis.on('scroll',ScrollTrigger.update);}
+}
+/* anchor smooth */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const el=document.querySelector(a.getAttribute('href'));
+    if(!el)return;e.preventDefault();
+    if(lenis)lenis.scrollTo(el,{offset:-40});else el.scrollIntoView({behavior:RM?'auto':'smooth'});
+  });
+});
+
+/* ===== GSAP reveals ===== */
+if(window.gsap && window.ScrollTrigger){
+  gsap.registerPlugin(ScrollTrigger);
+
+  if(!RM){
+    /* hero title line mask */
+    document.querySelectorAll('.hero-title .ln').forEach((ln,i)=>{
+      gsap.from(ln,{yPercent:120,duration:1.05,ease:'power4.out',delay:.15+i*.12});
+    });
+    /* hero reveals */
+    gsap.to('.hero .reveal',{opacity:1,y:0,duration:.9,stagger:.1,ease:'power3.out',delay:.55});
+
+    /* generic reveals */
+    gsap.utils.toArray('.reveal').forEach(el=>{
+      if(el.closest('.hero'))return;
+      gsap.to(el,{opacity:1,y:0,duration:.9,ease:'power3.out',
+        scrollTrigger:{trigger:el,start:'top 86%'}});
+    });
+
+    /* subtle parallax on canvas via scroll */
+    gsap.to('#bg-canvas',{yPercent:8,ease:'none',
+      scrollTrigger:{trigger:'body',start:'top top',end:'bottom bottom',scrub:true}});
+  } else {
+    document.querySelectorAll('.reveal').forEach(el=>{el.style.opacity=1;el.style.transform='none';});
+  }
+}else{
+  document.querySelectorAll('.reveal').forEach(el=>{el.style.opacity=1;el.style.transform='none';});
+}
+
+/* ===== count up ===== */
+function countUp(el){
+  const target=+el.dataset.count, suf=el.dataset.suffix||'';
+  if(RM){el.textContent=target.toLocaleString()+suf;return;}
+  const dur=1600,start=performance.now();
+  function tick(now){
+    const p=Math.min((now-start)/dur,1);
+    const e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(target*e).toLocaleString()+(p>=1?suf:'');
+    if(p<1)requestAnimationFrame(tick);else el.textContent=target.toLocaleString()+suf;
+  }
+  requestAnimationFrame(tick);
+}
+if(window.ScrollTrigger && !RM){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    ScrollTrigger.create({trigger:el,start:'top 90%',once:true,onEnter:()=>countUp(el)});
+  });
+}else{
+  document.querySelectorAll('[data-count]').forEach(countUp);
+}
+
+/* ===== bento glow follow ===== */
+document.querySelectorAll('[data-glow]').forEach(card=>{
+  card.addEventListener('pointermove',e=>{
+    const r=card.getBoundingClientRect();
+    card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+    card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+  });
+});
+
+/* ===== FAQ accordion ===== */
+document.querySelectorAll('.qa').forEach(qa=>{
+  const btn=qa.querySelector('button'),ans=qa.querySelector('.ans');
+  btn.addEventListener('click',()=>{
+    const open=qa.classList.toggle('open');
+    btn.setAttribute('aria-expanded',open);
+    ans.style.maxHeight=open?ans.scrollHeight+'px':0;
+  });
+});
+
+/* ===== burger ===== */
+document.querySelector('.burger')?.addEventListener('click',()=>{
+  const nav=document.querySelector('.nav-links');
+  const vis=nav.style.display==='flex';
+  Object.assign(nav.style,{display:vis?'':'flex',position:'absolute',top:'74px',left:0,right:0,
+    flexDirection:'column',background:'rgba(12,10,9,.96)',padding:'22px',gap:'18px',backdropFilter:'blur(14px)'});
+});
+</script>
+</body>
+</html>

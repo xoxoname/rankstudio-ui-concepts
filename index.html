@@ -3,49 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>랭크스튜디오 — UI 시안 10종 (v2)</title>
+    <title>랭크스튜디오 — 어워즈 UI 시안 10종</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-      :root { --bg:#101013; --card:#191a1e; --ink:#f1efe8; --muted:#9a958a; --line:rgba(241,239,232,.12); --accent:#ff7a59; }
+      :root { --bg:#0c0d10; --card:#16181d; --ink:#f2f0ea; --muted:#9b968c; --line:rgba(242,240,234,.12); --accent:#c2f032; }
       * { box-sizing:border-box; margin:0; }
       body { background:var(--bg); color:var(--ink); font-family:"Pretendard",sans-serif; padding:clamp(28px,6vw,72px) clamp(16px,4vw,56px) 96px; -webkit-font-smoothing:antialiased; }
-      header { max-width:1240px; margin:0 auto 46px; }
+      header { max-width:1280px; margin:0 auto 46px; }
       .kicker { font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); font-weight:700; }
-      h1 { font-size:clamp(30px,5vw,52px); line-height:1.1; margin:14px 0 16px; letter-spacing:-.02em; }
-      header p { color:var(--muted); font-size:16px; line-height:1.65; max-width:70ch; }
-      .grid { max-width:1240px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px; }
-      @media (max-width:780px){ .grid{ grid-template-columns:1fr; } }
-      .card { border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--card); display:flex; flex-direction:column; transition:transform .18s ease, border-color .18s ease; }
-      .card:hover { transform:translateY(-4px); border-color:var(--accent); }
-      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1080; object-fit:cover; object-position:top; background:#222; }
+      h1 { font-size:clamp(30px,5vw,54px); line-height:1.08; margin:14px 0 16px; letter-spacing:-.02em; }
+      header p { color:var(--muted); font-size:16px; line-height:1.65; max-width:72ch; }
+      .grid { max-width:1280px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px; }
+      @media (max-width:820px){ .grid{ grid-template-columns:1fr; } }
+      .card { border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--card); display:flex; flex-direction:column; transition:transform .18s ease, border-color .18s ease; }
+      .card:hover { transform:translateY(-5px); border-color:var(--accent); }
+      .shot { display:block; width:100%; border-bottom:1px solid var(--line); aspect-ratio:1440/1100; object-fit:cover; object-position:top; background:#222; }
       .meta { padding:20px 22px 22px; display:flex; flex-direction:column; gap:7px; }
       .num { font-size:12px; color:var(--accent); font-weight:700; letter-spacing:.1em; }
-      .meta h2 { font-size:21px; letter-spacing:-.01em; }
+      .meta h2 { font-size:22px; letter-spacing:-.01em; }
       .meta .en { color:var(--muted); font-size:12.5px; letter-spacing:.03em; }
       .meta p { color:var(--muted); font-size:13.5px; line-height:1.55; margin-top:2px; }
-      .open { margin-top:12px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#1a1208; font-weight:700; font-size:14px; padding:11px 18px; border-radius:9px; }
-      .open:hover { filter:brightness(1.07); }
-      footer { max-width:1240px; margin:54px auto 0; color:var(--muted); font-size:13.5px; line-height:1.7; }
+      .open { margin-top:13px; align-self:flex-start; text-decoration:none; background:var(--accent); color:#0c0d10; font-weight:800; font-size:14px; padding:11px 19px; border-radius:9px; }
+      .open:hover { filter:brightness(1.08); }
+      footer { max-width:1280px; margin:54px auto 0; color:var(--muted); font-size:13.5px; line-height:1.8; }
+      footer a { color:var(--ink); }
     </style>
   </head>
   <body>
     <header>
-      <div class="kicker">RANKSTUDIO · UI DIRECTION STUDY v2 · 10 CONCEPTS</div>
-      <h1>랭크스튜디오 UI 시안 10종</h1>
-      <p>2026 어워드급 기법(실사 이미지·그레인 텍스처·GSAP/Lenis 스크롤 모션·SplitType 키네틱·Three.js 셰이더·커스텀 커서)을 적용해 10개의 서로 다른 아트 디렉션으로 제작했습니다. 카드를 열면 실제 모션·호버·반응형이 그대로 동작합니다. (일부 모션은 스크롤해야 나타납니다.) 마음에 드는 방향 또는 섞을 요소를 알려주시면 실제 앱에 정식 이식합니다.</p>
+      <div class="kicker">RANKSTUDIO · AWWWARDS-STYLE STUDY · 10 CONCEPTS</div>
+      <h1>랭크스튜디오 — 어워즈 스타일 UI 시안 10종</h1>
+      <p>실제 Awwwards 수상작(Jeton·Overlake·Bruno Simon 등)을 아키타입으로, 2026 트렌드 — 표현적 초대형 타이포·시네마틱 실사 사진·스크롤리텔링·라이트 3D/공간감·Lenis 스무스 스크롤·커스텀 커서 — 를 적용했습니다. 카드를 열면 실제 모션·호버·3D·스크롤 인터랙션이 동작합니다. (대부분 <b>스크롤해야</b> 진가가 나옵니다.)</p>
     </header>
     <main class="grid">
-      <article class="card"><a href="v2-01-noir.html" target="_blank"><img class="shot" src="previews/g-v2-01-noir.png" alt="Noir Couture"/></a><div class="meta"><span class="num">01</span><h2>느와르 꾸뛰르</h2><span class="en">Noir Couture · 다크 럭셔리</span><p>풀블리드 흑백 사진 위 거대 세리프. 패션하우스급 시네마틱.</p><a class="open" href="v2-01-noir.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-02-swiss-kinetic.html" target="_blank"><img class="shot" src="previews/g-v2-02-swiss-kinetic.png" alt="Kinetic Swiss"/></a><div class="meta"><span class="num">02</span><h2>키네틱 스위스</h2><span class="en">Kinetic Swiss Poster · 라이트</span><p>타이포가 곧 UI. 글자단위 키네틱(SplitType)+마퀴.</p><a class="open" href="v2-02-swiss-kinetic.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-03-aurora-webgl.html" target="_blank"><img class="shot" src="previews/g-v2-03-aurora-webgl.png" alt="Liquid Aurora WebGL"/></a><div class="meta"><span class="num">03</span><h2>리퀴드 오로라</h2><span class="en">Liquid Aurora · Three.js 셰이더</span><p>살아 움직이는 유체 그라데이션+커서 distortion. 보라 배제.</p><a class="open" href="v2-03-aurora-webgl.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-04-magazine.html" target="_blank"><img class="shot" src="previews/g-v2-04-magazine.png" alt="Analog Magazine"/></a><div class="meta"><span class="num">04</span><h2>아날로그 매거진</h2><span class="en">Analog Magazine · 크림 세리프</span><p>실사 콜라주·드롭캡·풀쿼트. 가장 인쇄물/사람 손맛.</p><a class="open" href="v2-04-magazine.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-05-apple-min.html" target="_blank"><img class="shot" src="previews/g-v2-05-apple-min.png" alt="Apple Minimal"/></a><div class="meta"><span class="num">05</span><h2>애플 미니멀</h2><span class="en">Apple-grade Minimal · 핀 스크롤</span><p>넓은 여백+GSAP 핀 스크롤 스토리텔링. 극도로 정제.</p><a class="open" href="v2-05-apple-min.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-06-riso-brutalist.html" target="_blank"><img class="shot" src="previews/g-v2-06-riso-brutalist.png" alt="Riso Brutalist"/></a><div class="meta"><span class="num">06</span><h2>리소 브루탈리즘</h2><span class="en">Riso Brutalist Collage · 볼드</span><p>하프톤 사진 콜라주+스티커+하드 섀도우. 자신감/손맛.</p><a class="open" href="v2-06-riso-brutalist.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-07-data-editorial.html" target="_blank"><img class="shot" src="previews/g-v2-07-data-editorial.png" alt="Data Editorial"/></a><div class="meta"><span class="num">07</span><h2>데이터 에디토리얼</h2><span class="en">Data Editorial · FT/이코노미스트급</span><p>정교한 SVG 인포그래픽. 진중한 분석 제품 신뢰감.</p><a class="open" href="v2-07-data-editorial.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-08-organic-sand.html" target="_blank"><img class="shot" src="previews/g-v2-08-organic-sand.png" alt="Organic Sand"/></a><div class="meta"><span class="num">08</span><h2>오가닉 샌드</h2><span class="en">Organic Warm Sand · 따뜻 프리미엄</span><p>곡선 블롭+따뜻한 라이프스타일 사진. 친근한 고급 브랜드.</p><a class="open" href="v2-08-organic-sand.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-09-terminal-luxe.html" target="_blank"><img class="shot" src="previews/g-v2-09-terminal-luxe.png" alt="Terminal Luxe"/></a><div class="meta"><span class="num">09</span><h2>터미널 럭스</h2><span class="en">Terminal Luxe · 다크 모노</span><p>모노 '엔진룸'+은은한 스캔라인. 정밀·신뢰의 럭셔리.</p><a class="open" href="v2-09-terminal-luxe.html" target="_blank">시안 열기 →</a></div></article>
-      <article class="card"><a href="v2-10-gradient-couture.html" target="_blank"><img class="shot" src="previews/g-v2-10-gradient-couture.png" alt="Gradient Couture"/></a><div class="meta"><span class="num">10</span><h2>그라데이션 꾸뛰르</h2><span class="en">Gradient Couture · 바이브런트</span><p>선셋 그레이니 그라데이션+이미지 컷아웃. 패션테크.</p><a class="open" href="v2-10-gradient-couture.html" target="_blank">시안 열기 →</a></div></article>
+      <article class="card"><a href="award-01-fintech-morph.html" target="_blank"><img class="shot" src="previews/g-award-01-fintech-morph.png" alt="Fintech Morph"/></a><div class="meta"><span class="num">01</span><h2>핀테크 스크롤 모핑</h2><span class="en">Jeton형 · 라이트 프리미엄</span><p>스크롤하면 제품 UI가 단계적으로 조립·모핑. 부드러운 Lenis.</p><a class="open" href="award-01-fintech-morph.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-02-3d-playground.html" target="_blank"><img class="shot" src="previews/g-award-02-3d-playground.png" alt="3D Playground"/></a><div class="meta"><span class="num">02</span><h2>3D 플레이그라운드</h2><span class="en">Bruno Simon형 · Three.js</span><p>마우스로 미는 부유 3D 토큰. 다크 프리미엄+플레이풀.</p><a class="open" href="award-02-3d-playground.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-03-cinematic.html" target="_blank"><img class="shot" src="previews/g-award-03-cinematic.png" alt="Cinematic"/></a><div class="meta"><span class="num">03</span><h2>시네마틱 퍼스트</h2><span class="en">Overlake형 · 사진 주도</span><p>풀블리드 고해상 사진+층층 색감. 가장 영화 같은.</p><a class="open" href="award-03-cinematic.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-04-scrolly-story.html" target="_blank"><img class="shot" src="previews/g-award-04-scrolly-story.png" alt="Scrollytelling"/></a><div class="meta"><span class="num">04</span><h2>스크롤리텔링 내러티브</h2><span class="en">NYT 인터랙티브형</span><p>"묻힘→AI 신호→발견" 핀 씬으로 단계별 전개.</p><a class="open" href="award-04-scrolly-story.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-05-type-maximal.html" target="_blank"><img class="shot" src="previews/g-award-05-type-maximal.png" alt="Type Maximal"/></a><div class="meta"><span class="num">05</span><h2>표현적 타입 맥시멀</h2><span class="en">가변폰트 키네틱</span><p>거대 타이포가 스크롤에 weight·자간 모핑. 타입이 곧 UI.</p><a class="open" href="award-05-type-maximal.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-06-spatial-glass.html" target="_blank"><img class="shot" src="previews/g-award-06-spatial-glass.png" alt="Spatial Glass"/></a><div class="meta"><span class="num">06</span><h2>스페이셜 글래스</h2><span class="en">visionOS형 · 라이트</span><p>레이어 깊이+마우스 틸트 패럴랙스. 고급 공간감.</p><a class="open" href="award-06-spatial-glass.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-07-horizontal.html" target="_blank"><img class="shot" src="previews/g-award-07-horizontal.png" alt="Horizontal"/></a><div class="meta"><span class="num">07</span><h2>가로 스크롤 쇼케이스</h2><span class="en">Awwwards 단골</span><p>세로 스크롤→풀패널 가로 이동. 시네마틱 사진 패널.</p><a class="open" href="award-07-horizontal.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-08-dark-immersive.html" target="_blank"><img class="shot" src="previews/g-award-08-dark-immersive.png" alt="Dark Immersive"/></a><div class="meta"><span class="num">08</span><h2>다크 몰입 프로덕트</h2><span class="en">Linear/Vercel 2026형</span><p>스크롤 피처 시어터+미세 글로우. 현행 프리미엄 SaaS.</p><a class="open" href="award-08-dark-immersive.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-09-vibrant-canvas.html" target="_blank"><img class="shot" src="previews/g-award-09-vibrant-canvas.png" alt="Vibrant Canvas"/></a><div class="meta"><span class="num">09</span><h2>에너제틱 캔버스</h2><span class="en">Stripe/Vercel 이벤트형</span><p>살아 움직이는 그레이니 그라데이션. 에너제틱+프리미엄.</p><a class="open" href="award-09-vibrant-canvas.html" target="_blank">열기 →</a></div></article>
+      <article class="card"><a href="award-10-brutalist.html" target="_blank"><img class="shot" src="previews/g-award-10-brutalist.png" alt="Refined Brutalist"/></a><div class="meta"><span class="num">10</span><h2>정제된 안티디자인</h2><span class="en">2026 카운터트렌드</span><p>모노·노출 구조·거대 브루탈 타이포. 큐레이팅된 하이엔드.</p><a class="open" href="award-10-brutalist.html" target="_blank">열기 →</a></div></article>
     </main>
-    <footer>10개 모두 외부 플랫폼 실명·금지 표현 없이 제작 · 한국어 카피 · 'AI 기반' 포지셔닝 · 320/768/1440 반응형 · prefers-reduced-motion 정지 처리.</footer>
+    <footer>
+      10종 모두 외부 플랫폼 실명·금지 표현 없이 제작 · 한국어 카피 · 'AI 기반' 포지셔닝 · 320/768/1440 반응형 · prefers-reduced-motion 정지.<br/>
+      이전 시안도 보기 — 에디토리얼 6종: <a href="../index.html">(v1)</a> · 아트디렉션 10종(v2): v2-01 ~ v2-10 파일.
+    </footer>
   </body>
 </html>

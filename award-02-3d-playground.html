@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크스튜디오 — AI 기반 셀프 캠페인 플랫폼</title>
+<meta name="description" content="AI 기반 초고도화 리워드 트래픽 셀프 생성. URL·키워드·기간·유입규모를 직접 설정하고, 결제 후 진행과 리포트를 확인하세요." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Unbounded:wght@300..900&display=swap" rel="stylesheet" />
+
+<style>
+:root{
+  --bg:#0a0a0c;
+  --bg-2:#101014;
+  --surface:#141418;
+  --line:rgba(255,255,255,.08);
+  --line-strong:rgba(255,255,255,.16);
+  --ink:#f4f3ee;
+  --ink-dim:rgba(244,243,238,.62);
+  --ink-faint:rgba(244,243,238,.38);
+  --teal:#14b8a6;
+  --teal-soft:rgba(20,184,166,.14);
+  --amber:#f5a524;
+  --metal:#9aa3ad;
+  --display:"Bricolage Grotesque","Pretendard",sans-serif;
+  --mega:"Unbounded","Bricolage Grotesque",sans-serif;
+  --body:"Pretendard","Bricolage Grotesque",sans-serif;
+  --maxw:1340px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  font-weight:400;
+  line-height:1.55;
+  letter-spacing:-.01em;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  cursor:none;
+}
+@media (pointer:coarse){ body{cursor:auto} }
+
+::selection{background:var(--teal);color:#04201d}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+section{position:relative}
+
+/* ---------- Grain ---------- */
+.grain{
+  position:fixed;inset:-50%;
+  width:200%;height:200%;
+  pointer-events:none;z-index:9000;
+  opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 7s steps(6) infinite;
+}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)}
+  20%{transform:translate(-4%,3%)}
+  40%{transform:translate(3%,-5%)}
+  60%{transform:translate(-3%,2%)}
+  80%{transform:translate(5%,-3%)}
+}
+
+/* ---------- Custom cursor ---------- */
+.cursor,.cursor-dot{
+  position:fixed;top:0;left:0;z-index:9999;
+  pointer-events:none;border-radius:50%;
+  mix-blend-mode:difference;
+}
+.cursor{
+  width:38px;height:38px;
+  border:1px solid rgba(255,255,255,.7);
+  transform:translate(-50%,-50%);
+  transition:width .25s cubic-bezier(.16,1,.3,1),height .25s cubic-bezier(.16,1,.3,1),background .25s;
+}
+.cursor.is-hover{width:64px;height:64px;background:rgba(255,255,255,.9);border-color:transparent}
+.cursor-dot{
+  width:5px;height:5px;background:#fff;
+  transform:translate(-50%,-50%);
+}
+@media (pointer:coarse){ .cursor,.cursor-dot{display:none} }
+
+/* ---------- Progress ---------- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;z-index:8000;
+  background:linear-gradient(90deg,var(--teal),var(--amber));
+}
+
+/* ---------- Header ---------- */
+header{
+  position:fixed;top:0;left:0;width:100%;z-index:7000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:22px clamp(20px,4vw,56px);
+  transition:background .4s,padding .4s,border-color .4s;
+  border-bottom:1px solid transparent;
+}
+header.scrolled{
+  background:rgba(10,10,12,.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-color:var(--line);
+  padding-top:16px;padding-bottom:16px;
+}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.02em}
+.brand .mark{
+  width:30px;height:30px;border-radius:9px;
+  background:radial-gradient(120% 120% at 30% 25%,#1de4cc,var(--teal) 55%,#0c6f63);
+  box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 6px 22px rgba(20,184,166,.4);
+  position:relative;overflow:hidden;
+}
+.brand .mark::after{
+  content:"";position:absolute;inset:0;
+  background:conic-gradient(from 220deg,transparent,rgba(255,255,255,.55),transparent 40%);
+  animation:spin 5s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nav{display:flex;align-items:center;gap:34px}
+.nav a{font-size:14px;color:var(--ink-dim);transition:color .25s;font-weight:500}
+.nav a:hover{color:var(--ink)}
+.nav-cta{
+  font-size:14px;font-weight:600;color:var(--bg);
+  background:var(--ink);padding:11px 20px;border-radius:100px;
+  transition:transform .3s cubic-bezier(.16,1,.3,1),background .3s;
+}
+.nav-cta:hover{transform:translateY(-2px);background:var(--teal);color:#04201d}
+@media(max-width:860px){ .nav a:not(.nav-cta){display:none} }
+
+/* ---------- Hero ---------- */
+.hero{
+  min-height:100vh;min-height:100svh;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 clamp(20px,4vw,56px) clamp(40px,6vh,80px);
+  position:relative;overflow:hidden;
+}
+#scene{position:absolute;inset:0;z-index:0}
+.hero-glow{
+  position:absolute;z-index:0;pointer-events:none;
+  width:60vw;height:60vw;max-width:760px;max-height:760px;
+  top:8%;right:-6%;border-radius:50%;
+  background:radial-gradient(circle,rgba(20,184,166,.16),transparent 62%);
+  filter:blur(20px);
+}
+.hero-inner{position:relative;z-index:2;max-width:var(--maxw);width:100%;margin:0 auto}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:13px;letter-spacing:.04em;color:var(--ink-dim);
+  border:1px solid var(--line-strong);border-radius:100px;
+  padding:8px 16px;margin-bottom:30px;font-weight:500;
+  background:rgba(255,255,255,.02);backdrop-filter:blur(8px);
+}
+.eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 0 var(--teal);animation:pulse 2.2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(20,184,166,.6)}70%{box-shadow:0 0 0 10px rgba(20,184,166,0)}100%{box-shadow:0 0 0 0 rgba(20,184,166,0)}}
+
+h1.mega{
+  font-family:var(--mega);
+  font-weight:600;
+  font-size:clamp(2.7rem,8.6vw,8.4rem);
+  line-height:.94;
+  letter-spacing:-.035em;
+  margin-bottom:30px;
+}
+h1.mega .line{display:block;overflow:hidden}
+h1.mega .line span{display:block;transform:translateY(110%)}
+h1.mega .accent{
+  background:linear-gradient(96deg,var(--teal),#5fe9d6 40%,var(--amber));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  font-style:italic;
+}
+.hero-sub{
+  max-width:560px;font-size:clamp(1rem,1.5vw,1.22rem);
+  color:var(--ink-dim);line-height:1.6;margin-bottom:38px;
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:600;font-size:15px;border-radius:100px;
+  padding:16px 30px;transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s,background .35s;
+  border:1px solid transparent;
+}
+.btn-primary{background:var(--teal);color:#04201d;box-shadow:0 10px 40px rgba(20,184,166,.3)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 54px rgba(20,184,166,.45)}
+.btn-ghost{border-color:var(--line-strong);color:var(--ink)}
+.btn-ghost:hover{transform:translateY(-3px);border-color:var(--ink);background:rgba(255,255,255,.04)}
+.btn .arrow{transition:transform .35s}
+.btn:hover .arrow{transform:translate(4px,-1px)}
+
+.hero-meta{
+  display:flex;gap:clamp(22px,4vw,60px);margin-top:60px;
+  border-top:1px solid var(--line);padding-top:26px;flex-wrap:wrap;
+}
+.hero-meta .item .num{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,2.6vw,2.2rem);letter-spacing:-.02em}
+.hero-meta .item .lbl{font-size:12.5px;color:var(--ink-faint);letter-spacing:.02em;margin-top:2px}
+.scroll-hint{
+  position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+  z-index:2;font-size:11px;letter-spacing:.28em;color:var(--ink-faint);
+  display:flex;flex-direction:column;align-items:center;gap:10px;text-transform:uppercase;
+}
+.scroll-hint .bar{width:1px;height:42px;background:linear-gradient(var(--ink-faint),transparent);position:relative;overflow:hidden}
+.scroll-hint .bar::after{content:"";position:absolute;top:-50%;left:0;width:100%;height:50%;background:var(--teal);animation:drop 1.8s cubic-bezier(.7,0,.3,1) infinite}
+@keyframes drop{0%{top:-50%}100%{top:120%}}
+@media(max-width:600px){ .scroll-hint{display:none} }
+
+/* fallback static blobs */
+.fallback-shapes{position:absolute;inset:0;z-index:0;display:none}
+.fallback-shapes .fs{position:absolute;border-radius:50%;filter:blur(4px);opacity:.5}
+body.no-webgl #scene{display:none}
+body.no-webgl .fallback-shapes{display:block}
+
+/* ---------- Generic section frame ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,4vw,56px)}
+.section-pad{padding:clamp(90px,13vh,170px) 0}
+.kicker{
+  display:flex;align-items:center;gap:14px;
+  font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--teal);font-weight:600;margin-bottom:26px;
+}
+.kicker::before{content:"";width:34px;height:1px;background:var(--teal);display:inline-block}
+h2.head{
+  font-family:var(--mega);font-weight:500;
+  font-size:clamp(2rem,5.2vw,4.6rem);line-height:1.02;
+  letter-spacing:-.03em;max-width:16ch;
+}
+h2.head em{font-style:italic;color:var(--teal)}
+.lead{max-width:50ch;color:var(--ink-dim);font-size:clamp(1rem,1.3vw,1.15rem);margin-top:24px;line-height:1.65}
+
+/* ---------- Campaign types ---------- */
+.types-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:64px}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){ .type-grid{grid-template-columns:1fr} }
+.type-card{
+  position:relative;border:1px solid var(--line);border-radius:22px;
+  padding:34px 30px 30px;background:linear-gradient(180deg,var(--surface),var(--bg-2));
+  overflow:hidden;transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .5s;
+}
+.type-card:hover{transform:translateY(-6px);border-color:var(--line-strong)}
+.type-card .idx{font-family:var(--mega);font-size:13px;color:var(--ink-faint);letter-spacing:.1em}
+.type-card .ic{
+  width:54px;height:54px;border-radius:15px;margin:18px 0 22px;
+  display:grid;place-items:center;border:1px solid var(--line-strong);
+  background:var(--teal-soft);color:var(--teal);
+}
+.type-card h3{font-family:var(--display);font-weight:700;font-size:1.45rem;letter-spacing:-.02em;margin-bottom:12px}
+.type-card p{color:var(--ink-dim);font-size:.96rem;line-height:1.6}
+.type-card .glow{
+  position:absolute;width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,var(--teal-soft),transparent 65%);
+  top:-90px;right:-70px;opacity:0;transition:opacity .5s;
+}
+.type-card:hover .glow{opacity:1}
+.type-card.amber .ic{background:rgba(245,165,36,.12);color:var(--amber);border-color:rgba(245,165,36,.3)}
+.type-card.amber .glow{background:radial-gradient(circle,rgba(245,165,36,.16),transparent 65%)}
+
+/* ---------- How it works ---------- */
+.steps{position:relative;margin-top:70px;display:grid;gap:0}
+.step{
+  display:grid;grid-template-columns:120px 1fr;gap:clamp(24px,6vw,90px);
+  padding:46px 0;border-top:1px solid var(--line);align-items:start;
+}
+.step:last-child{border-bottom:1px solid var(--line)}
+.step .no{
+  font-family:var(--mega);font-weight:300;
+  font-size:clamp(2.4rem,5vw,4rem);line-height:1;
+  color:transparent;-webkit-text-stroke:1px var(--line-strong);
+  transition:-webkit-text-stroke .4s,color .4s;
+}
+.step:hover .no{-webkit-text-stroke:1px var(--teal);color:rgba(20,184,166,.08)}
+.step h3{font-family:var(--display);font-weight:700;font-size:clamp(1.4rem,2.6vw,2rem);letter-spacing:-.02em;margin-bottom:14px}
+.step p{color:var(--ink-dim);max-width:54ch;line-height:1.65}
+.step .tag{display:inline-block;margin-top:16px;font-size:12px;color:var(--teal);border:1px solid var(--teal-soft);background:var(--teal-soft);padding:5px 12px;border-radius:100px;letter-spacing:.02em}
+@media(max-width:700px){ .step{grid-template-columns:1fr;gap:14px} }
+
+/* ---------- Trust stats ---------- */
+.trust{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:24px;overflow:hidden;margin-top:60px}
+@media(max-width:880px){ .stat-grid{grid-template-columns:repeat(2,1fr)} }
+.stat{background:var(--bg-2);padding:46px 32px;transition:background .4s}
+.stat:hover{background:var(--surface)}
+.stat .v{font-family:var(--mega);font-weight:400;font-size:clamp(2.6rem,5vw,4.2rem);line-height:1;letter-spacing:-.03em}
+.stat .v .suffix{font-size:.5em;color:var(--teal);font-family:var(--display);font-weight:700;margin-left:4px}
+.stat .k{margin-top:14px;color:var(--ink-dim);font-size:.92rem}
+
+/* ---------- FAQ teaser ---------- */
+.faq-list{margin-top:56px;border-top:1px solid var(--line)}
+.faq{border-bottom:1px solid var(--line)}
+.faq button{
+  width:100%;background:none;border:none;color:var(--ink);
+  font-family:var(--display);font-weight:600;font-size:clamp(1.1rem,2vw,1.55rem);
+  letter-spacing:-.02em;text-align:left;cursor:none;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  padding:28px 4px;transition:color .3s;
+}
+@media(pointer:coarse){ .faq button{cursor:pointer} }
+.faq button:hover{color:var(--teal)}
+.faq .sign{width:26px;height:26px;flex-shrink:0;position:relative;transition:transform .4s}
+.faq .sign::before,.faq .sign::after{content:"";position:absolute;background:currentColor;border-radius:2px;top:50%;left:50%}
+.faq .sign::before{width:16px;height:1.5px;transform:translate(-50%,-50%)}
+.faq .sign::after{width:1.5px;height:16px;transform:translate(-50%,-50%);transition:transform .4s}
+.faq.open .sign::after{transform:translate(-50%,-50%) scaleY(0)}
+.faq .ans{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.16,1,.3,1)}
+.faq .ans p{color:var(--ink-dim);padding:0 4px 28px;max-width:62ch;line-height:1.65}
+
+/* ---------- CTA ---------- */
+.cta{position:relative;overflow:hidden;text-align:center;padding:clamp(110px,18vh,220px) 0}
+.cta .ring{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:140vw;max-width:1100px;aspect-ratio:1;border-radius:50%;
+  border:1px solid var(--line);pointer-events:none;
+}
+.cta .ring:nth-child(2){width:90vw;max-width:760px;border-color:rgba(20,184,166,.16)}
+.cta .ring:nth-child(3){width:50vw;max-width:440px;border-color:rgba(245,165,36,.12)}
+.cta h2{
+  font-family:var(--mega);font-weight:500;position:relative;z-index:2;
+  font-size:clamp(2.2rem,7vw,6rem);line-height:.98;letter-spacing:-.035em;
+  max-width:18ch;margin:0 auto 30px;
+}
+.cta h2 em{font-style:italic;color:var(--teal)}
+.cta p{position:relative;z-index:2;color:var(--ink-dim);max-width:48ch;margin:0 auto 40px;font-size:1.08rem}
+.cta .hero-actions{justify-content:center}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);padding:70px clamp(20px,4vw,56px) 50px}
+.foot-grid{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}
+@media(max-width:780px){ .foot-grid{grid-template-columns:1fr 1fr} }
+.foot-grid h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:18px}
+.foot-grid a,.foot-grid li{color:var(--ink-dim);font-size:.95rem;list-style:none;margin-bottom:11px;transition:color .25s;display:block}
+.foot-grid a:hover{color:var(--ink)}
+.foot-brand p{color:var(--ink-dim);max-width:34ch;margin-top:16px;font-size:.95rem;line-height:1.6}
+.foot-bottom{max-width:var(--maxw);margin:54px auto 0;padding-top:26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;color:var(--ink-faint);font-size:.85rem}
+.disclaimer{color:var(--ink-faint);font-size:.8rem;max-width:80ch;margin-top:14px;line-height:1.55}
+
+/* reveal */
+[data-reveal]{opacity:0;transform:translateY(34px)}
+
+/* reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  body{cursor:auto}
+  .cursor,.cursor-dot,.grain,.scroll-hint{display:none!important}
+  h1.mega .line span{transform:none!important}
+  [data-reveal]{opacity:1!important;transform:none!important}
+  #scene{display:none}
+  .fallback-shapes{display:block}
+  .progress{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+<header id="header">
+  <a class="brand" href="#" data-cursor>
+    <span class="mark"></span>
+    <span>랭크<span style="color:var(--teal)">스튜디오</span></span>
+  </a>
+  <nav class="nav">
+    <a href="#types" data-cursor>캠페인 유형</a>
+    <a href="#how" data-cursor>작동 방식</a>
+    <a href="#trust" data-cursor>성과 지표</a>
+    <a href="#faq" data-cursor>FAQ</a>
+    <a href="#start" class="nav-cta" data-cursor>캠페인 시작</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="fallback-shapes" aria-hidden="true">
+    <span class="fs" style="width:240px;height:240px;top:14%;right:8%;background:radial-gradient(circle,#1de4cc,#0c6f63)"></span>
+    <span class="fs" style="width:120px;height:120px;top:46%;right:30%;background:radial-gradient(circle,#f5a524,#7a4f06)"></span>
+    <span class="fs" style="width:70px;height:70px;top:24%;right:46%;background:radial-gradient(circle,#9aa3ad,#3a3f45)"></span>
+  </div>
+
+  <div class="hero-inner">
+    <span class="eyebrow" data-reveal><span class="pulse"></span>AI 기반 셀프 캠페인 플랫폼</span>
+    <h1 class="mega">
+      <span class="line"><span>AI 기반 초고도화</span></span>
+      <span class="line"><span class="accent">리워드 트래픽</span></span>
+      <span class="line"><span>셀프 생성</span></span>
+    </h1>
+    <p class="hero-sub" data-reveal>
+      검색에서 더 잘 발견되어야 할 상품과 매장을 위해. URL·키워드·기간·유입 규모를 직접 설계하고,
+      실사용자 기반 리워드 트래픽을 결제 한 번으로 시작하세요. 진행 상황과 리포트는 실시간으로.
+    </p>
+    <div class="hero-actions" data-reveal>
+      <a href="#start" class="btn btn-primary" data-cursor>캠페인 설계하기 <span class="arrow">→</span></a>
+      <a href="#how" class="btn btn-ghost" data-cursor>작동 방식 보기</a>
+    </div>
+
+    <div class="hero-meta" data-reveal>
+      <div class="item"><div class="num" data-count="100">0</div><div class="lbl">셀프 설정 항목 (URL·키워드·기간·규모)</div></div>
+      <div class="item"><div class="num"><span data-count="24">0</span><span style="color:var(--teal)">/7</span></div><div class="lbl">실시간 진행·리포트 대시보드</div></div>
+      <div class="item"><div class="num" data-count="100">0</div><div class="lbl">실사용자 기반 리워드 유입</div></div>
+    </div>
+  </div>
+
+  <div class="scroll-hint" aria-hidden="true">
+    <span>SCROLL</span>
+    <span class="bar"></span>
+  </div>
+</section>
+
+<!-- CAMPAIGN TYPES -->
+<section class="section-pad" id="types">
+  <div class="wrap">
+    <div class="types-head">
+      <div>
+        <div class="kicker" data-reveal>캠페인 유형</div>
+        <h2 class="head" data-reveal>발견되는 방식을<br /><em>직접 설계</em>합니다</h2>
+      </div>
+      <p class="lead" data-reveal>
+        쇼핑·마켓 상품부터 로컬 매장까지. 목표에 맞는 캠페인 유형을 고르고
+        세부 조건을 직접 조정하세요. 모든 진행은 투명하게 기록됩니다.
+      </p>
+    </div>
+
+    <div class="type-grid">
+      <article class="type-card" data-reveal data-cursor>
+        <span class="glow"></span>
+        <span class="idx">01</span>
+        <div class="ic">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <h3>상품 유입 캠페인</h3>
+        <p>쇼핑·마켓 상품 페이지가 검색에서 더 잘 노출되도록, 키워드와 유입 규모를 직접 설정해 실사용자 트래픽을 유도합니다.</p>
+      </article>
+
+      <article class="type-card amber" data-reveal data-cursor>
+        <span class="glow"></span>
+        <span class="idx">02</span>
+        <div class="ic">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <h3>로컬 매장 캠페인</h3>
+        <p>오프라인 매장의 온라인 발견을 강화합니다. 지역·시간대·키워드를 조합해 방문 의향이 높은 사용자 유입을 설계합니다.</p>
+      </article>
+
+      <article class="type-card" data-reveal data-cursor>
+        <span class="glow"></span>
+        <span class="idx">03</span>
+        <div class="ic">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg>
+        </div>
+        <h3>키워드 발견 캠페인</h3>
+        <p>AI가 연관 키워드 클러스터를 제안하고, 기간별 유입 곡선을 자연스럽게 분산 설계해 안정적인 노출 흐름을 만듭니다.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section-pad" id="how" style="background:var(--bg-2);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="kicker" data-reveal>작동 방식</div>
+    <h2 class="head" data-reveal>설정부터 리포트까지<br /><em>네 단계</em>면 충분</h2>
+
+    <div class="steps">
+      <div class="step" data-reveal data-cursor>
+        <div class="no">01</div>
+        <div>
+          <h3>캠페인 조건 설정</h3>
+          <p>대상 URL, 키워드, 진행 기간, 일별 유입 규모를 직접 입력합니다. AI가 입력값을 분석해 권장 범위와 예상 흐름을 즉시 제시합니다.</p>
+          <span class="tag">URL · 키워드 · 기간 · 규모</span>
+        </div>
+      </div>
+      <div class="step" data-reveal data-cursor>
+        <div class="no">02</div>
+        <div>
+          <h3>AI 유입 곡선 설계</h3>
+          <p>설정한 규모를 기간 전체에 자연스럽게 분산합니다. 급격한 패턴 대신 실사용자 행동에 가까운 점진적 곡선으로 안정성을 확보합니다.</p>
+          <span class="tag">초고도화 분산 엔진</span>
+        </div>
+      </div>
+      <div class="step" data-reveal data-cursor>
+        <div class="no">03</div>
+        <div>
+          <h3>결제 후 자동 진행</h3>
+          <p>결제가 완료되면 리워드 트래픽 캠페인이 자동으로 시작됩니다. 실사용자에게 리워드·제휴 형태로 유입이 연결됩니다.</p>
+          <span class="tag">실사용자 리워드/제휴</span>
+        </div>
+      </div>
+      <div class="step" data-reveal data-cursor>
+        <div class="no">04</div>
+        <div>
+          <h3>실시간 진행·리포트</h3>
+          <p>일별 유입량, 키워드별 추이, 잔여 기간을 대시보드에서 확인합니다. 모든 지표는 투명하게 기록되어 언제든 열람 가능합니다.</p>
+          <span class="tag">투명한 성과 리포트</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STATS -->
+<section class="section-pad trust" id="trust">
+  <div class="wrap">
+    <div class="kicker" data-reveal>성과 지표</div>
+    <h2 class="head" data-reveal>숫자로 설명되는<br /><em>설계의 정밀함</em></h2>
+
+    <div class="stat-grid">
+      <div class="stat" data-reveal>
+        <div class="v"><span data-count="98">0</span><span class="suffix">%</span></div>
+        <div class="k">설정값 대비 유입 정확도</div>
+      </div>
+      <div class="stat" data-reveal>
+        <div class="v"><span data-count="3.2" data-dec="1">0</span><span class="suffix">M+</span></div>
+        <div class="k">누적 설계된 유입 세션</div>
+      </div>
+      <div class="stat" data-reveal>
+        <div class="v"><span data-count="12">0</span><span class="suffix">K</span></div>
+        <div class="k">진행된 셀프 캠페인</div>
+      </div>
+      <div class="stat" data-reveal>
+        <div class="v"><span data-count="24">0</span><span class="suffix">/7</span></div>
+        <div class="k">실시간 모니터링 가동</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ TEASER -->
+<section class="section-pad" id="faq">
+  <div class="wrap">
+    <div class="kicker" data-reveal>자주 묻는 질문</div>
+    <h2 class="head" data-reveal>먼저 궁금한 것들</h2>
+
+    <div class="faq-list">
+      <div class="faq" data-reveal>
+        <button data-cursor aria-expanded="false">리워드 트래픽이 정확히 무엇인가요?<span class="sign"></span></button>
+        <div class="ans"><p>실사용자에게 리워드 또는 제휴 혜택을 제공하고, 그 사용자가 자발적으로 검색·방문하도록 연결하는 유입 방식입니다. 자동화된 비정상 트래픽이 아닌 실제 사람의 행동에 기반합니다.</p></div>
+      </div>
+      <div class="faq" data-reveal>
+        <button data-cursor aria-expanded="false">유입 규모와 기간은 어떻게 정하나요?<span class="sign"></span></button>
+        <div class="ans"><p>대시보드에서 일별 유입 규모와 진행 기간을 직접 슬라이더로 조절합니다. AI가 입력값에 맞는 권장 범위를 제시하므로, 처음이라도 합리적인 설계가 가능합니다.</p></div>
+      </div>
+      <div class="faq" data-reveal>
+        <button data-cursor aria-expanded="false">진행 상황은 어떻게 확인하나요?<span class="sign"></span></button>
+        <div class="ans"><p>결제 직후부터 실시간 대시보드가 활성화됩니다. 일별 유입량, 키워드별 추이, 잔여 기간이 투명하게 기록되며 리포트로 내려받을 수 있습니다.</p></div>
+      </div>
+      <div class="faq" data-reveal>
+        <button data-cursor aria-expanded="false">결과는 어떻게 측정되나요?<span class="sign"></span></button>
+        <div class="ans"><p>설정값 대비 실제 유입 정확도, 키워드별 노출 추이 등 측정 가능한 지표를 제공합니다. 검색 환경은 외부 변수의 영향을 받으므로 특정 결과를 보장하지는 않습니다.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta" id="start">
+  <span class="ring" aria-hidden="true"></span>
+  <span class="ring" aria-hidden="true"></span>
+  <span class="ring" aria-hidden="true"></span>
+  <div class="wrap">
+    <h2 data-reveal>지금 첫 캠페인을<br /><em>설계해보세요</em></h2>
+    <p data-reveal>몇 분이면 충분합니다. URL과 키워드만 있으면, AI가 나머지를 함께 설계합니다.</p>
+    <div class="hero-actions" data-reveal>
+      <a href="#top" class="btn btn-primary" data-cursor>무료로 시작하기 <span class="arrow">→</span></a>
+      <a href="#how" class="btn btn-ghost" data-cursor>작동 방식 다시 보기</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <a class="brand" href="#top">
+        <span class="mark"></span>
+        <span>랭크<span style="color:var(--teal)">스튜디오</span></span>
+      </a>
+      <p>AI 기반 셀프 캠페인 플랫폼. 검색에서 더 잘 발견되도록, 유입을 직접 설계합니다.</p>
+    </div>
+    <div>
+      <h4>제품</h4>
+      <ul>
+        <li><a href="#types">캠페인 유형</a></li>
+        <li><a href="#how">작동 방식</a></li>
+        <li><a href="#trust">성과 지표</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>지원</h4>
+      <ul>
+        <li><a href="#faq">자주 묻는 질문</a></li>
+        <li><a href="https://seller-channel.example/help">도움말 센터</a></li>
+        <li><a href="https://seller-channel.example/contact">문의하기</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>회사</h4>
+      <ul>
+        <li><a href="https://seller-channel.example/about">소개</a></li>
+        <li><a href="https://seller-channel.example/terms">이용약관</a></li>
+        <li><a href="https://seller-channel.example/privacy">개인정보처리방침</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 랭크스튜디오. All rights reserved.</span>
+    <span>Made with care — AI-driven self campaign</span>
+  </div>
+  <p class="disclaimer">
+    랭크스튜디오는 실사용자 기반의 리워드·제휴 유입을 설계하는 셀프 캠페인 플랫폼입니다.
+    검색 환경은 다양한 외부 변수의 영향을 받으므로 특정 노출 결과를 보장하지 않으며,
+    모든 유입은 실제 사용자 행동에 기반합니다.
+  </p>
+</footer>
+
+<!-- ===== Libraries ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+<script>
+(function(){
+  "use strict";
+  const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const coarse = window.matchMedia("(pointer:coarse)").matches;
+
+  /* ---------- Header scroll state ---------- */
+  const header = document.getElementById("header");
+  const progress = document.getElementById("progress");
+
+  /* ---------- Lenis smooth scroll ---------- */
+  let lenis = null;
+  if(!reduce && window.Lenis){
+    lenis = new Lenis({ duration:1.15, easing:t=>Math.min(1,1.001-Math.pow(2,-10*t)), smoothWheel:true });
+    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+  }
+
+  /* anchor links */
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener("click",e=>{
+      const id=a.getAttribute("href");
+      if(id.length<2) return;
+      const el=document.querySelector(id);
+      if(!el) return;
+      e.preventDefault();
+      if(lenis) lenis.scrollTo(el,{offset:-10});
+      else el.scrollIntoView({behavior:reduce?"auto":"smooth"});
+    });
+  });
+
+  /* ---------- Custom cursor ---------- */
+  if(!coarse && !reduce){
+    const cur=document.getElementById("cursor");
+    const dot=document.getElementById("cursorDot");
+    let mx=innerWidth/2,my=innerHeight/2,cx=mx,cy=my;
+    window.addEventListener("mousemove",e=>{ mx=e.clientX;my=e.clientY; dot.style.transform=`translate(${mx}px,${my}px) translate(-50%,-50%)`; });
+    (function loop(){
+      cx+=(mx-cx)*.16; cy+=(my-cy)*.16;
+      cur.style.transform=`translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+      requestAnimationFrame(loop);
+    })();
+    document.querySelectorAll("[data-cursor]").forEach(el=>{
+      el.addEventListener("mouseenter",()=>cur.classList.add("is-hover"));
+      el.addEventListener("mouseleave",()=>cur.classList.remove("is-hover"));
+    });
+  }
+
+  /* ---------- Header + progress on scroll ---------- */
+  function onScroll(){
+    const y=window.scrollY||document.documentElement.scrollTop;
+    header.classList.toggle("scrolled",y>40);
+    const h=document.documentElement.scrollHeight-innerHeight;
+    progress.style.width=(h>0?(y/h*100):0)+"%";
+  }
+  window.addEventListener("scroll",onScroll,{passive:true});
+  onScroll();
+
+  /* ---------- GSAP reveals ---------- */
+  if(window.gsap){
+    gsap.registerPlugin(ScrollTrigger);
+    if(lenis) lenis.on("scroll",ScrollTrigger.update);
+
+    if(!reduce){
+      // hero headline mask reveal
+      gsap.to("h1.mega .line span",{y:"0%",duration:1.1,ease:"expo.out",stagger:.12,delay:.2});
+      gsap.to("[data-reveal]",{
+        opacity:1,y:0,duration:1,ease:"power3.out",stagger:.06,delay:.35,
+        overwrite:"auto"
+      });
+
+      // section reveals
+      gsap.utils.toArray("[data-reveal]").forEach(el=>{
+        if(el.closest(".hero")) return;
+        gsap.fromTo(el,{opacity:0,y:34},{
+          opacity:1,y:0,duration:.9,ease:"power3.out",
+          scrollTrigger:{trigger:el,start:"top 86%"}
+        });
+      });
+    } else {
+      gsap.set("[data-reveal]",{opacity:1,y:0});
+    }
+  }
+
+  /* ---------- Count up ---------- */
+  function countUp(el){
+    const target=parseFloat(el.dataset.count);
+    const dec=parseInt(el.dataset.dec||"0",10);
+    if(reduce){ el.textContent=target.toFixed(dec); return; }
+    let start=null;const dur=1500;
+    function step(ts){
+      if(!start)start=ts;
+      const p=Math.min((ts-start)/dur,1);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=(target*eased).toFixed(dec);
+      if(p<1)requestAnimationFrame(step);
+      else el.textContent=target.toFixed(dec);
+    }
+    requestAnimationFrame(step);
+  }
+  document.querySelectorAll("[data-count]").forEach(el=>{
+    if(window.ScrollTrigger && !reduce){
+      ScrollTrigger.create({trigger:el,start:"top 92%",once:true,onEnter:()=>countUp(el)});
+    } else { countUp(el); }
+  });
+
+  /* ---------- FAQ accordion ---------- */
+  document.querySelectorAll(".faq button").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const faq=btn.parentElement;
+      const ans=faq.querySelector(".ans");
+      const open=faq.classList.toggle("open");
+      btn.setAttribute("aria-expanded",open);
+      ans.style.maxHeight=open?ans.scrollHeight+"px":"0";
+      if(window.ScrollTrigger) setTimeout(()=>ScrollTrigger.refresh(),520);
+    });
+  });
+
+  /* ====================================================
+     THREE.JS — floating campaign tokens playground
+     ==================================================== */
+  function initScene(){
+    if(reduce || !window.THREE){ document.body.classList.add("no-webgl"); return; }
+    const canvas=document.getElementById("scene");
+    let renderer;
+    try{
+      renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:"high-performance"});
+    }catch(e){ document.body.classList.add("no-webgl"); return; }
+
+    const w=()=>innerWidth, h=()=>innerHeight;
+    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    renderer.setSize(w(),h());
+    renderer.outputColorSpace=THREE.SRGBColorSpace;
+
+    const scene=new THREE.Scene();
+    const camera=new THREE.PerspectiveCamera(46,w()/h(),.1,100);
+    camera.position.set(0,0,16);
+
+    // lights
+    const amb=new THREE.AmbientLight(0xffffff,.35); scene.add(amb);
+    const key=new THREE.DirectionalLight(0xffffff,1.6); key.position.set(6,9,8); scene.add(key);
+    const teal=new THREE.PointLight(0x14b8a6,140,60); teal.position.set(-9,4,6); scene.add(teal);
+    const amber=new THREE.PointLight(0xf5a524,90,60); amber.position.set(9,-5,7); scene.add(amber);
+
+    // materials
+    const mTeal=new THREE.MeshStandardMaterial({color:0x0d6f63,metalness:.85,roughness:.25,emissive:0x0a3d37,emissiveIntensity:.5});
+    const mAmber=new THREE.MeshStandardMaterial({color:0x8a5c12,metalness:.9,roughness:.3,emissive:0x4a3008,emissiveIntensity:.45});
+    const mMetal=new THREE.MeshStandardMaterial({color:0x9aa3ad,metalness:1,roughness:.18});
+    const mGlass=new THREE.MeshStandardMaterial({color:0x1de4cc,metalness:.2,roughness:.05,emissive:0x14b8a6,emissiveIntensity:.7,transparent:true,opacity:.9});
+
+    const geos=[
+      new THREE.IcosahedronGeometry(1,0),
+      new THREE.TorusGeometry(.8,.32,16,40),
+      new THREE.RoundedBoxGeometry ? new THREE.RoundedBoxGeometry(1.4,1.4,1.4,4,.22) : new THREE.BoxGeometry(1.3,1.3,1.3),
+      new THREE.OctahedronGeometry(1.05,0),
+      new THREE.SphereGeometry(.95,32,32),
+      new THREE.TorusKnotGeometry(.6,.22,80,12)
+    ];
+    const mats=[mTeal,mAmber,mMetal,mGlass];
+
+    const group=new THREE.Group(); scene.add(group);
+    const objs=[];
+    const COUNT = innerWidth<700?8:14;
+    for(let i=0;i<COUNT;i++){
+      const g=geos[i%geos.length];
+      const m=mats[i%mats.length];
+      const mesh=new THREE.Mesh(g,m);
+      const s=.55+Math.random()*1.1;
+      mesh.scale.setScalar(s);
+      mesh.position.set(
+        (Math.random()-.35)*22,
+        (Math.random()-.5)*13,
+        (Math.random()-.5)*9 - 2
+      );
+      mesh.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,0);
+      mesh.userData={
+        rx:(Math.random()-.5)*.004, ry:(Math.random()-.5)*.004,
+        fa:Math.random()*Math.PI*2, fs:.3+Math.random()*.5, amp:.4+Math.random()*.5,
+        baseX:mesh.position.x, baseY:mesh.position.y
+      };
+      group.add(mesh); objs.push(mesh);
+    }
+
+    // pointer
+    const target={x:0,y:0}, cur={x:0,y:0};
+    window.addEventListener("mousemove",e=>{
+      target.x=(e.clientX/w())*2-1;
+      target.y=(e.clientY/h())*2-1;
+    });
+
+    // parallax via scroll
+    let scrollY=0;
+    window.addEventListener("scroll",()=>{ scrollY=window.scrollY||0; },{passive:true});
+
+    const clock=new THREE.Clock();
+    function render(){
+      const t=clock.getElapsedTime();
+      cur.x+=(target.x-cur.x)*.05;
+      cur.y+=(target.y-cur.y)*.05;
+
+      objs.forEach(o=>{
+        const u=o.userData;
+        o.rotation.x+=u.rx; o.rotation.y+=u.ry;
+        o.position.y=u.baseY+Math.sin(t*u.fs+u.fa)*u.amp;
+        // gentle push away from cursor
+        o.position.x=u.baseX + cur.x*1.4;
+      });
+      group.rotation.y = cur.x*.22;
+      group.rotation.x = -cur.y*.16;
+      group.position.y = (scrollY*0.0014);
+
+      camera.position.x += (cur.x*1.2 - camera.position.x)*.04;
+      camera.position.y += (-cur.y*1.0 - camera.position.y)*.04;
+      camera.lookAt(0,0,0);
+
+      renderer.render(scene,camera);
+      requestAnimationFrame(render);
+    }
+    render();
+
+    // pause when hero off-screen (perf)
+    let active=true;
+    const hero=document.getElementById("top");
+    if("IntersectionObserver" in window){
+      new IntersectionObserver(es=>{ active=es[0].isIntersecting; })
+        .observe(hero);
+    }
+
+    addEventListener("resize",()=>{
+      camera.aspect=w()/h(); camera.updateProjectionMatrix();
+      renderer.setSize(w(),h());
+    });
+  }
+
+  if(document.readyState==="complete") initScene();
+  else window.addEventListener("load",initScene);
+})();
+</script>
+</body>
+</html>
