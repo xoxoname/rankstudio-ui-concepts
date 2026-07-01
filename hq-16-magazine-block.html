@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랭크 스튜디오 — 직접 만드는 캠페인</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --ink:#111111;
+    --paper:#f4f1ea;
+    --paper-2:#ece7dc;
+    --vermilion:#e5341f;
+    --blue:#1f43ff;
+    --line:#111111;
+    --grid: minmax(0,1fr);
+    --pad: clamp(20px, 5vw, 88px);
+    --maxw: 1440px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Pretendard Variable",Pretendard,-apple-system,system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    word-break:keep-all;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--vermilion);color:var(--paper)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto}
+  .pad{padding-left:var(--pad);padding-right:var(--pad)}
+
+  /* ============ TOP BAR ============ */
+  header.bar{
+    position:sticky;top:0;z-index:50;
+    background:var(--ink);color:var(--paper);
+    border-bottom:2px solid var(--ink);
+  }
+  .bar-in{
+    display:flex;align-items:center;justify-content:space-between;
+    height:64px;
+  }
+  .logo{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.02em;font-size:18px}
+  .logo .mark{width:26px;height:26px;flex:0 0 auto}
+  .nav{display:flex;gap:28px;font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+  .nav a{opacity:.72;transition:opacity .2s}
+  .nav a:hover{opacity:1}
+  .bar .cta{
+    background:var(--vermilion);color:var(--paper);
+    font-weight:800;font-size:13px;letter-spacing:.02em;
+    padding:10px 18px;border:2px solid var(--vermilion);
+    transition:background .2s,color .2s;
+  }
+  .bar .cta:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+  @media(max-width:820px){.nav{display:none}}
+
+  /* ============ HERO ============ */
+  .hero{border-bottom:2px solid var(--ink)}
+  .hero-in{
+    display:grid;grid-template-columns:1.35fr .9fr;
+    min-height:clamp(520px,78vh,760px);
+  }
+  .hero-left{
+    padding:clamp(28px,5vw,72px) var(--pad);
+    display:flex;flex-direction:column;justify-content:space-between;
+    border-right:2px solid var(--ink);
+  }
+  .kicker{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--blue);
+  }
+  .kicker .dot{width:9px;height:9px;background:var(--blue);border-radius:50%}
+  h1{
+    font-size:clamp(30px,4.5vw,60px);
+    line-height:1.02;letter-spacing:-.03em;font-weight:800;
+    margin:clamp(20px,3vw,34px) 0 0;
+  }
+  h1 .hl{color:var(--vermilion)}
+  h1 .u{
+    background:linear-gradient(var(--blue),var(--blue)) bottom/100% .12em no-repeat;
+    padding-bottom:.02em;
+  }
+  .lede{
+    font-size:clamp(15px,1.3vw,17px);color:#333;max-width:44ch;
+    margin-top:clamp(18px,2.4vw,26px);
+  }
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:34px}
+  .btn{
+    font-weight:800;font-size:15px;letter-spacing:-.01em;
+    padding:15px 26px;border:2px solid var(--ink);
+    display:inline-flex;align-items:center;gap:10px;
+    transition:transform .12s ease, background .2s, color .2s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--ink);color:var(--paper)}
+  .btn-primary:hover{background:var(--vermilion);border-color:var(--vermilion)}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper)}
+  .btn .arw{width:18px;height:18px}
+  .hero-meta{
+    display:flex;gap:26px;flex-wrap:wrap;font-size:12.5px;color:#555;
+    font-weight:600;letter-spacing:.01em;margin-top:auto;padding-top:32px;
+  }
+  .hero-meta b{color:var(--ink);font-weight:800}
+
+  .hero-right{
+    background:var(--vermilion);color:var(--paper);
+    position:relative;overflow:hidden;
+    display:flex;flex-direction:column;justify-content:space-between;
+    padding:clamp(24px,3vw,40px);
+  }
+  .hero-right .idx{
+    font-size:clamp(90px,13vw,190px);line-height:.8;font-weight:800;
+    letter-spacing:-.05em;opacity:.9;
+  }
+  .hero-right .idx small{font-size:.28em;vertical-align:super;font-weight:700;letter-spacing:0}
+  .hero-right .caption{
+    font-size:14px;font-weight:700;line-height:1.4;max-width:26ch;
+    border-top:2px solid rgba(244,241,234,.4);padding-top:16px;
+  }
+  .hero-right .bigtype{
+    font-size:clamp(30px,4.6vw,58px);font-weight:800;letter-spacing:-.03em;
+    line-height:.98;
+  }
+  .hero-right svg.deco{position:absolute;right:-40px;bottom:-30px;width:60%;opacity:.16;pointer-events:none}
+  @media(max-width:900px){
+    .hero-in{grid-template-columns:1fr}
+    .hero-left{border-right:none;border-bottom:2px solid var(--ink)}
+    .hero-right{min-height:280px}
+  }
+
+  /* ============ QUICKSTART (inline) ============ */
+  .qs{border-bottom:2px solid var(--ink);background:var(--ink);color:var(--paper)}
+  .qs-in{padding:clamp(28px,4vw,52px) var(--pad)}
+  .qs-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:26px}
+  .qs-head h2{font-size:clamp(22px,2.6vw,32px);font-weight:800;letter-spacing:-.02em}
+  .qs-head .sub{font-size:13px;color:#bbb;font-weight:600;letter-spacing:.02em}
+  .qs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:2px solid var(--paper)}
+  .qs-field{
+    padding:18px;border-right:2px solid var(--paper);
+    display:flex;flex-direction:column;gap:9px;
+  }
+  .qs-field:last-child{border-right:none}
+  .qs-field label{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);
+    background:var(--paper);width:fit-content;padding:2px 7px}
+  .qs-field input,.qs-field select{
+    background:transparent;border:none;border-bottom:2px solid var(--paper);
+    color:var(--paper);font-family:inherit;font-size:15px;font-weight:600;
+    padding:6px 0;outline:none;width:100%;
+  }
+  .qs-field input::placeholder{color:#888}
+  .qs-field select option{color:var(--ink)}
+  .qs-foot{
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    margin-top:22px;
+  }
+  .qs-note{font-size:12.5px;color:#aaa;max-width:56ch;line-height:1.5}
+  .qs-submit{
+    background:var(--vermilion);color:var(--paper);border:2px solid var(--vermilion);
+    font-weight:800;font-size:15px;padding:14px 30px;cursor:pointer;font-family:inherit;
+    display:inline-flex;align-items:center;gap:10px;transition:background .2s,color .2s;
+  }
+  .qs-submit:hover{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+  @media(max-width:900px){.qs-grid{grid-template-columns:1fr 1fr}
+    .qs-field:nth-child(2){border-right:none}
+    .qs-field:nth-child(1),.qs-field:nth-child(2){border-bottom:2px solid var(--paper)}}
+  @media(max-width:560px){.qs-grid{grid-template-columns:1fr}
+    .qs-field{border-right:none;border-bottom:2px solid var(--paper)}
+    .qs-field:last-child{border-bottom:none}}
+
+  /* ============ MARQUEE strip ============ */
+  .strip{background:var(--blue);color:var(--paper);border-bottom:2px solid var(--ink);overflow:hidden}
+  .strip-track{
+    display:flex;gap:40px;white-space:nowrap;
+    font-size:clamp(20px,2.4vw,30px);font-weight:800;letter-spacing:-.01em;
+    padding:16px 0;animation:slide 26s linear infinite;
+  }
+  .strip-track span{display:inline-flex;align-items:center;gap:40px}
+  .strip-track .sep{color:var(--vermilion)}
+  @keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){.strip-track{animation:none;padding-left:var(--pad)}}
+
+  /* ============ SECTION scaffolding ============ */
+  section.blk{border-bottom:2px solid var(--ink)}
+  .sec-head{
+    display:grid;grid-template-columns:auto 1fr;gap:clamp(18px,3vw,44px);
+    align-items:end;padding:clamp(34px,5vw,72px) var(--pad) clamp(20px,3vw,34px);
+  }
+  .sec-index{
+    font-size:clamp(48px,7vw,110px);line-height:.8;font-weight:800;
+    letter-spacing:-.05em;color:var(--ink);
+  }
+  .sec-index.rev{color:var(--vermilion)}
+  .sec-title{}
+  .sec-title .tag{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+  .sec-title h2{font-size:clamp(26px,3.4vw,46px);font-weight:800;letter-spacing:-.03em;line-height:1.04;margin-top:10px}
+  .sec-title p{font-size:15px;color:#444;max-width:52ch;margin-top:14px}
+
+  /* ============ HOW: 3 steps ============ */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);border-top:2px solid var(--ink)}
+  .step{padding:clamp(24px,3vw,40px) var(--pad);border-right:2px solid var(--ink);position:relative}
+  .steps .step:last-child{border-right:none}
+  .step .n{font-size:clamp(40px,5vw,72px);font-weight:800;line-height:.8;letter-spacing:-.04em}
+  .step:nth-child(1) .n{color:var(--ink)}
+  .step:nth-child(2) .n{color:var(--vermilion)}
+  .step:nth-child(3) .n{color:var(--blue)}
+  .step h3{font-size:clamp(18px,1.8vw,22px);font-weight:800;letter-spacing:-.02em;margin:20px 0 10px}
+  .step p{font-size:14.5px;color:#444}
+  .step svg{width:44px;height:44px;margin-top:22px}
+  @media(max-width:820px){.steps{grid-template-columns:1fr}
+    .step{border-right:none;border-bottom:2px solid var(--ink)}
+    .steps .step:last-child{border-bottom:none}}
+
+  /* ============ FEATURE color blocks (alternating) ============ */
+  .feat{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink)}
+  .feat .fx-visual{
+    position:relative;min-height:340px;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    border-right:2px solid var(--ink);
+  }
+  .feat.rev .fx-visual{order:2;border-right:none;border-left:2px solid var(--ink)}
+  .feat.rev .fx-body{order:1}
+  .fx-visual.ink{background:var(--ink)}
+  .fx-visual.verm{background:var(--vermilion)}
+  .fx-visual.blue{background:var(--blue)}
+  .fx-visual.paper{background:var(--paper-2)}
+  .fx-visual .num{
+    position:absolute;top:18px;left:22px;font-size:14px;font-weight:800;letter-spacing:.06em;
+    color:var(--paper);mix-blend-mode:difference;opacity:.9;
+  }
+  .fx-visual svg{width:74%;height:auto}
+  .fx-body{padding:clamp(28px,4vw,60px) var(--pad);display:flex;flex-direction:column;justify-content:center}
+  .fx-body .tag{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+  .fx-body h3{font-size:clamp(22px,2.8vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.05;margin:14px 0 16px}
+  .fx-body h3 em{font-style:normal;color:var(--vermilion)}
+  .fx-body p{font-size:15px;color:#3a3a3a;max-width:46ch}
+  .fx-body ul{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:12px}
+  .fx-body li{display:flex;gap:12px;font-size:14.5px;font-weight:600;align-items:flex-start}
+  .fx-body li .b{width:10px;height:10px;flex:0 0 auto;margin-top:6px;background:var(--blue)}
+  .fx-body li:nth-child(2) .b{background:var(--vermilion)}
+  .fx-body li:nth-child(3) .b{background:var(--ink)}
+  @media(max-width:820px){
+    .feat{grid-template-columns:1fr}
+    .feat .fx-visual{border-right:none;border-bottom:2px solid var(--ink);min-height:240px}
+    .feat.rev .fx-visual{order:0;border-left:none;border-bottom:2px solid var(--ink)}
+    .feat.rev .fx-body{order:0}
+  }
+
+  /* ============ NUMBERS band ============ */
+  .band{background:var(--ink);color:var(--paper);border-top:2px solid var(--ink)}
+  .band-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+  .band-cell{padding:clamp(30px,4vw,56px) var(--pad);border-right:2px solid rgba(244,241,234,.25)}
+  .band-cell:last-child{border-right:none}
+  .band-cell .big{font-size:clamp(40px,6vw,84px);font-weight:800;letter-spacing:-.04em;line-height:.9}
+  .band-cell:nth-child(1) .big{color:var(--paper)}
+  .band-cell:nth-child(2) .big{color:var(--vermilion)}
+  .band-cell:nth-child(3) .big{color:#7f95ff}
+  .band-cell .lbl{font-size:14px;color:#cfcabf;margin-top:16px;font-weight:600;max-width:30ch}
+  @media(max-width:820px){.band-grid{grid-template-columns:1fr}
+    .band-cell{border-right:none;border-bottom:2px solid rgba(244,241,234,.25)}
+    .band-cell:last-child{border-bottom:none}}
+
+  /* ============ COMPLIANCE / clarity ============ */
+  .clar{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid var(--ink)}
+  .clar .col{padding:clamp(28px,4vw,60px) var(--pad)}
+  .clar .col.a{border-right:2px solid var(--ink)}
+  .clar h3{font-size:clamp(20px,2.4vw,30px);font-weight:800;letter-spacing:-.02em;margin-bottom:20px}
+  .clar .lst{display:flex;flex-direction:column;gap:14px}
+  .clar .row{display:flex;gap:14px;font-size:14.5px;line-height:1.5}
+  .clar .row .k{width:22px;height:22px;flex:0 0 auto;margin-top:1px}
+  .clar .row b{font-weight:800}
+  .clar .fine{font-size:12.5px;color:#666;margin-top:24px;line-height:1.6}
+  @media(max-width:820px){.clar{grid-template-columns:1fr}
+    .clar .col.a{border-right:none;border-bottom:2px solid var(--ink)}}
+
+  /* ============ FINAL CTA ============ */
+  .final{background:var(--vermilion);color:var(--paper);border-top:2px solid var(--ink);position:relative;overflow:hidden}
+  .final-in{padding:clamp(48px,7vw,110px) var(--pad);position:relative;z-index:2}
+  .final .huge{font-size:clamp(34px,6vw,88px);font-weight:800;letter-spacing:-.04em;line-height:.98;max-width:20ch}
+  .final .huge .u{background:linear-gradient(var(--paper),var(--paper)) bottom/100% .1em no-repeat}
+  .final p{font-size:16px;margin-top:24px;max-width:48ch;font-weight:500;opacity:.95}
+  .final .fbtns{display:flex;flex-wrap:wrap;gap:16px;margin-top:38px}
+  .final .btn-fill{background:var(--paper);color:var(--ink);border:2px solid var(--paper)}
+  .final .btn-fill:hover{background:transparent;color:var(--paper)}
+  .final .btn-out{background:transparent;color:var(--paper);border:2px solid var(--paper)}
+  .final .btn-out:hover{background:var(--paper);color:var(--ink)}
+  .final svg.dg{position:absolute;right:-8%;top:-14%;width:48%;opacity:.13;z-index:1;pointer-events:none}
+  @media(max-width:900px){.final svg.dg{width:70%;right:-20%;top:auto;bottom:-16%;opacity:.1}}
+
+  /* ============ FOOTER ============ */
+  footer{background:var(--ink);color:var(--paper)}
+  .ft-in{padding:clamp(34px,4vw,60px) var(--pad);display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:32px}
+  .ft-in .brand .logo{margin-bottom:16px}
+  .ft-in p{font-size:13px;color:#a8a8a8;max-width:40ch;line-height:1.6}
+  .ft-col h4{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#7f95ff;margin-bottom:16px}
+  .ft-col a{display:block;font-size:14px;color:#d8d5cd;margin-bottom:10px;transition:color .2s}
+  .ft-col a:hover{color:var(--paper)}
+  .ft-bot{border-top:2px solid rgba(244,241,234,.2);padding:20px var(--pad);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:12px;color:#8a8a8a}
+  @media(max-width:820px){.ft-in{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- =================== BAR =================== -->
+<header class="bar">
+  <div class="wrap pad bar-in">
+    <a class="logo" href="#top" aria-label="랭크 스튜디오 홈">
+      <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="28" height="28" fill="#e5341f"/>
+        <path d="M9 23V9h6.5c3 0 4.8 1.7 4.8 4.3 0 2-1.1 3.4-2.9 4L21 23h-3.4l-3-4.7H12V23H9zm3-7.1h3c1.4 0 2.2-.7 2.2-1.8 0-1.2-.8-1.8-2.2-1.8h-3v3.6z" fill="#f4f1ea"/>
+      </svg>
+      랭크 스튜디오
+    </a>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a href="#how">이용 흐름</a>
+      <a href="#feat">기능</a>
+      <a href="#numbers">성과</a>
+      <a href="#clarity">정책</a>
+    </nav>
+    <a class="cta" href="#make">광고 만들기</a>
+  </div>
+</header>
+
+<!-- =================== HERO =================== -->
+<section class="hero" id="top">
+  <div class="wrap hero-in">
+    <div class="hero-left">
+      <div>
+        <span class="kicker"><span class="dot"></span>AI 기반 셀프 캠페인 스튜디오</span>
+        <h1>
+          당신의 채널을,<br>
+          <span class="hl">직접</span> 알리는 가장<br>
+          <span class="u">단순한 방법</span>.
+        </h1>
+        <p class="lede">
+          URL과 키워드, 기간과 유입 규모만 정하면 됩니다. 복잡한 대행 없이
+          스스로 캠페인을 설계하고, 실사용자 유입으로 쇼핑·오픈마켓·로컬 발견성을 키우세요.
+        </p>
+      </div>
+      <div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#make">
+            광고 만들기
+            <svg class="arw" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#how">이용 흐름 보기</a>
+        </div>
+        <div class="hero-meta">
+          <span>설정 <b>4단계</b></span>
+          <span>결제 후 <b>즉시 진행</b></span>
+          <span>실시간 <b>리포트 제공</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="idx">01<small>/04</small></div>
+      <div class="bigtype">만들고,<br>확인하고,<br>키운다.</div>
+      <div class="caption">대행사에 맡기지 않고, 내 손으로 캠페인을 굴리는 경험.</div>
+      <svg class="deco" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <circle cx="100" cy="100" r="96" stroke="#f4f1ea" stroke-width="6"/>
+        <circle cx="100" cy="100" r="58" stroke="#f4f1ea" stroke-width="6"/>
+        <path d="M100 4v192M4 100h192" stroke="#f4f1ea" stroke-width="6"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- =================== QUICKSTART =================== -->
+<section class="qs" id="make">
+  <div class="wrap qs-in">
+    <div class="qs-head">
+      <h2>지금 바로 캠페인 만들기</h2>
+      <span class="sub">4가지만 입력하면 초안이 완성됩니다</span>
+    </div>
+    <form class="qs-grid" onsubmit="return false" aria-label="퀵스타트 캠페인 설정">
+      <div class="qs-field">
+        <label for="q-url">채널 URL</label>
+        <input id="q-url" type="url" placeholder="seller-channel.example/store" autocomplete="off">
+      </div>
+      <div class="qs-field">
+        <label for="q-kw">핵심 키워드</label>
+        <input id="q-kw" type="text" placeholder="예: 핸드메이드 캔들" autocomplete="off">
+      </div>
+      <div class="qs-field">
+        <label for="q-term">진행 기간</label>
+        <select id="q-term">
+          <option>7일</option>
+          <option>14일</option>
+          <option>30일</option>
+          <option>직접 설정</option>
+        </select>
+      </div>
+      <div class="qs-field">
+        <label for="q-vol">유입 규모</label>
+        <select id="q-vol">
+          <option>가볍게 시작</option>
+          <option>표준</option>
+          <option>집중</option>
+        </select>
+      </div>
+    </form>
+    <div class="qs-foot">
+      <p class="qs-note">
+        입력값은 초안 설계에만 쓰입니다. 결제 후 진행 상황과 유입 리포트를 대시보드에서 실시간으로 확인하세요.
+      </p>
+      <button class="qs-submit" type="button">
+        초안 만들기
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- =================== MARQUEE =================== -->
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>쇼핑 발견성 <em class="sep">✦</em> 오픈마켓 노출 <em class="sep">✦</em> 로컬 검색 <em class="sep">✦</em> 실사용자 유입 <em class="sep">✦</em> 리워드 트래픽 <em class="sep">✦</em></span>
+    <span>쇼핑 발견성 <em class="sep">✦</em> 오픈마켓 노출 <em class="sep">✦</em> 로컬 검색 <em class="sep">✦</em> 실사용자 유입 <em class="sep">✦</em> 리워드 트래픽 <em class="sep">✦</em></span>
+  </div>
+</div>
+
+<!-- =================== HOW =================== -->
+<section class="blk" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">02</div>
+      <div class="sec-title">
+        <span class="tag">이용 흐름</span>
+        <h2>설정에서 리포트까지,<br>흐름은 하나로 이어집니다.</h2>
+        <p>대행 미팅도, 긴 제안서도 필요 없습니다. 만들고 결제하면, 진행과 리포트가 알아서 따라옵니다.</p>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">01</div>
+        <h3>캠페인 설계</h3>
+        <p>채널 URL·키워드·기간·유입 규모를 직접 정합니다. AI가 목표에 맞춘 초안을 제안합니다.</p>
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="4" y="4" width="40" height="40" stroke="#111" stroke-width="3"/>
+          <path d="M14 24h20M24 14v20" stroke="#e5341f" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <h3>결제 · 진행</h3>
+        <p>초안을 확인하고 결제하면 즉시 진행됩니다. 실사용자 유입이 목표 구간을 향해 움직입니다.</p>
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="4" y="10" width="40" height="28" stroke="#111" stroke-width="3"/>
+          <path d="M4 18h40" stroke="#111" stroke-width="3"/>
+          <path d="M11 29h9" stroke="#1f43ff" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <h3>리포트 확인</h3>
+        <p>유입 추이와 발견성 변화를 대시보드에서 확인합니다. 다음 캠페인은 데이터로 다듬습니다.</p>
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M6 42V6M6 42h36" stroke="#111" stroke-width="3" stroke-linecap="round"/>
+          <path d="M14 34l8-10 7 6 11-16" stroke="#1f43ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== FEATURE 1 =================== -->
+<section class="blk" id="feat">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index rev">03</div>
+      <div class="sec-title">
+        <span class="tag">핵심 기능</span>
+        <h2>대행이 아니라,<br>스스로 굴리는 스튜디오.</h2>
+        <p>도구는 단순하게, 통제권은 온전히 당신에게. 필요한 순간에 만들고, 원할 때 멈춥니다.</p>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="fx-visual verm">
+        <span class="num">FIG. A</span>
+        <svg viewBox="0 0 200 160" fill="none" aria-hidden="true">
+          <rect x="20" y="20" width="160" height="120" stroke="#f4f1ea" stroke-width="4"/>
+          <rect x="20" y="20" width="160" height="30" fill="#f4f1ea"/>
+          <path d="M40 78h80M40 98h110M40 118h60" stroke="#f4f1ea" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="150" cy="105" r="20" stroke="#111" stroke-width="4"/>
+          <path d="M150 96v18M141 105h18" stroke="#111" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="fx-body">
+        <span class="tag">FEATURE 01</span>
+        <h3>내 손으로 만드는 <em>캠페인 설계</em></h3>
+        <p>템플릿에 갇히지 않습니다. URL, 키워드, 기간, 유입 규모를 조합해 상황에 맞는 캠페인을 직접 구성하세요.</p>
+        <ul>
+          <li><span class="b"></span>목표 기반 AI 초안 제안</li>
+          <li><span class="b"></span>키워드·기간·규모 자유 조합</li>
+          <li><span class="b"></span>진행 전 예상 비용 미리보기</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feat rev">
+      <div class="fx-visual blue">
+        <span class="num">FIG. B</span>
+        <svg viewBox="0 0 200 160" fill="none" aria-hidden="true">
+          <path d="M20 140V20M20 140h160" stroke="#f4f1ea" stroke-width="4" stroke-linecap="round"/>
+          <rect x="44" y="96" width="20" height="44" fill="#f4f1ea"/>
+          <rect x="84" y="70" width="20" height="70" fill="#f4f1ea"/>
+          <rect x="124" y="44" width="20" height="96" fill="#e5341f"/>
+          <path d="M34 110l40-24 40 18 46-52" stroke="#111" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="fx-body">
+        <span class="tag">FEATURE 02</span>
+        <h3>실시간으로 보는 <em>유입 리포트</em></h3>
+        <p>캠페인이 지금 어디쯤 왔는지, 발견성이 어떻게 움직이는지 한 화면에서 확인합니다. 다음 결정은 데이터가 돕습니다.</p>
+        <ul>
+          <li><span class="b"></span>유입 추이 실시간 시각화</li>
+          <li><span class="b"></span>키워드별 발견성 변화 추적</li>
+          <li><span class="b"></span>캠페인 종료 후 요약 리포트</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feat">
+      <div class="fx-visual ink">
+        <span class="num">FIG. C</span>
+        <svg viewBox="0 0 200 160" fill="none" aria-hidden="true">
+          <circle cx="100" cy="80" r="54" stroke="#f4f1ea" stroke-width="4"/>
+          <circle cx="100" cy="80" r="10" fill="#e5341f"/>
+          <circle cx="60" cy="52" r="7" fill="#f4f1ea"/>
+          <circle cx="146" cy="60" r="7" fill="#f4f1ea"/>
+          <circle cx="132" cy="118" r="7" fill="#1f43ff"/>
+          <circle cx="62" cy="112" r="7" fill="#1f43ff"/>
+          <path d="M100 80l-40-28M100 80l46-20M100 80l32 38M100 80l-38 32" stroke="#f4f1ea" stroke-width="3"/>
+        </svg>
+      </div>
+      <div class="fx-body">
+        <span class="tag">FEATURE 03</span>
+        <h3>진짜 사람에게 닿는 <em>실사용자 유입</em></h3>
+        <p>리워드 참여로 움직이는 실사용자 트래픽입니다. 쇼핑·오픈마켓·로컬에서 자연스러운 관심을 만들고, 발견될 기회를 넓힙니다.</p>
+        <ul>
+          <li><span class="b"></span>리워드 기반 실사용자 참여</li>
+          <li><span class="b"></span>쇼핑·오픈마켓·로컬 대응</li>
+          <li><span class="b"></span>기간·규모에 맞춘 자연스러운 유입</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== NUMBERS =================== -->
+<section class="band" id="numbers">
+  <div class="wrap">
+    <div class="sec-head" style="padding-bottom:0">
+      <div class="sec-index rev" style="color:#7f95ff">04</div>
+      <div class="sec-title">
+        <span class="tag" style="color:#7f95ff">성과 지표</span>
+        <h2 style="color:#f4f1ea">숫자로 보는<br>셀프 캠페인의 힘.</h2>
+      </div>
+    </div>
+    <div class="band-grid">
+      <div class="band-cell">
+        <div class="big">4단계</div>
+        <div class="lbl">URL · 키워드 · 기간 · 유입 규모. 설정은 이게 전부입니다.</div>
+      </div>
+      <div class="band-cell">
+        <div class="big">실시간</div>
+        <div class="lbl">결제 즉시 진행, 대시보드에서 유입과 발견성을 실시간 추적.</div>
+      </div>
+      <div class="band-cell">
+        <div class="big">100%</div>
+        <div class="lbl">직접 만들고 직접 멈추는, 온전히 내 통제 아래의 캠페인.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== CLARITY / COMPLIANCE =================== -->
+<section class="blk" id="clarity">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">05</div>
+      <div class="sec-title">
+        <span class="tag">정직한 원칙</span>
+        <h2>무엇을 하고,<br>무엇을 하지 않는가.</h2>
+        <p>랭크 스튜디오는 스스로 캠페인을 설계하도록 돕는 도구입니다. 원칙은 분명합니다.</p>
+      </div>
+    </div>
+    <div class="clar">
+      <div class="col a">
+        <h3>우리가 하는 일</h3>
+        <div class="lst">
+          <div class="row">
+            <svg class="k" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" stroke="#1f43ff" stroke-width="2"/><path d="M6 12.5l3.5 3.5L18 8" stroke="#1f43ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>캠페인 설계를 돕습니다.</b> 목표에 맞춰 키워드·기간·유입 규모를 구성하도록 안내합니다.</span>
+          </div>
+          <div class="row">
+            <svg class="k" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" stroke="#1f43ff" stroke-width="2"/><path d="M6 12.5l3.5 3.5L18 8" stroke="#1f43ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>실사용자 유입을 연결합니다.</b> 리워드로 참여한 실제 사용자가 자연스럽게 방문합니다.</span>
+          </div>
+          <div class="row">
+            <svg class="k" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" stroke="#1f43ff" stroke-width="2"/><path d="M6 12.5l3.5 3.5L18 8" stroke="#1f43ff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>투명한 리포트를 제공합니다.</b> 진행 상황과 성과를 있는 그대로 보여줍니다.</span>
+          </div>
+        </div>
+      </div>
+      <div class="col b">
+        <h3>우리가 하지 않는 일</h3>
+        <div class="lst">
+          <div class="row">
+            <svg class="k" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" stroke="#e5341f" stroke-width="2"/><path d="M7 7l10 10M17 7L7 17" stroke="#e5341f" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span>성과를 부풀리거나 결과를 약속하지 않습니다.</span>
+          </div>
+          <div class="row">
+            <svg class="k" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" stroke="#e5341f" stroke-width="2"/><path d="M7 7l10 10M17 7L7 17" stroke="#e5341f" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span>실제 관심이 아닌, 자동화된 방식의 인위적 활동을 만들지 않습니다.</span>
+          </div>
+          <div class="row">
+            <svg class="k" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1.5" y="1.5" width="21" height="21" stroke="#e5341f" stroke-width="2"/><path d="M7 7l10 10M17 7L7 17" stroke="#e5341f" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <span>규칙을 벗어난 편법을 권하거나 제공하지 않습니다.</span>
+          </div>
+        </div>
+        <p class="fine">
+          랭크 스튜디오는 실제 사용자의 자발적 참여를 기반으로 합니다. 모든 활동은 각 서비스의 이용약관과 관련 규정을 준수하는 범위 안에서 이루어집니다. 화면의 예시 주소는 seller-channel.example 로 표기된 가상의 값입니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================== FINAL CTA =================== -->
+<section class="final">
+  <div class="wrap final-in">
+    <div class="huge">이제, <span class="u">직접</span> 만들어<br>볼 차례입니다.</div>
+    <p>미팅도 대행도 없이. 지금 4가지만 입력하면 첫 캠페인 초안이 완성됩니다.</p>
+    <div class="fbtns">
+      <a class="btn btn-fill" href="#make">
+        광고 만들기
+        <svg class="arw" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-out" href="#how">이용 흐름 다시 보기</a>
+    </div>
+  </div>
+  <svg class="dg" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+    <rect x="10" y="10" width="180" height="180" stroke="#f4f1ea" stroke-width="7"/>
+    <path d="M10 100h180M100 10v180M40 40l120 120M160 40L40 160" stroke="#f4f1ea" stroke-width="7"/>
+  </svg>
+</section>
+
+<!-- =================== FOOTER =================== -->
+<footer>
+  <div class="wrap ft-in">
+    <div class="brand">
+      <a class="logo" href="#top">
+        <svg class="mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="28" height="28" fill="#e5341f"/>
+          <path d="M9 23V9h6.5c3 0 4.8 1.7 4.8 4.3 0 2-1.1 3.4-2.9 4L21 23h-3.4l-3-4.7H12V23H9zm3-7.1h3c1.4 0 2.2-.7 2.2-1.8 0-1.2-.8-1.8-2.2-1.8h-3v3.6z" fill="#f4f1ea"/>
+        </svg>
+        랭크 스튜디오
+      </a>
+      <p>AI 기반 셀프 캠페인 스튜디오. 직접 만들고, 확인하고, 키우세요.</p>
+    </div>
+    <div class="ft-col">
+      <h4>제품</h4>
+      <a href="#how">이용 흐름</a>
+      <a href="#feat">핵심 기능</a>
+      <a href="#numbers">성과 지표</a>
+      <a href="#make">광고 만들기</a>
+    </div>
+    <div class="ft-col">
+      <h4>정보</h4>
+      <a href="#clarity">정직한 원칙</a>
+      <a href="#clarity">이용 정책</a>
+      <a href="#top">문의하기</a>
+    </div>
+  </div>
+  <div class="wrap ft-bot">
+    <span>© 2026 랭크 스튜디오</span>
+    <span>실사용자 유입 · 셀프 캠페인 · 투명한 리포트</span>
+  </div>
+</footer>
+
+</body>
+</html>

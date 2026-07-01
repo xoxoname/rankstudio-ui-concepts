@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>랭크 스튜디오 — 직접 만드는 셀프 캠페인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --ink:#161923;
+    --ink-2:#3a4152;
+    --ink-3:#6b7183;
+    --line:rgba(36,44,72,.10);
+    --line-2:rgba(36,44,72,.16);
+    --blue:#2447ff;
+    --blue-deep:#12207a;
+    --warm:#f6f4ef;         /* 웜 화이트 */
+    --cool:#eef1f8;         /* 미묘한 한색 틴트 */
+    --panel:rgba(255,255,255,.62);
+    --panel-2:rgba(255,255,255,.78);
+    --glass-line:rgba(255,255,255,.75);
+    --shadow-soft:0 24px 60px -28px rgba(24,32,64,.32), 0 6px 18px -10px rgba(24,32,64,.18);
+    --shadow-lift:0 40px 90px -40px rgba(24,32,64,.40), 0 10px 24px -12px rgba(24,32,64,.22);
+    --r-lg:26px; --r-md:18px; --r-sm:12px;
+    --unit:8px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    color:var(--ink);
+    line-height:1.6;
+    font-size:16px;
+    letter-spacing:-.01em;
+    word-break:keep-all;
+    background:
+      radial-gradient(120% 90% at 78% -8%, #ffffff 0%, rgba(255,255,255,0) 46%),
+      radial-gradient(90% 70% at 8% 4%, #f2eee6 0%, rgba(242,238,230,0) 42%),
+      radial-gradient(140% 120% at 50% 120%, #e7ecf7 0%, rgba(231,236,247,0) 50%),
+      linear-gradient(178deg, var(--warm) 0%, #eef0f6 62%, #e9edf6 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* 배경 공간 레이어 (사진 없음 — 순수 형태/깊이) */
+  .field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.5;mix-blend-mode:multiply}
+  .orb.a{width:44vw;height:44vw;left:-10vw;top:-8vw;
+    background:radial-gradient(circle at 34% 30%, rgba(36,71,255,.16), rgba(36,71,255,0) 62%)}
+  .orb.b{width:38vw;height:38vw;right:-8vw;top:18vh;
+    background:radial-gradient(circle at 60% 40%, rgba(255,214,170,.30), rgba(255,214,170,0) 60%)}
+  .orb.c{width:52vw;height:52vw;left:20vw;bottom:-22vw;
+    background:radial-gradient(circle at 50% 50%, rgba(133,161,235,.20), rgba(133,161,235,0) 60%)}
+  .grid-lines{position:absolute;inset:0;
+    background-image:linear-gradient(rgba(36,44,72,.035) 1px, transparent 1px);
+    background-size:100% 64px;opacity:.7}
+
+  .wrap{position:relative;z-index:1;max-width:1140px;margin:0 auto;padding:0 24px}
+
+  /* 네비 */
+  nav{position:sticky;top:0;z-index:40;padding:14px 0}
+  .nav-in{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:10px 12px 10px 20px;border-radius:18px;
+    background:var(--panel-2);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+    border:1px solid var(--glass-line);
+    box-shadow:0 10px 30px -18px rgba(24,32,64,.30);
+  }
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700;letter-spacing:-.02em;font-size:17px}
+  .brand .mk{width:26px;height:26px;border-radius:8px;position:relative;
+    background:linear-gradient(150deg,#3a5bff,#12207a);box-shadow:0 6px 16px -6px rgba(36,71,255,.6)}
+  .brand .mk::after{content:"";position:absolute;inset:6px 6px auto auto;width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.9)}
+  .nav-links{display:flex;gap:6px;align-items:center}
+  .nav-links a{color:var(--ink-2);text-decoration:none;font-size:14px;font-weight:500;padding:8px 12px;border-radius:10px;transition:background .2s,color .2s}
+  .nav-links a:hover{background:rgba(36,44,72,.06);color:var(--ink)}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;
+    border:none;cursor:pointer;text-decoration:none;border-radius:12px;padding:11px 18px;
+    transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .2s,background .2s;
+    white-space:nowrap;
+  }
+  .btn-primary{color:#fff;background:linear-gradient(160deg,#3a5bff,#2447ff 55%,#1a35c8);
+    box-shadow:0 12px 28px -12px rgba(36,71,255,.7), inset 0 1px 0 rgba(255,255,255,.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 18px 36px -12px rgba(36,71,255,.8), inset 0 1px 0 rgba(255,255,255,.35)}
+  .btn-ghost{color:var(--ink);background:var(--panel);border:1px solid var(--glass-line)}
+  .btn-ghost:hover{transform:translateY(-2px);background:var(--panel-2)}
+
+  /* 히어로 */
+  header.hero{padding:72px 0 48px;position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--blue-deep);
+    background:rgba(36,71,255,.08);border:1px solid rgba(36,71,255,.16);padding:6px 13px;border-radius:999px;margin-bottom:22px}
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px rgba(36,71,255,.18)}
+  h1{
+    font-size:clamp(28px,3.6vw,52px);line-height:1.12;font-weight:800;letter-spacing:-.035em;
+    margin:0 0 20px;max-width:14ch;
+  }
+  h1 .hl{color:var(--blue);position:relative;white-space:nowrap}
+  .lede{font-size:clamp(15px,1.3vw,18px);color:var(--ink-2);max-width:44ch;margin:0 0 30px;font-weight:450}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .hero-note{font-size:13px;color:var(--ink-3);margin-top:16px;display:flex;gap:16px;flex-wrap:wrap}
+  .hero-note span{display:inline-flex;align-items:center;gap:6px}
+  .chk{width:16px;height:16px;border-radius:50%;background:rgba(36,71,255,.12);color:var(--blue-deep);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
+
+  .hero-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:start}
+  .hero-copy{padding-top:8px}
+
+  /* 스페이셜 카드 스택 (제품 UI, 정밀 소형) */
+  .stage{position:relative;perspective:1400px;min-height:430px}
+  .deck{position:relative;transform-style:preserve-3d;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .card{
+    position:absolute;border-radius:var(--r-md);
+    background:var(--panel-2);
+    -webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
+    border:1px solid var(--glass-line);
+    box-shadow:var(--shadow-soft);
+  }
+  .card .hd{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .card .hd .t{font-size:13px;font-weight:700;letter-spacing:-.01em}
+  .card .hd .pill{font-size:11px;font-weight:600;color:var(--blue-deep);background:rgba(36,71,255,.10);padding:3px 9px;border-radius:999px}
+  .card .bd{padding:16px}
+
+  /* 카드1: 캠페인 구성 (맨 앞) */
+  .c-build{width:326px;left:0;top:70px;transform:translateZ(70px)}
+  .fld{margin-bottom:12px}
+  .fld:last-child{margin-bottom:0}
+  .fld label{display:block;font-size:11px;font-weight:600;color:var(--ink-3);margin-bottom:5px}
+  .fld .box{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.7);border:1px solid var(--line-2);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--ink-2)}
+  .fld .box .k{margin-left:auto;color:var(--ink-3);font-size:11px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:11.5px;font-weight:500;background:rgba(36,71,255,.08);color:var(--blue-deep);border:1px solid rgba(36,71,255,.14);padding:5px 10px;border-radius:8px}
+  .chip.on{background:var(--blue);color:#fff;border-color:transparent}
+
+  /* 카드2: 리포트 (뒤) */
+  .c-report{width:280px;right:0;top:6px;transform:translateZ(20px)}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .kpi{background:rgba(255,255,255,.55);border:1px solid var(--line);border-radius:12px;padding:11px}
+  .kpi .lab{font-size:10.5px;color:var(--ink-3);font-weight:600}
+  .kpi .val{font-size:19px;font-weight:800;letter-spacing:-.03em;margin-top:2px}
+  .kpi .val small{font-size:11px;font-weight:600;color:var(--blue);margin-left:4px}
+  .spark{display:flex;align-items:flex-end;gap:5px;height:56px;padding:4px 2px 0}
+  .spark i{flex:1;background:linear-gradient(180deg,#5b78ff,#2447ff);border-radius:4px 4px 2px 2px;opacity:.85}
+
+  /* 카드3: 진행 상태 (플로팅 배지) */
+  .c-live{width:210px;right:6%;bottom:8%;transform:translateZ(110px);padding:0}
+  .live-in{display:flex;align-items:center;gap:11px;padding:13px 15px}
+  .live-ic{width:36px;height:36px;border-radius:11px;background:linear-gradient(150deg,#e8f7ee,#cdeede);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .live-ic .ring{width:16px;height:16px;border-radius:50%;border:3px solid #14a05c;border-right-color:transparent;animation:spin 1.4s linear infinite}
+  .live .lt{font-size:12.5px;font-weight:700}
+  .live .ls{font-size:11px;color:var(--ink-3);margin-top:1px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* 섹션 공통 */
+  section{padding:56px 0;position:relative}
+  .sec-head{max-width:52ch;margin-bottom:36px}
+  .sec-tag{font-size:13px;font-weight:700;color:var(--blue);letter-spacing:.02em;margin-bottom:12px}
+  h2{font-size:clamp(23px,2.5vw,34px);font-weight:800;letter-spacing:-.03em;margin:0 0 12px;line-height:1.2}
+  .sec-lede{color:var(--ink-2);font-size:clamp(15px,1.2vw,16px);margin:0;max-width:46ch}
+
+  /* 스텝 (풀림애드식 이해도 — 단계 흐름) */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .step{
+    background:var(--panel);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+    border:1px solid var(--glass-line);border-radius:var(--r-md);padding:20px 18px;
+    box-shadow:0 16px 40px -26px rgba(24,32,64,.32);position:relative;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;
+  }
+  .step:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift)}
+  .step .n{font-size:12px;font-weight:800;color:var(--blue);letter-spacing:.06em;margin-bottom:14px}
+  .step .ic{width:40px;height:40px;border-radius:12px;background:linear-gradient(150deg,rgba(36,71,255,.14),rgba(36,71,255,.05));
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--blue-deep)}
+  .step h3{font-size:16px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em}
+  .step p{font-size:13.5px;color:var(--ink-2);margin:0;line-height:1.55}
+  .step .arrow{position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:var(--line-2);z-index:2}
+
+  /* 특징 카드 (레이어 깊이) */
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .fcard{
+    background:var(--panel-2);-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+    border:1px solid var(--glass-line);border-radius:var(--r-lg);padding:26px 24px;
+    box-shadow:var(--shadow-soft);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s;position:relative;overflow:hidden;
+  }
+  .fcard::before{content:"";position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,255,255,.5),rgba(255,255,255,0) 40%);pointer-events:none}
+  .fcard:hover{transform:translateY(-6px);box-shadow:var(--shadow-lift)}
+  .fcard .fic{width:46px;height:46px;border-radius:14px;background:linear-gradient(150deg,#eaf0ff,#d7e0ff);
+    display:flex;align-items:center;justify-content:center;color:var(--blue-deep);margin-bottom:18px;position:relative}
+  .fcard h3{font-size:18px;font-weight:700;margin:0 0 8px;letter-spacing:-.02em}
+  .fcard p{font-size:14px;color:var(--ink-2);margin:0;line-height:1.6}
+
+  /* 인라인 퀵스타트 */
+  .quick{
+    background:var(--panel-2);-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
+    border:1px solid var(--glass-line);border-radius:var(--r-lg);padding:34px;box-shadow:var(--shadow-lift);position:relative;overflow:hidden;
+  }
+  .quick::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(36,71,255,.14),transparent 65%);pointer-events:none}
+  .quick-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:center;position:relative}
+  .quick h2{margin-bottom:8px}
+  .quick .sec-lede{margin-bottom:0}
+  .qform{display:flex;flex-direction:column;gap:12px}
+  .qrow{display:flex;flex-direction:column;gap:6px}
+  .qrow label{font-size:12.5px;font-weight:600;color:var(--ink-2)}
+  .qinput{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.72);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;transition:border .2s,box-shadow .2s}
+  .qinput:focus-within{border-color:var(--blue);box-shadow:0 0 0 4px rgba(36,71,255,.14)}
+  .qinput input, .qinput select{border:none;background:transparent;outline:none;font:inherit;font-size:14px;color:var(--ink);width:100%}
+  .qinput .pre{color:var(--ink-3);font-size:13px;flex-shrink:0}
+  .qsplit{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .qform .btn-primary{margin-top:6px;justify-content:center;padding:13px}
+  .qmeta{font-size:12px;color:var(--ink-3);text-align:center;margin-top:2px}
+
+  /* FAQ / 안내 */
+  .assure{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .acard{background:var(--panel);border:1px solid var(--glass-line);border-radius:var(--r-md);padding:20px;box-shadow:0 14px 34px -26px rgba(24,32,64,.3)}
+  .acard .q{font-size:14.5px;font-weight:700;margin:0 0 8px;display:flex;gap:8px;align-items:flex-start}
+  .acard .q .qm{color:var(--blue);flex-shrink:0}
+  .acard p{font-size:13px;color:var(--ink-2);margin:0;line-height:1.55}
+
+  /* 최종 CTA */
+  .final{
+    text-align:center;background:
+      radial-gradient(120% 140% at 50% -20%, rgba(36,71,255,.10), transparent 55%),
+      var(--panel-2);
+    -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+    border:1px solid var(--glass-line);border-radius:var(--r-lg);padding:52px 32px;box-shadow:var(--shadow-lift)}
+  .final h2{max-width:20ch;margin:0 auto 14px}
+  .final p{color:var(--ink-2);max-width:40ch;margin:0 auto 26px}
+  .final .hero-cta{justify-content:center}
+
+  footer{padding:40px 0 56px;color:var(--ink-3);font-size:13px}
+  .foot-in{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding-top:24px;border-top:1px solid var(--line)}
+  footer a{color:var(--ink-3);text-decoration:none}
+  footer a:hover{color:var(--ink-2)}
+
+  @media (max-width:900px){
+    .hero-layout{grid-template-columns:1fr;gap:36px}
+    .stage{min-height:400px;margin-top:8px}
+    .steps{grid-template-columns:1fr 1fr}
+    .step .arrow{display:none}
+    .feat{grid-template-columns:1fr}
+    .quick-grid{grid-template-columns:1fr;gap:24px}
+    .assure{grid-template-columns:1fr}
+    .nav-links{display:none}
+  }
+  @media (max-width:560px){
+    .steps{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr 1fr}
+    .quick{padding:24px}
+    header.hero{padding:40px 0 20px}
+    .c-report{position:relative;width:100%;right:auto;top:auto;margin-top:16px;transform:none}
+    .c-build{position:relative;width:100%;transform:none}
+    .c-live{position:absolute;right:4%;bottom:38%}
+    .stage{min-height:auto;display:flex;flex-direction:column}
+    .deck{transform:none!important}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .deck{transform:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="field" aria-hidden="true">
+  <div class="grid-lines"></div>
+  <div class="orb a"></div>
+  <div class="orb b"></div>
+  <div class="orb c"></div>
+</div>
+
+<div class="wrap">
+  <nav aria-label="주요">
+    <div class="nav-in">
+      <div class="brand"><span class="mk" aria-hidden="true"></span>랭크 스튜디오</div>
+      <div class="nav-links">
+        <a href="#how">진행 방식</a>
+        <a href="#why">특징</a>
+        <a href="#start">퀵스타트</a>
+        <a href="#faq">안내</a>
+      </div>
+      <a href="#start" class="btn btn-primary">광고 만들기</a>
+    </div>
+  </nav>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-layout">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot" aria-hidden="true"></span>AI 기반 셀프 캠페인 스튜디오</span>
+        <h1>내 상품의 발견성을<br><span class="hl">직접</span> 끌어올리는 법</h1>
+        <p class="lede">쇼핑·오픈마켓·로컬 상품이 더 잘 발견되도록. URL·키워드·기간·유입 규모를 정하고 결제하면, AI가 캠페인을 설계하고 실제 사용자 유입을 만들어 진행 상황을 리포트로 보여줍니다.</p>
+        <div class="hero-cta">
+          <a href="#start" class="btn btn-primary">광고 만들기 →</a>
+          <a href="#how" class="btn btn-ghost">진행 방식 보기</a>
+        </div>
+        <div class="hero-note">
+          <span><span class="chk">✓</span>리워드 참여로 만드는 실사용자 유입</span>
+          <span><span class="chk">✓</span>진행 중 언제든 리포트 확인</span>
+        </div>
+      </div>
+
+      <div class="stage" aria-hidden="true">
+        <div class="deck" id="deck">
+          <div class="card c-report">
+            <div class="hd"><span class="t">캠페인 리포트</span><span class="pill">진행 중</span></div>
+            <div class="bd">
+              <div class="kpis">
+                <div class="kpi"><div class="lab">방문 유입</div><div class="val">3,240<small>↑</small></div></div>
+                <div class="kpi"><div class="lab">노출 기간</div><div class="val">14<small>일</small></div></div>
+              </div>
+              <div class="spark">
+                <i style="height:38%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:66%"></i><i style="height:58%"></i><i style="height:80%"></i><i style="height:72%"></i><i style="height:96%"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="card c-build">
+            <div class="hd"><span class="t">캠페인 구성</span><span class="pill">1분 설정</span></div>
+            <div class="bd">
+              <div class="fld">
+                <label>상품 URL</label>
+                <div class="box">seller-channel.example/item<span class="k">연결됨</span></div>
+              </div>
+              <div class="fld">
+                <label>발견 키워드</label>
+                <div class="chips">
+                  <span class="chip on">여름 원피스</span>
+                  <span class="chip">린넨 셔츠</span>
+                  <span class="chip">+ 추가</span>
+                </div>
+              </div>
+              <div class="fld">
+                <label>기간 · 유입 규모</label>
+                <div class="box">14일 · 표준<span class="k">₩ 조정</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card c-live live">
+            <div class="live-in">
+              <div class="live-ic"><span class="ring" aria-hidden="true"></span></div>
+              <div>
+                <div class="lt">유입 진행 중</div>
+                <div class="ls">실사용자 참여 반영</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">진행 방식</div>
+      <h2>설정부터 리포트까지, 네 단계면 충분합니다</h2>
+      <p class="sec-lede">복잡한 대시보드도, 사전 지식도 필요 없습니다. 필요한 것을 입력하면 나머지는 AI가 설계합니다.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n">STEP 01</div>
+        <div class="ic" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </div>
+        <h3>URL·키워드 입력</h3>
+        <p>알리고 싶은 상품 페이지와 발견에 쓰일 키워드를 넣습니다.</p>
+        <div class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="step">
+        <div class="n">STEP 02</div>
+        <div class="ic" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg>
+        </div>
+        <h3>기간·규모 결정</h3>
+        <p>노출 기간과 유입 규모를 정하면 예상 비용이 함께 안내됩니다.</p>
+        <div class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="step">
+        <div class="n">STEP 03</div>
+        <div class="ic" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <h3>결제·시작</h3>
+        <p>결제가 확인되면 AI가 캠페인을 설계하고 곧바로 시작합니다.</p>
+        <div class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></div>
+      </div>
+      <div class="step">
+        <div class="n">STEP 04</div>
+        <div class="ic" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        </div>
+        <h3>진행·리포트</h3>
+        <p>유입 흐름과 진행 상황을 실시간에 가깝게 리포트로 확인합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">왜 랭크 스튜디오인가</div>
+      <h2>대행이 아니라, 내가 만드는 캠페인</h2>
+      <p class="sec-lede">한 번의 설정으로 끝나는 셀프 캠페인. 흐름이 투명하게 보이고, 유입은 실제 사람에게서 나옵니다.</p>
+    </div>
+    <div class="feat">
+      <div class="fcard">
+        <div class="fic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.3L20 8l-4 4 1 6-5-3-5 3 1-6-4-4 5.6-.7z"/></svg>
+        </div>
+        <h3>실사용자 유입</h3>
+        <p>리워드에 참여한 실제 사용자가 상품을 방문합니다. 관심 있는 사람에게 상품이 자연스럽게 노출되는 방식입니다.</p>
+      </div>
+      <div class="fcard">
+        <div class="fic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <h3>1분이면 시작</h3>
+        <p>URL과 키워드, 기간만 정하면 됩니다. 캠페인 설계는 AI가 맡고, 세팅 시간은 최소로 줄였습니다.</p>
+      </div>
+      <div class="fcard">
+        <div class="fic" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12" y="7" width="3" height="10"/><rect x="17" y="9" width="3" height="8"/></svg>
+        </div>
+        <h3>투명한 리포트</h3>
+        <p>방문 유입과 진행 상태를 한눈에. 캠페인이 지금 어디까지 왔는지 언제든 직접 확인할 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap">
+    <div class="quick">
+      <div class="quick-grid">
+        <div>
+          <div class="sec-tag">인라인 퀵스타트</div>
+          <h2>지금 바로 광고 만들기</h2>
+          <p class="sec-lede">아래에 상품 정보를 입력하면 예상 구성이 즉시 준비됩니다. 결제 전까지는 자유롭게 수정할 수 있습니다.</p>
+        </div>
+        <form class="qform" onsubmit="return false" aria-label="퀵스타트">
+          <div class="qrow">
+            <label for="q-url">상품 URL</label>
+            <div class="qinput"><span class="pre" aria-hidden="true">https://</span><input id="q-url" type="text" placeholder="seller-channel.example/item" /></div>
+          </div>
+          <div class="qrow">
+            <label for="q-kw">발견 키워드</label>
+            <div class="qinput"><input id="q-kw" type="text" placeholder="여름 원피스, 린넨 셔츠" /></div>
+          </div>
+          <div class="qsplit">
+            <div class="qrow">
+              <label for="q-days">노출 기간</label>
+              <div class="qinput"><select id="q-days"><option>7일</option><option selected>14일</option><option>30일</option></select></div>
+            </div>
+            <div class="qrow">
+              <label for="q-scale">유입 규모</label>
+              <div class="qinput"><select id="q-scale"><option>가볍게</option><option selected>표준</option><option>집중</option></select></div>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit">광고 만들기 →</button>
+          <div class="qmeta">입력 후 예상 구성·비용이 안내됩니다. 결제 전까지 수정 가능</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">알아두면 좋은 안내</div>
+      <h2>자주 묻는 질문</h2>
+    </div>
+    <div class="assure">
+      <div class="acard">
+        <p class="q"><span class="qm" aria-hidden="true">Q</span>유입은 어떻게 만들어지나요?</p>
+        <p>리워드에 참여한 실제 사용자가 상품 페이지를 방문하는 방식입니다. 사람의 실제 관심과 행동에 기반합니다.</p>
+      </div>
+      <div class="acard">
+        <p class="q"><span class="qm" aria-hidden="true">Q</span>진행 상황을 볼 수 있나요?</p>
+        <p>네. 방문 유입과 기간, 진행 상태를 리포트에서 언제든 확인할 수 있어 흐름이 투명하게 보입니다.</p>
+      </div>
+      <div class="acard">
+        <p class="q"><span class="qm" aria-hidden="true">Q</span>어떤 상품에 맞나요?</p>
+        <p>쇼핑몰·오픈마켓 상품이나 로컬 매장처럼, 더 많은 사람에게 발견되기를 원하는 경우에 적합합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="final">
+      <div class="sec-tag" style="color:var(--blue)">지금 시작하기</div>
+      <h2>내 상품의 다음 장면을 직접 만들어 보세요</h2>
+      <p>설정은 1분, 흐름은 투명하게. 준비되었다면 첫 캠페인을 만들어 보세요.</p>
+      <div class="hero-cta">
+        <a href="#start" class="btn btn-primary">광고 만들기 →</a>
+        <a href="#how" class="btn btn-ghost">진행 방식 다시 보기</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-in">
+      <div class="brand"><span class="mk" aria-hidden="true"></span>랭크 스튜디오</div>
+      <div>AI 기반 셀프 캠페인 스튜디오 · 실사용자 발견성</div>
+      <div><a href="#start">광고 만들기</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var deck = document.getElementById("deck");
+  var stage = deck ? deck.parentElement : null;
+  if(deck && stage && !reduce){
+    var raf=null, tx=0, ty=0;
+    stage.addEventListener("mousemove", function(e){
+      var r = stage.getBoundingClientRect();
+      var px = (e.clientX - r.left)/r.width - .5;
+      var py = (e.clientY - r.top)/r.height - .5;
+      tx = px*10; ty = py*-8;
+      if(!raf){ raf = requestAnimationFrame(apply); }
+    });
+    stage.addEventListener("mouseleave", function(){ tx=0; ty=0; if(!raf) raf=requestAnimationFrame(apply); });
+    function apply(){
+      deck.style.transform = "rotateY("+tx.toFixed(2)+"deg) rotateX("+ty.toFixed(2)+"deg)";
+      raf=null;
+    }
+  }
+})();
+</script>
+</body>
+</html>
