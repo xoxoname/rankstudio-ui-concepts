@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크 스튜디오 — 광고를 직접 만드는 셀프 캠페인</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --bone:#f3f1ea;        /* 본 오프화이트 */
+    --ink:#101014;         /* 잉크 */
+    --ink-2:#3a3a42;
+    --ink-3:#6a6a72;
+    --cobalt:#1b35e8;      /* 코발트 */
+    --cobalt-d:#1226a8;
+    --lime:#c6f24e;        /* 라임 */
+    --lime-d:#a9d92f;
+    --card:#fbfaf6;
+    --maxw:1200px;
+    --r:4px;
+    --shadow-sm:4px 4px 0 var(--ink);
+    --shadow-lg:12px 12px 0 var(--ink);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bone);color:var(--ink);
+    font-family:"Pretendard Variable",Pretendard,-apple-system,system-ui,sans-serif;
+    font-size:16px;line-height:1.62;letter-spacing:-.01em;
+    -webkit-font-smoothing:antialiased;word-break:keep-all;overflow-x:hidden;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(18px,4vw,44px)}
+  h1,h2,h3{line-height:1.06;letter-spacing:-.035em;word-break:keep-all;font-weight:800;margin:0}
+  h1{font-size:clamp(30px,4vw,58px)}
+  h2{font-size:clamp(26px,3.4vw,46px)}
+  h3{font-size:clamp(18px,1.7vw,23px);letter-spacing:-.02em;line-height:1.15}
+  p{margin:0}
+  a{color:inherit;text-decoration:none}
+  .lead{font-size:clamp(15px,1.35vw,16px);color:var(--ink-2);line-height:1.72;max-width:40em}
+  .eyebrow{
+    font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:11px;color:var(--ink);
+  }
+  .eyebrow::before{content:"";width:26px;height:14px;background:var(--lime);
+    border:2px solid var(--ink);display:inline-block;flex:none;transform:skewX(-16deg)}
+
+  /* buttons */
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;justify-content:center;
+    font-weight:800;font-size:15px;letter-spacing:-.01em;cursor:pointer;
+    padding:15px 28px;border:2.5px solid var(--ink);border-radius:var(--r);
+    background:var(--bone);color:var(--ink);transition:transform .13s ease,box-shadow .13s ease;
+    box-shadow:var(--shadow-sm);
+  }
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+  .btn-primary{background:var(--cobalt);color:#fff;border-color:var(--ink)}
+  .btn-lime{background:var(--lime);color:var(--ink);border-color:var(--ink)}
+  .btn-lg{padding:18px 36px;font-size:16px}
+  .btn-ghost{box-shadow:none;background:transparent}
+  .btn-ghost:hover{box-shadow:none;transform:none;background:var(--ink);color:var(--bone)}
+
+  /* header */
+  header{position:sticky;top:0;z-index:40;background:rgba(243,241,234,.92);
+    backdrop-filter:blur(9px);border-bottom:2.5px solid var(--ink)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:70px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.03em;font-size:18px}
+  .mark{width:34px;height:34px;flex:none}
+  .nav-links{display:flex;gap:28px;align-items:center;font-size:14px;font-weight:600;color:var(--ink-2)}
+  .nav-links a{position:relative}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:3px;
+    background:var(--lime);transform:scaleX(0);transform-origin:left;transition:transform .18s ease}
+  .nav-links a:hover::after{transform:scaleX(1)}
+  .nav-cta{display:flex;gap:10px;align-items:center}
+  @media(max-width:860px){.nav-links{display:none}}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;border-bottom:2.5px solid var(--ink);
+    background:
+      radial-gradient(circle at 88% 14%, rgba(198,242,78,.22), transparent 42%),
+      var(--bone)}
+  .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(28px,4vw,64px);
+    align-items:center;padding:clamp(46px,7vw,94px) 0 clamp(50px,7vw,96px)}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;
+    letter-spacing:.02em;padding:7px 13px;border:2px solid var(--ink);border-radius:100px;
+    background:#fff;margin-bottom:22px}
+  .tag i{width:8px;height:8px;border-radius:50%;background:var(--cobalt);display:inline-block;flex:none}
+  .hero h1{margin:0 0 22px}
+  .hero h1 em{font-style:normal;color:var(--cobalt)}
+  .hero h1 .hl{background:var(--lime);box-shadow:0 0 0 2px var(--ink);padding:0 .12em;border-radius:3px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+  .hero-note{margin-top:22px;font-size:13px;color:var(--ink-3);display:flex;gap:18px;flex-wrap:wrap}
+  .hero-note span{display:inline-flex;align-items:center;gap:7px}
+  .hero-note span::before{content:"";width:10px;height:10px;background:var(--cobalt);
+    border:1.5px solid var(--ink);flex:none;transform:rotate(45deg)}
+  .hero-art{position:relative}
+  .hero-art svg{width:100%;height:auto;display:block}
+  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:36px}
+    .hero-art{order:-1;max-width:460px}}
+
+  /* section base */
+  section{padding:clamp(56px,8vw,108px) 0}
+  .sec-head{max-width:46em;margin-bottom:clamp(30px,4vw,54px)}
+  .sec-head h2{margin:16px 0 14px}
+  .divider{border:0;border-top:2.5px solid var(--ink);margin:0}
+
+  /* ---- quickstart ---- */
+  #start{background:var(--cobalt);color:#fff;position:relative;overflow:hidden}
+  #start .bgband{position:absolute;inset:0;pointer-events:none;opacity:.9}
+  #start .bgband svg{width:100%;height:100%}
+  #start .wrap{position:relative;z-index:2}
+  #start .eyebrow{color:#fff}
+  #start .eyebrow::before{background:var(--lime);border-color:#fff}
+  #start h2{color:#fff}
+  #start .lead{color:#d7ddff}
+  .qs-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(28px,4vw,60px);align-items:start}
+  @media(max-width:920px){.qs-grid{grid-template-columns:1fr;gap:34px}}
+  .qs-copy .steps{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:18px}
+  .qs-copy .steps li{display:flex;gap:16px;align-items:flex-start}
+  .qs-copy .steps b{flex:none;width:36px;height:36px;border-radius:var(--r);border:2px solid #fff;
+    color:var(--ink);background:var(--lime);display:grid;place-items:center;font-size:15px;font-weight:800}
+  .qs-copy .steps div{font-size:14px;color:#cfd6ff;line-height:1.6}
+  .qs-copy .steps strong{color:#fff;font-weight:700;display:block;margin-bottom:2px}
+  .qs-card{background:var(--bone);color:var(--ink);border:2.5px solid var(--ink);
+    border-radius:var(--r);box-shadow:var(--shadow-lg);padding:clamp(22px,2.6vw,32px)}
+  .qs-card h3{margin-bottom:4px;display:flex;align-items:center;gap:10px}
+  .qs-card h3::before{content:"";width:16px;height:16px;background:var(--lime);
+    border:2px solid var(--ink);flex:none}
+  .qs-card .sub{font-size:13px;color:var(--ink-3);margin-bottom:20px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;font-weight:800;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--ink-2);margin-bottom:7px}
+  .field input,.field select{
+    width:100%;padding:13px 14px;border:2px solid var(--ink);border-radius:var(--r);
+    background:#fff;font:inherit;font-size:14px;color:var(--ink);
+  }
+  .field input:focus,.field select:focus{outline:none;box-shadow:3px 3px 0 var(--lime-d)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .estimate{border:2px solid var(--ink);border-radius:var(--r);padding:16px 18px;margin:6px 0 18px;
+    display:flex;align-items:baseline;justify-content:space-between;gap:12px;background:var(--lime)}
+  .estimate .lbl{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+  .estimate .val{font-size:clamp(24px,3vw,32px);font-weight:800;letter-spacing:-.03em;color:var(--ink)}
+  .estimate .val small{font-size:13px;color:var(--ink-2);font-weight:700}
+  .qs-card .btn{width:100%}
+  .qs-fine{font-size:11.5px;color:var(--ink-3);margin-top:12px;line-height:1.5;text-align:center}
+
+  /* ---- how / feature cards ---- */
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2.5px solid var(--ink);
+    border-radius:var(--r);overflow:hidden;background:var(--card)}
+  .feat > div{padding:clamp(24px,3vw,36px);border-right:2.5px solid var(--ink);position:relative}
+  .feat > div:last-child{border-right:0}
+  .feat .fig{width:100%;height:118px;margin-bottom:22px}
+  .feat h3{margin-bottom:9px}
+  .feat p{font-size:14px;color:var(--ink-2);line-height:1.62}
+  .feat .idx{position:absolute;top:16px;right:20px;font-size:12px;font-weight:800;
+    letter-spacing:.1em;color:var(--ink-3)}
+  @media(max-width:860px){.feat{grid-template-columns:1fr}
+    .feat > div{border-right:0;border-bottom:2.5px solid var(--ink)}
+    .feat > div:last-child{border-bottom:0}}
+
+  /* ---- steps flow ---- */
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,22px)}
+  .flow .node{border:2.5px solid var(--ink);border-radius:var(--r);background:var(--card);
+    padding:24px;position:relative;transition:transform .14s ease,box-shadow .14s ease}
+  .flow .node:hover{transform:translate(-3px,-3px);box-shadow:var(--shadow-sm)}
+  .flow .n{font-size:12px;font-weight:800;letter-spacing:.12em;color:var(--cobalt)}
+  .flow .node h3{margin:14px 0 8px;font-size:19px}
+  .flow .node p{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+  .flow .node .ic{width:46px;height:46px;position:absolute;top:20px;right:20px}
+  @media(max-width:860px){.flow{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.flow{grid-template-columns:1fr}}
+
+  /* ---- stats ---- */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:2.5px solid var(--ink);border-radius:var(--r);overflow:hidden}
+  .stats .cell{padding:clamp(28px,3.4vw,44px);border-right:2.5px solid var(--ink)}
+  .stats .cell:last-child{border-right:0}
+  .stats .c1{background:var(--cobalt);color:#fff}
+  .stats .c2{background:var(--lime);color:var(--ink)}
+  .stats .c3{background:var(--ink);color:var(--bone)}
+  .stats .big{font-size:clamp(34px,4.4vw,54px);font-weight:800;letter-spacing:-.04em;line-height:1}
+  .stats .lab{margin-top:14px;font-size:14px;line-height:1.55}
+  .stats .c1 .lab{color:#d7ddff} .stats .c2 .lab{color:var(--ink-2)} .stats .c3 .lab{color:#c9c8c2}
+  @media(max-width:760px){.stats{grid-template-columns:1fr}
+    .stats .cell{border-right:0;border-bottom:2.5px solid var(--ink)}
+    .stats .cell:last-child{border-bottom:0}}
+
+  /* ---- faq ---- */
+  .faq{display:grid;gap:0;border-top:2.5px solid var(--ink)}
+  .faq details{border-bottom:2.5px solid var(--ink);padding:20px 4px}
+  .faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;
+    align-items:center;gap:16px;font-weight:700;font-size:clamp(16px,1.6vw,18px)}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary .plus{flex:none;width:28px;height:28px;border:2px solid var(--ink);border-radius:var(--r);
+    display:grid;place-items:center;position:relative;background:var(--lime)}
+  .faq summary .plus::before,.faq summary .plus::after{content:"";position:absolute;background:var(--ink)}
+  .faq summary .plus::before{width:13px;height:2.5px}
+  .faq summary .plus::after{width:2.5px;height:13px;transition:transform .2s ease}
+  .faq details[open] summary .plus::after{transform:scaleY(0)}
+  .faq .ans{margin-top:14px;font-size:14.5px;color:var(--ink-2);line-height:1.72;max-width:60em}
+
+  /* ---- final cta ---- */
+  .final{background:var(--ink);color:#fff;border-top:2.5px solid var(--ink);position:relative;overflow:hidden}
+  .final .wrap{position:relative;z-index:2;text-align:center;padding:clamp(58px,7vw,100px) clamp(18px,4vw,44px)}
+  .final .eyebrow{color:#fff}
+  .final .eyebrow::before{background:var(--lime);border-color:#fff}
+  .final h2{color:#fff;margin:16px 0 16px}
+  .final h2 .hl{background:var(--lime);color:var(--ink);box-shadow:0 0 0 2px var(--lime);padding:0 .1em;border-radius:3px}
+  .final p{color:#c9c8c2;max-width:36em;margin:0 auto 30px}
+  .final .bgart{position:absolute;inset:0;z-index:1;opacity:.55;pointer-events:none}
+  .final .bgart svg{width:100%;height:100%}
+
+  /* footer */
+  footer{padding:clamp(40px,5vw,62px) 0;font-size:13px;color:var(--ink-2);border-top:2.5px solid var(--ink)}
+  .foot-top{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .foot-links{display:flex;gap:24px;flex-wrap:wrap;font-weight:600}
+  .foot-links a:hover{color:var(--ink)}
+  .foot-note{margin-top:26px;padding-top:22px;border-top:2px solid var(--ink);color:var(--ink-3);
+    font-size:12px;line-height:1.72;max-width:74em}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);border:0}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *{transition:none !important;animation:none !important}
+  }
+</style>
+</head>
+<body>
+<h1 class="sr-only">랭크 스튜디오 — AI로 광고를 직접 만드는 셀프 캠페인 랜딩 페이지</h1>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <div class="wrap nav">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="37" height="37" rx="4" fill="var(--bone)" stroke="#101014" stroke-width="2.5"/>
+        <rect x="7" y="7" width="14" height="14" fill="#1b35e8"/>
+        <rect x="21" y="21" width="12" height="12" fill="#c6f24e" stroke="#101014" stroke-width="2"/>
+        <path d="M22 8 L33 8 L33 19 Z" fill="#101014"/>
+      </svg>
+      랭크 스튜디오
+    </div>
+    <nav class="nav-links" aria-label="주요">
+      <a href="#how">작동 방식</a>
+      <a href="#steps">진행 순서</a>
+      <a href="#numbers">숫자로</a>
+      <a href="#faq">자주 묻는 질문</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-primary" href="#start">광고 만들기</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" style="padding:0">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="tag"><i></i>셀프 캠페인 스튜디오</span>
+      <h1>광고는 <em>직접</em> 만들고,<br><span class="hl">실사용자</span>가 찾아오게.</h1>
+      <p class="lead" style="margin-top:20px">URL과 키워드, 기간, 유입 규모만 정하면 됩니다. AI가 캠페인을 구성하고, 리워드로 참여한 실제 사용자들의 방문이 쇼핑·오픈마켓·로컬 채널의 발견성을 높입니다. 결제 후 진행 상황과 리포트를 한눈에 확인하세요.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#start">광고 만들기</a>
+        <a class="btn btn-ghost btn-lg" href="#how">작동 방식 보기</a>
+      </div>
+      <div class="hero-note">
+        <span>카드 등록 없이 견적</span>
+        <span>기간·규모 자유 설정</span>
+        <span>실시간 리포트</span>
+      </div>
+    </div>
+
+    <!-- HERO ART: bold color-block geometric composition (사진 0) -->
+    <div class="hero-art">
+      <svg viewBox="0 0 520 500" role="img" aria-labelledby="heroTitle heroDesc">
+        <title id="heroTitle">코발트와 라임 그래픽 구성</title>
+        <desc id="heroDesc">색면과 정교한 기하 도형, 선으로 이루어진 코발트·라임 추상 구성.</desc>
+        <!-- outer frame -->
+        <rect x="8" y="8" width="504" height="484" rx="6" fill="none" stroke="#101014" stroke-width="2.5"/>
+        <!-- large cobalt field -->
+        <rect x="30" y="30" width="270" height="270" fill="#1b35e8"/>
+        <!-- lime quarter over cobalt -->
+        <path d="M300 30 L300 165 A135 135 0 0 0 165 30 Z" fill="#c6f24e"/>
+        <!-- concentric squares (precision geometry) inside cobalt -->
+        <rect x="70" y="180" width="90" height="90" fill="none" stroke="#c6f24e" stroke-width="2.5"/>
+        <rect x="90" y="200" width="50" height="50" fill="none" stroke="#f3f1ea" stroke-width="2.5"/>
+        <rect x="108" y="218" width="14" height="14" fill="#c6f24e"/>
+        <!-- lime bar bottom -->
+        <rect x="30" y="330" width="220" height="46" fill="#c6f24e" stroke="#101014" stroke-width="2.5"/>
+        <!-- ink circle top-right -->
+        <circle cx="410" cy="130" r="78" fill="#101014"/>
+        <circle cx="410" cy="130" r="78" fill="none" stroke="#101014" stroke-width="2.5"/>
+        <!-- lime arc inside ink circle -->
+        <path d="M410 60 A70 70 0 0 1 480 130" fill="none" stroke="#c6f24e" stroke-width="7"/>
+        <!-- cobalt dot center -->
+        <circle cx="410" cy="130" r="16" fill="#1b35e8"/>
+        <!-- ascending bars (data-ish) bottom right -->
+        <rect x="300" y="410" width="30" height="56" fill="#1b35e8" stroke="#101014" stroke-width="2.5"/>
+        <rect x="340" y="386" width="30" height="80" fill="#c6f24e" stroke="#101014" stroke-width="2.5"/>
+        <rect x="380" y="356" width="30" height="110" fill="#101014"/>
+        <rect x="420" y="326" width="30" height="140" fill="#1b35e8" stroke="#101014" stroke-width="2.5"/>
+        <!-- diagonal precision lines -->
+        <line x1="30" y1="400" x2="270" y2="466" stroke="#101014" stroke-width="2.5"/>
+        <line x1="30" y1="466" x2="150" y2="400" stroke="#101014" stroke-width="2.5"/>
+        <!-- small lime dot accent -->
+        <circle cx="300" cy="376" r="9" fill="#c6f24e" stroke="#101014" stroke-width="2"/>
+        <!-- plus mark -->
+        <line x1="475" y1="220" x2="475" y2="248" stroke="#101014" stroke-width="2.5"/>
+        <line x1="461" y1="234" x2="489" y2="234" stroke="#101014" stroke-width="2.5"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUICKSTART ============ -->
+<section id="start">
+  <div class="bgband" aria-hidden="true">
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice">
+      <path d="M-40 560 L360 200" stroke="#c6f24e" stroke-width="3" opacity=".5"/>
+      <circle cx="1080" cy="120" r="150" fill="none" stroke="#ffffff" stroke-width="2" opacity=".28"/>
+      <path d="M1080 -30 A150 150 0 0 1 1230 120" fill="none" stroke="#c6f24e" stroke-width="7" opacity=".6"/>
+      <rect x="60" y="500" width="120" height="120" fill="none" stroke="#ffffff" stroke-width="2" opacity=".22"/>
+    </svg>
+  </div>
+  <div class="wrap qs-grid">
+    <div class="qs-copy">
+      <span class="eyebrow">인라인 퀵스타트</span>
+      <h2 style="margin:16px 0 14px">지금 바로<br>광고를 구성해 보세요</h2>
+      <p class="lead">네 가지 항목만 입력하면 예상 비용이 실시간으로 계산됩니다. 카드 등록 없이 견적부터 확인하고, 결제 직전 상세 설정에서 한 번 더 검토합니다.</p>
+      <ol class="steps">
+        <li><b>1</b><div><strong>대상 채널 URL</strong>내 쇼핑몰·오픈마켓·로컬 채널 주소를 붙여 넣습니다.</div></li>
+        <li><b>2</b><div><strong>키워드와 기간</strong>발견되고 싶은 키워드와 진행 기간을 정합니다.</div></li>
+        <li><b>3</b><div><strong>유입 규모</strong>하루 방문 규모를 단계로 고릅니다.</div></li>
+        <li><b>4</b><div><strong>결제 후 진행</strong>진행 상황과 리포트를 대시보드에서 확인합니다.</div></li>
+      </ol>
+    </div>
+
+    <form class="qs-card" onsubmit="return false" aria-label="퀵스타트 견적">
+      <h3>광고 만들기</h3>
+      <p class="sub">예상 비용 미리보기 · 카드 등록 불필요</p>
+
+      <div class="field">
+        <label for="qs-url">대상 채널 URL</label>
+        <input id="qs-url" type="url" placeholder="https://seller-channel.example/my-store/123" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="qs-kw">발견 키워드</label>
+        <input id="qs-kw" type="text" placeholder="예: 수제 캔들, 원목 도마" autocomplete="off" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="qs-days">진행 기간</label>
+          <select id="qs-days">
+            <option value="7">7일</option>
+            <option value="14" selected>14일</option>
+            <option value="30">30일</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="qs-vol">하루 유입 규모</label>
+          <select id="qs-vol">
+            <option value="1">소 (기본)</option>
+            <option value="2" selected>중 (표준)</option>
+            <option value="3">대 (집중)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="estimate">
+        <span class="lbl">예상 비용</span>
+        <span class="val" id="qs-cost">₩196,000 <small>/ 14일</small></span>
+      </div>
+
+      <button class="btn btn-lime btn-lg" type="submit">견적 확인하고 계속하기</button>
+      <p class="qs-fine">입력값 기준 추정치이며 실제 금액은 결제 직전 상세 설정에서 최종 확정됩니다.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ HOW / FEATURES ============ -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">작동 방식</span>
+      <h2>사진 대신, 명료한 구조로</h2>
+      <p class="lead">복잡한 대행 없이 셀프로. AI가 캠페인 뼈대를 짜고, 실제 사용자들이 리워드를 받고 참여해 자연스러운 방문을 만듭니다. 세 가지 축으로 이해하면 충분합니다.</p>
+    </div>
+
+    <div class="feat">
+      <div>
+        <span class="idx">01</span>
+        <svg class="fig" viewBox="0 0 200 118" aria-hidden="true">
+          <rect x="18" y="24" width="70" height="70" fill="#1b35e8"/>
+          <path d="M88 24 L88 59 A35 35 0 0 0 53 24 Z" fill="#c6f24e"/>
+          <rect x="18" y="24" width="70" height="70" fill="none" stroke="#101014" stroke-width="2.5"/>
+          <rect x="118" y="34" width="60" height="16" fill="#101014"/>
+          <rect x="118" y="58" width="44" height="10" fill="#1b35e8"/>
+          <rect x="118" y="74" width="52" height="10" fill="#c6f24e" stroke="#101014" stroke-width="1.5"/>
+          <circle cx="170" cy="30" r="6" fill="#c6f24e" stroke="#101014" stroke-width="1.5"/>
+        </svg>
+        <h3>직접 만드는 캠페인</h3>
+        <p>URL과 키워드를 넣으면 AI가 목표에 맞는 캠페인 구성을 제안합니다. 대행 의뢰 없이 스스로 설계하고 조정합니다.</p>
+      </div>
+      <div>
+        <span class="idx">02</span>
+        <svg class="fig" viewBox="0 0 200 118" aria-hidden="true">
+          <circle cx="60" cy="60" r="42" fill="none" stroke="#101014" stroke-width="2.5"/>
+          <path d="M60 18 A42 42 0 0 1 102 60" fill="none" stroke="#c6f24e" stroke-width="7"/>
+          <circle cx="60" cy="60" r="14" fill="#1b35e8"/>
+          <line x1="60" y1="60" x2="150" y2="30" stroke="#101014" stroke-width="2.5"/>
+          <line x1="60" y1="60" x2="160" y2="70" stroke="#101014" stroke-width="2.5"/>
+          <line x1="60" y1="60" x2="150" y2="98" stroke="#101014" stroke-width="2.5"/>
+          <circle cx="152" cy="30" r="8" fill="#1b35e8" stroke="#101014" stroke-width="1.5"/>
+          <circle cx="162" cy="70" r="8" fill="#c6f24e" stroke="#101014" stroke-width="1.5"/>
+          <circle cx="152" cy="98" r="8" fill="#101014"/>
+        </svg>
+        <h3>실사용자 유입</h3>
+        <p>리워드로 참여한 실제 사용자들이 채널을 방문합니다. 쇼핑·오픈마켓·로컬에서 사람이 찾아오는 발견성을 만듭니다.</p>
+      </div>
+      <div>
+        <span class="idx">03</span>
+        <svg class="fig" viewBox="0 0 200 118" aria-hidden="true">
+          <rect x="24" y="72" width="24" height="30" fill="#1b35e8" stroke="#101014" stroke-width="2"/>
+          <rect x="58" y="52" width="24" height="50" fill="#c6f24e" stroke="#101014" stroke-width="2"/>
+          <rect x="92" y="34" width="24" height="68" fill="#101014"/>
+          <rect x="126" y="20" width="24" height="82" fill="#1b35e8" stroke="#101014" stroke-width="2"/>
+          <polyline points="36,66 70,46 104,28 138,14" fill="none" stroke="#c6f24e" stroke-width="3"/>
+          <circle cx="138" cy="14" r="6" fill="#c6f24e" stroke="#101014" stroke-width="1.5"/>
+        </svg>
+        <h3>투명한 리포트</h3>
+        <p>결제 후 진행 현황과 유입 리포트를 대시보드에서 실시간으로 확인합니다. 무엇이 어떻게 진행되는지 명확합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ============ STEPS FLOW ============ -->
+<section id="steps">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">진행 순서</span>
+      <h2>네 단계로 끝</h2>
+      <p class="lead">입력에서 리포트까지, 흐름은 단순합니다.</p>
+    </div>
+    <div class="flow">
+      <div class="node">
+        <svg class="ic" viewBox="0 0 46 46" aria-hidden="true"><rect x="4" y="4" width="38" height="38" rx="4" fill="none" stroke="#101014" stroke-width="2.5"/><rect x="14" y="14" width="18" height="18" fill="#1b35e8"/></svg>
+        <span class="n">STEP 01</span>
+        <h3>입력</h3>
+        <p>URL · 키워드 · 기간 · 유입 규모를 정합니다.</p>
+      </div>
+      <div class="node">
+        <svg class="ic" viewBox="0 0 46 46" aria-hidden="true"><rect x="4" y="4" width="38" height="38" rx="4" fill="none" stroke="#101014" stroke-width="2.5"/><path d="M23 8 A15 15 0 0 1 38 23 L23 23 Z" fill="#c6f24e"/><circle cx="23" cy="23" r="6" fill="#101014"/></svg>
+        <span class="n">STEP 02</span>
+        <h3>결제</h3>
+        <p>실시간 견적을 확인하고 결제합니다.</p>
+      </div>
+      <div class="node">
+        <svg class="ic" viewBox="0 0 46 46" aria-hidden="true"><rect x="4" y="4" width="38" height="38" rx="4" fill="none" stroke="#101014" stroke-width="2.5"/><path d="M14 32 L23 12 L32 32 Z" fill="#1b35e8"/></svg>
+        <span class="n">STEP 03</span>
+        <h3>진행</h3>
+        <p>실사용자 유입이 시작되어 채널을 방문합니다.</p>
+      </div>
+      <div class="node">
+        <svg class="ic" viewBox="0 0 46 46" aria-hidden="true"><rect x="4" y="4" width="38" height="38" rx="4" fill="none" stroke="#101014" stroke-width="2.5"/><polyline points="13,30 20,22 26,27 34,15" fill="none" stroke="#101014" stroke-width="3"/><circle cx="34" cy="15" r="4" fill="#c6f24e" stroke="#101014" stroke-width="1.5"/></svg>
+        <span class="n">STEP 04</span>
+        <h3>리포트</h3>
+        <p>대시보드에서 진행 상황과 성과를 확인합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ============ STATS ============ -->
+<section id="numbers">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">숫자로 보기</span>
+      <h2>단순한 설정, 명확한 흐름</h2>
+    </div>
+    <div class="stats">
+      <div class="cell c1"><div class="big">4</div><div class="lab">입력 항목만으로 캠페인 구성 완료</div></div>
+      <div class="cell c2"><div class="big">0원</div><div class="lab">견적 확인까지 필요한 사전 결제</div></div>
+      <div class="cell c3"><div class="big">실시간</div><div class="lab">진행 현황과 유입 리포트 열람</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap" style="max-width:880px">
+    <div class="sec-head">
+      <span class="eyebrow">자주 묻는 질문</span>
+      <h2>궁금한 점 풀림애드식으로</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>랭크 스튜디오는 무엇을 하나요?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="ans">직접 광고를 만드는 셀프 캠페인 도구입니다. 대상 채널 URL과 키워드, 기간, 유입 규모를 정하면 AI가 캠페인을 구성하고, 리워드로 참여한 실제 사용자들의 방문으로 쇼핑·오픈마켓·로컬 채널의 발견성을 높입니다. 진행 상황은 리포트로 확인합니다.</div>
+      </details>
+      <details>
+        <summary>비용은 어떻게 계산되나요?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="ans">진행 기간과 하루 유입 규모에 따라 예상 비용이 자동으로 계산됩니다. 위 퀵스타트 폼에서 카드 등록 없이 견적을 먼저 확인할 수 있고, 결제 직전 상세 설정에서 최종 금액을 한 번 더 검토합니다.</div>
+      </details>
+      <details>
+        <summary>유입되는 방문자는 누구인가요?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="ans">리워드를 받고 자발적으로 참여한 실제 사용자들입니다. 이들이 채널을 방문해 자연스러운 발견성을 만듭니다. 참여는 사용자의 선택에 따르며, 방문은 실제 사람의 활동으로 이루어집니다.</div>
+      </details>
+      <details>
+        <summary>어떤 채널에 활용할 수 있나요?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="ans">쇼핑몰, 오픈마켓 상품 페이지, 로컬 비즈니스 채널 등 URL로 접근할 수 있는 채널에 활용할 수 있습니다. 발견되고 싶은 키워드를 함께 지정하면 캠페인 구성에 반영됩니다.</div>
+      </details>
+      <details>
+        <summary>진행 상황은 어떻게 확인하나요?<span class="plus" aria-hidden="true"></span></summary>
+        <div class="ans">결제 후 대시보드에서 진행 현황과 유입 리포트를 실시간으로 열람할 수 있습니다. 기간 동안의 흐름과 성과를 한눈에 파악하도록 구성되어 있습니다.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final" style="padding:0">
+  <div class="bgart" aria-hidden="true">
+    <svg viewBox="0 0 1200 380" preserveAspectRatio="xMidYMid slice">
+      <rect x="80" y="70" width="200" height="200" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <path d="M80 70 L280 70 L280 270 Z" fill="none" stroke="#c6f24e" stroke-width="3"/>
+      <circle cx="1040" cy="190" r="150" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <path d="M1040 40 A150 150 0 0 1 1190 190" fill="none" stroke="#c6f24e" stroke-width="8"/>
+      <line x1="560" y1="20" x2="720" y2="360" stroke="#ffffff" stroke-width="2"/>
+      <rect x="640" y="150" width="80" height="80" fill="none" stroke="#c6f24e" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="wrap">
+    <span class="eyebrow">지금 시작</span>
+    <h2>광고, 남이 아니라<br><span class="hl">당신</span>이 직접 만드세요.</h2>
+    <p>네 가지 항목만 정하면 됩니다. 카드 등록 없이 견적부터 확인하고, 실사용자가 채널을 찾아오게 하세요.</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-lime btn-lg" href="#start">광고 만들기</a>
+      <a class="btn btn-ghost btn-lg" href="#faq" style="color:#fff;border-color:#fff">더 알아보기</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+          <rect x="1.5" y="1.5" width="37" height="37" rx="4" fill="var(--bone)" stroke="#101014" stroke-width="2.5"/>
+          <rect x="7" y="7" width="14" height="14" fill="#1b35e8"/>
+          <rect x="21" y="21" width="12" height="12" fill="#c6f24e" stroke="#101014" stroke-width="2"/>
+          <path d="M22 8 L33 8 L33 19 Z" fill="#101014"/>
+        </svg>
+        랭크 스튜디오
+      </div>
+      <nav class="foot-links" aria-label="푸터">
+        <a href="#how">작동 방식</a>
+        <a href="#steps">진행 순서</a>
+        <a href="#numbers">숫자로</a>
+        <a href="#faq">FAQ</a>
+        <a href="#start">광고 만들기</a>
+      </nav>
+    </div>
+    <p class="foot-note">랭크 스튜디오는 셀프 캠페인 도구입니다. 리워드로 참여한 실제 사용자들의 자발적 방문으로 발견성을 높입니다. 표시된 예상 비용은 입력값 기준 추정치이며 실제 금액은 결제 직전 확정됩니다. 예시 URL(seller-channel.example)은 설명을 위한 가상 주소입니다.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var days=document.getElementById('qs-days');
+  var vol=document.getElementById('qs-vol');
+  var cost=document.getElementById('qs-cost');
+  var base=7000; // per-day base unit
+  function fmt(n){return '₩'+n.toLocaleString('ko-KR');}
+  function calc(){
+    var d=parseInt(days.value,10);
+    var v=parseInt(vol.value,10);
+    var total=base*d*v;
+    cost.innerHTML=fmt(total)+' <small>/ '+d+'일</small>';
+  }
+  [days,vol].forEach(function(el){el.addEventListener('change',calc);});
+  calc();
+})();
+</script>
+</body>
+</html>

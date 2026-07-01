@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>랭크 스튜디오 — 직접 만드는 셀프 캠페인</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --ink:#0a0a0c;
+    --ink-70:rgba(10,10,12,.7);
+    --ink-52:rgba(10,10,12,.52);
+    --ink-38:rgba(10,10,12,.38);
+    --paper:#ffffff;
+    --offwhite:#f7f6f4;
+    --offwhite-2:#f1efec;
+    --line:rgba(10,10,12,.09);
+    --line-2:rgba(10,10,12,.14);
+    --coral:#ff6a3d;
+    --amber:#ffc24b;
+    --coral-deep:#e64f22;
+    --radius:18px;
+    --radius-sm:12px;
+    --shadow-soft:0 1px 2px rgba(10,10,12,.04), 0 8px 24px rgba(10,10,12,.05);
+    --shadow-lift:0 2px 6px rgba(10,10,12,.06), 0 22px 48px rgba(10,10,12,.10);
+    --maxw:1140px;
+    --ease:cubic-bezier(.22,.61,.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{
+    font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;
+    font-size:16px;
+    word-break:keep-all;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--coral);color:#fff}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .eyebrow{
+    font-size:12.5px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--coral-deep);display:inline-flex;align-items:center;gap:9px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--coral);display:inline-block}
+
+  /* ============ NAV ============ */
+  nav{
+    position:sticky;top:0;z-index:60;
+    backdrop-filter:saturate(1.4) blur(14px);
+    -webkit-backdrop-filter:saturate(1.4) blur(14px);
+    background:rgba(255,255,255,.72);
+    border-bottom:1px solid transparent;
+    transition:border-color .3s var(--ease), background .3s var(--ease);
+  }
+  nav.scrolled{border-bottom-color:var(--line);background:rgba(255,255,255,.86)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:750;letter-spacing:-.02em;font-size:17px}
+  .brand .mk{
+    width:26px;height:26px;border-radius:8px;position:relative;overflow:hidden;
+    background:
+      radial-gradient(120% 120% at 20% 15%, var(--amber) 0%, transparent 55%),
+      radial-gradient(130% 130% at 85% 90%, var(--coral) 0%, var(--coral-deep) 70%);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+  }
+  .brand .mk::after{content:"";position:absolute;inset:0;background:url(#grain);opacity:.4}
+  .nav-links{display:flex;gap:30px;align-items:center;font-size:14.5px;color:var(--ink-70);font-weight:520}
+  .nav-links a{transition:color .2s}
+  .nav-links a:hover{color:var(--ink)}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  @media(max-width:820px){.nav-links{display:none}}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-weight:640;font-size:15px;letter-spacing:-.01em;cursor:pointer;border:none;
+    border-radius:999px;padding:13px 24px;transition:transform .18s var(--ease), box-shadow .25s var(--ease), background .25s;
+    white-space:nowrap;line-height:1;
+  }
+  .btn-primary{
+    color:#fff;position:relative;
+    background:linear-gradient(180deg,#ff7d54 0%, var(--coral) 42%, var(--coral-deep) 100%);
+    box-shadow:0 1px 1px rgba(255,255,255,.4) inset, 0 6px 16px rgba(230,79,34,.28);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 1px 1px rgba(255,255,255,.4) inset,0 12px 26px rgba(230,79,34,.36)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+  .btn-ghost:hover{background:var(--offwhite);transform:translateY(-1px)}
+  .btn-sm{padding:9px 16px;font-size:14px}
+  .btn-lg{padding:16px 30px;font-size:16px}
+
+  /* ============ HERO ============ */
+  header{position:relative;padding:74px 0 40px;overflow:hidden}
+  header::after{content:"";position:absolute;left:0;right:0;bottom:0;height:200px;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,#fff 92%)}
+  .mesh{position:absolute;inset:-16% -8% auto -8%;height:680px;z-index:0;pointer-events:none;opacity:.92}
+  .mesh svg{width:100%;height:100%;display:block}
+  .grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.5;mix-blend-mode:overlay}
+  .hero{position:relative;z-index:2;display:grid;grid-template-columns:1.06fr .94fr;gap:56px;align-items:center;min-height:560px}
+  @media(max-width:940px){.hero{grid-template-columns:1fr;gap:40px}}
+
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:560;
+    color:var(--ink-70);background:rgba(255,255,255,.7);border:1px solid var(--line);
+    padding:7px 14px 7px 8px;border-radius:999px;margin-bottom:26px;box-shadow:var(--shadow-soft);
+  }
+  .hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(255,106,61,.16)}
+  h1{
+    font-size:clamp(28px,3.6vw,52px);line-height:1.06;letter-spacing:-.035em;font-weight:800;
+    margin-bottom:22px;
+  }
+  h1 .accent{
+    background:linear-gradient(105deg,var(--coral-deep) 0%, var(--coral) 45%, var(--amber) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero-sub{font-size:clamp(15px,1.15vw,17px);color:var(--ink-70);max-width:490px;margin-bottom:32px;line-height:1.66}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .hero-note{font-size:13px;color:var(--ink-52);margin-top:18px;display:flex;align-items:center;gap:7px}
+  .hero-note svg{flex:none}
+
+  /* quickstart card */
+  .quickstart{
+    position:relative;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow-lift);padding:22px;
+  }
+  .qs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .qs-title{font-size:14.5px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  .qs-title .spark{
+    width:22px;height:22px;border-radius:7px;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--amber),var(--coral));color:#fff;font-size:12px;
+  }
+  .qs-steps{font-size:12px;color:var(--ink-38);font-weight:560;letter-spacing:.02em}
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-70);margin-bottom:7px;letter-spacing:-.01em}
+  .field .ipt{
+    width:100%;border:1px solid var(--line-2);border-radius:var(--radius-sm);background:var(--offwhite);
+    padding:12px 14px;font-size:14px;font-family:inherit;color:var(--ink);transition:border-color .2s,background .2s,box-shadow .2s;
+  }
+  .field .ipt:focus{outline:none;border-color:var(--coral);background:#fff;box-shadow:0 0 0 3px rgba(255,106,61,.14)}
+  .field .ipt::placeholder{color:var(--ink-38)}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+  .chip{
+    font-size:12.5px;font-weight:550;padding:6px 12px;border-radius:999px;border:1px solid var(--line-2);
+    background:#fff;color:var(--ink-70);cursor:pointer;transition:all .18s var(--ease);
+  }
+  .chip:hover{border-color:var(--coral);color:var(--coral-deep)}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .qs-foot{margin-top:18px}
+  .qs-foot .btn{width:100%}
+  .qs-meta{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11.5px;color:var(--ink-38);margin-top:12px}
+
+  /* trust strip */
+  .trust{position:relative;z-index:2;margin-top:64px;padding-top:26px;border-top:1px solid var(--line)}
+  .trust-lbl{font-size:12px;color:var(--ink-38);font-weight:560;letter-spacing:.05em;margin-bottom:18px}
+  .trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+  @media(max-width:720px){.trust-grid{grid-template-columns:repeat(2,1fr);gap:26px 20px}}
+  .stat .n{font-size:clamp(26px,2.6vw,34px);font-weight:790;letter-spacing:-.03em;line-height:1}
+  .stat .n .u{font-size:.55em;font-weight:650;color:var(--coral-deep);margin-left:2px}
+  .stat .l{font-size:13px;color:var(--ink-52);margin-top:8px}
+
+  /* ============ SECTION SHELL ============ */
+  section{position:relative;padding:96px 0}
+  .sec-head{max-width:640px;margin-bottom:52px}
+  .sec-head.center{margin-left:auto;margin-right:auto;text-align:center}
+  h2{font-size:clamp(24px,2.9vw,40px);line-height:1.12;letter-spacing:-.03em;font-weight:790;margin:16px 0 16px}
+  .sec-head p{font-size:16px;color:var(--ink-70);line-height:1.66}
+
+  /* how it works — asymmetric */
+  .how{background:var(--offwhite);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  @media(max-width:860px){.steps{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.steps{grid-template-columns:1fr}}
+  .step{background:var(--paper);padding:30px 26px;position:relative;transition:background .25s}
+  .step:hover{background:#fffdfb}
+  .step .idx{
+    font-size:12px;font-weight:750;letter-spacing:.08em;color:var(--coral-deep);
+    display:inline-flex;align-items:center;gap:8px;margin-bottom:36px;
+  }
+  .step .idx b{
+    width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:13px;
+    background:var(--offwhite-2);color:var(--ink);border:1px solid var(--line);
+  }
+  .step h3{font-size:17px;font-weight:720;letter-spacing:-.02em;margin-bottom:9px}
+  .step p{font-size:13.5px;color:var(--ink-52);line-height:1.6}
+
+  /* feature bento — asymmetric */
+  .bento{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-auto-rows:minmax(0,auto);gap:16px}
+  @media(max-width:860px){.bento{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.bento{grid-template-columns:1fr}}
+  .card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:26px;
+    position:relative;overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lift);border-color:var(--line-2)}
+  .card h3{font-size:18px;font-weight:730;letter-spacing:-.02em;margin-bottom:10px}
+  .card p{font-size:14px;color:var(--ink-52);line-height:1.62}
+  .card .ic{
+    width:42px;height:42px;border-radius:12px;display:grid;place-items:center;margin-bottom:18px;
+    background:var(--offwhite);border:1px solid var(--line);color:var(--coral-deep);
+  }
+  .card.feature-lead{grid-row:span 2;background:linear-gradient(170deg,#fff 0%, #fffaf6 100%)}
+  .card.feature-lead .visual{margin-top:24px}
+  .card.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .card.dark h3{color:#fff}
+  .card.dark p{color:rgba(255,255,255,.62)}
+  .card.dark .ic{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:var(--amber)}
+
+  /* mini traffic viz (css/svg art, restrained UI accent) */
+  .flowviz{width:100%;height:auto;display:block}
+  .metric-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+  .metric{flex:1;min-width:96px;background:rgba(255,255,255,.55);border:1px solid var(--line);border-radius:var(--radius-sm);padding:13px 14px}
+  .metric .k{font-size:11.5px;color:var(--ink-52);font-weight:550;margin-bottom:6px}
+  .metric .v{font-size:20px;font-weight:770;letter-spacing:-.02em}
+  .metric .v .up{font-size:12px;color:var(--coral-deep);font-weight:650;margin-left:5px}
+
+  /* compliance / reality band */
+  .reality{background:var(--ink);color:#fff;border-radius:24px;padding:clamp(32px,4vw,56px);position:relative;overflow:hidden}
+  .reality .mesh-dark{position:absolute;inset:0;opacity:.85;z-index:0}
+  .reality-in{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+  @media(max-width:820px){.reality-in{grid-template-columns:1fr;gap:32px}}
+  .reality h2{color:#fff}
+  .reality p{color:rgba(255,255,255,.66)}
+  .real-list{display:grid;gap:14px}
+  .real-item{display:flex;gap:13px;align-items:flex-start}
+  .real-item .rk{
+    flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;margin-top:1px;
+    background:linear-gradient(140deg,var(--amber),var(--coral));color:var(--ink);
+  }
+  .real-item .rt b{display:block;font-size:15px;font-weight:680;color:#fff;margin-bottom:3px;letter-spacing:-.01em}
+  .real-item .rt span{font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.55}
+
+  /* pricing-ish flow / final cta */
+  .final{text-align:center;padding:110px 0 96px;position:relative;overflow:hidden}
+  .final .mesh-soft{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.9}
+  .final-in{position:relative;z-index:2;max-width:680px;margin:0 auto}
+  .final h2{font-size:clamp(28px,3.6vw,50px);letter-spacing:-.035em;margin-bottom:20px}
+  .final p{font-size:17px;color:var(--ink-70);margin-bottom:34px}
+  .final .hero-cta{justify-content:center}
+
+  /* faq */
+  .faq{max-width:760px;margin:0 auto}
+  .qa{border-top:1px solid var(--line);padding:22px 4px;cursor:pointer}
+  .qa:last-child{border-bottom:1px solid var(--line)}
+  .qa summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:20px;font-size:16.5px;font-weight:640;letter-spacing:-.01em}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa .plus{flex:none;width:26px;height:26px;border-radius:8px;border:1px solid var(--line-2);display:grid;place-items:center;transition:transform .25s var(--ease),background .2s,color .2s}
+  .qa[open] .plus{transform:rotate(45deg);background:var(--ink);color:#fff;border-color:var(--ink)}
+  .qa .ans{font-size:14.5px;color:var(--ink-52);line-height:1.68;padding-top:14px;max-width:640px}
+
+  /* footer */
+  footer{border-top:1px solid var(--line);padding:56px 0 40px;background:var(--offwhite)}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:32px;margin-bottom:40px}
+  @media(max-width:720px){.foot-grid{grid-template-columns:1fr 1fr}}
+  .foot-grid h4{font-size:12.5px;font-weight:650;letter-spacing:.04em;color:var(--ink-38);text-transform:uppercase;margin-bottom:16px}
+  .foot-grid a{display:block;font-size:14px;color:var(--ink-70);margin-bottom:11px;transition:color .2s}
+  .foot-grid a:hover{color:var(--coral-deep)}
+  .foot-brand p{font-size:14px;color:var(--ink-52);max-width:280px;margin-top:14px;line-height:1.6}
+  .foot-btm{display:flex;justify-content:space-between;align-items:center;padding-top:24px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-38);flex-wrap:wrap;gap:12px}
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+  .reveal.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- global grain + gradient defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="grainf"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <radialGradient id="g1" cx="30%" cy="24%" r="80%"><stop offset="0%" stop-color="#ffc24b"/><stop offset="100%" stop-color="#ffc24b" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g2" cx="72%" cy="42%" r="70%"><stop offset="0%" stop-color="#ff6a3d"/><stop offset="100%" stop-color="#ff6a3d" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g3" cx="52%" cy="88%" r="60%"><stop offset="0%" stop-color="#e64f22"/><stop offset="100%" stop-color="#e64f22" stop-opacity="0"/></radialGradient>
+  </defs>
+</svg>
+
+<nav id="nav">
+  <div class="nav-in">
+    <a href="#" class="brand"><span class="mk"></span>랭크 스튜디오</a>
+    <div class="nav-links">
+      <a href="#how">이용 방법</a>
+      <a href="#features">기능</a>
+      <a href="#reality">작동 원리</a>
+      <a href="#faq">자주 묻는 질문</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#final" class="btn btn-ghost btn-sm" style="display:none" id="navGhost">문의</a>
+      <a href="#start" class="btn btn-primary btn-sm">광고 만들기</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<header>
+  <div class="mesh" aria-hidden="true">
+    <svg viewBox="0 0 1200 760" preserveAspectRatio="xMidYMid slice">
+      <rect width="1200" height="760" fill="#fff"/>
+      <circle cx="300" cy="120" r="360" fill="url(#g1)" opacity="0.85"/>
+      <circle cx="940" cy="230" r="400" fill="url(#g2)" opacity="0.78"/>
+      <circle cx="700" cy="640" r="300" fill="url(#g3)" opacity="0.55"/>
+      <rect width="1200" height="760" filter="url(#grainf)" opacity="0.18"/>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-copy">
+        <span class="hero-badge"><span class="dot"></span>AI가 대신 만드는 셀프 캠페인</span>
+        <h1>내 상품을, <span class="accent">더 많은 사람</span>이<br/>직접 발견하게.</h1>
+        <p class="hero-sub">쇼핑몰·오픈마켓 상품, 우리 동네 가게 — URL과 키워드만 넣으면 AI가 캠페인을 설계합니다. 실제 사용자가 리워드를 받고 방문하는 유입으로, 발견 가능성을 자연스럽게 높이세요.</p>
+        <div class="hero-cta">
+          <a href="#start" class="btn btn-primary btn-lg">광고 만들기 →</a>
+          <a href="#how" class="btn btn-ghost btn-lg">1분 만에 이해하기</a>
+        </div>
+        <div class="hero-note">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#e64f22" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          카드 없이 설계 미리보기 · 결제 후 진행 · 실시간 리포트
+        </div>
+      </div>
+
+      <!-- QUICKSTART -->
+      <div class="quickstart reveal" id="start">
+        <div class="qs-head">
+          <div class="qs-title"><span class="spark">✦</span>퀵스타트</div>
+          <div class="qs-steps">STEP 1 / 3</div>
+        </div>
+        <div class="field">
+          <label for="url">내 상품·가게 링크</label>
+          <input class="ipt" id="url" type="text" placeholder="seller-channel.example/products/123" />
+        </div>
+        <div class="field">
+          <label for="kw">발견 키워드</label>
+          <input class="ipt" id="kw" type="text" placeholder="핸드드립 원두, 성수동 카페" />
+          <div class="chips">
+            <button class="chip on" type="button">쇼핑 상품</button>
+            <button class="chip" type="button">오픈마켓</button>
+            <button class="chip" type="button">동네 가게</button>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="margin:0">
+            <label for="dur">진행 기간</label>
+            <input class="ipt" id="dur" type="text" placeholder="7일" />
+          </div>
+          <div class="field" style="margin:0">
+            <label for="vol">유입 규모</label>
+            <input class="ipt" id="vol" type="text" placeholder="일 200명" />
+          </div>
+        </div>
+        <div class="qs-foot">
+          <button class="btn btn-primary" type="button">설계 미리보기 만들기</button>
+          <div class="qs-meta">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="2"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="2"/></svg>
+            입력 정보는 캠페인 설계에만 사용됩니다
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- trust strip -->
+    <div class="trust reveal">
+      <div class="trust-lbl">셀러·소상공인이 랭크 스튜디오로 만든 결과</div>
+      <div class="trust-grid">
+        <div class="stat"><div class="n">3<span class="u">분</span></div><div class="l">평균 캠페인 설계 시간</div></div>
+        <div class="stat"><div class="n">100<span class="u">%</span></div><div class="l">실사용자 기반 유입</div></div>
+        <div class="stat"><div class="n">24<span class="u">/7</span></div><div class="l">실시간 진행 리포트</div></div>
+        <div class="stat"><div class="n">0<span class="u">원</span></div><div class="l">설계 미리보기 비용</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HOW ============ -->
+<section class="how" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">이용 방법</span>
+      <h2>복잡한 설정 없이,<br/>네 단계면 충분합니다.</h2>
+      <p>대행사에 맡기던 캠페인을 직접 만드세요. 무엇을 알릴지만 정하면 나머지는 AI가 설계하고, 진행 상황은 화면에서 그대로 보입니다.</p>
+    </div>
+    <div class="steps reveal">
+      <div class="step">
+        <div class="idx"><b>1</b>INPUT</div>
+        <h3>링크와 키워드 입력</h3>
+        <p>알리고 싶은 상품 URL과 사람들이 검색할 만한 키워드를 적습니다.</p>
+      </div>
+      <div class="step">
+        <div class="idx"><b>2</b>SETUP</div>
+        <h3>기간·규모 선택</h3>
+        <p>얼마 동안, 하루 몇 명 규모로 방문을 유도할지 슬라이더로 정합니다.</p>
+      </div>
+      <div class="step">
+        <div class="idx"><b>3</b>PAY</div>
+        <h3>미리보기 후 결제</h3>
+        <p>AI가 설계한 캠페인 구성과 예상 유입을 확인하고 결제합니다.</p>
+      </div>
+      <div class="step">
+        <div class="idx"><b>4</b>REPORT</div>
+        <h3>진행·리포트 확인</h3>
+        <p>실제 사용자의 방문이 쌓이는 흐름을 실시간 리포트로 확인합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES BENTO ============ -->
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">기능</span>
+      <h2>혼자서도 대행사처럼.</h2>
+      <p>설계부터 리포트까지, 셀프 캠페인에 필요한 것만 담았습니다. 거창한 도구가 아니라, 오늘 바로 쓸 수 있는 도구입니다.</p>
+    </div>
+    <div class="bento">
+      <div class="card feature-lead reveal">
+        <div class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 17l6-6 4 4 8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 7v5h-5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>실시간 유입 리포트</h3>
+        <p>실제 사용자의 방문이 시간대별로 쌓이는 흐름을 한눈에. 어떤 키워드로 얼마나 들어왔는지 투명하게 보여줍니다.</p>
+        <div class="visual">
+          <svg class="flowviz" viewBox="0 0 480 170" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff6a3d" stop-opacity="0.28"/>
+                <stop offset="100%" stop-color="#ff6a3d" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="140" x2="480" y2="140" stroke="rgba(10,10,12,.1)" stroke-width="1"/>
+            <line x1="0" y1="95" x2="480" y2="95" stroke="rgba(10,10,12,.06)" stroke-width="1"/>
+            <line x1="0" y1="50" x2="480" y2="50" stroke="rgba(10,10,12,.06)" stroke-width="1"/>
+            <path d="M0,128 C60,120 90,96 140,100 C190,104 210,60 260,54 C310,48 340,74 380,62 C420,50 450,30 480,26 L480,140 L0,140 Z" fill="url(#area)"/>
+            <path d="M0,128 C60,120 90,96 140,100 C190,104 210,60 260,54 C310,48 340,74 380,62 C420,50 450,30 480,26" fill="none" stroke="#e64f22" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="260" cy="54" r="4" fill="#fff" stroke="#e64f22" stroke-width="2.4"/>
+            <circle cx="480" cy="26" r="4" fill="#fff" stroke="#e64f22" stroke-width="2.4"/>
+          </svg>
+          <div class="metric-row">
+            <div class="metric"><div class="k">오늘 방문</div><div class="v">1,284<span class="up">↑ 18%</span></div></div>
+            <div class="metric"><div class="k">평균 체류</div><div class="v">42초</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card reveal">
+        <div class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.4 5.4 5.8.5-4.4 3.8 1.4 5.7L12 15.9 6.8 18.4l1.4-5.7L3.8 8.9l5.8-.5L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>AI 캠페인 설계</h3>
+        <p>키워드와 목표만 넣으면 유입 구성과 기간을 AI가 제안합니다.</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.9"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </div>
+        <h3>실사용자 유입</h3>
+        <p>리워드를 받고 방문하는 실제 사용자. 자연스러운 발견을 돕습니다.</p>
+      </div>
+
+      <div class="card dark reveal">
+        <div class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>투명한 진행</h3>
+        <p>결제부터 완료까지 모든 단계를 기록으로 남기고 언제든 확인.</p>
+      </div>
+
+      <div class="card reveal">
+        <div class="ic">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.9"/><path d="M3 9h18M8 4v16" stroke="currentColor" stroke-width="1.9"/></svg>
+        </div>
+        <h3>목적별 프리셋</h3>
+        <p>신상품 알리기, 리뷰 늘리기, 동네 알리기 등 상황별 시작점.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REALITY / COMPLIANCE ============ -->
+<section id="reality">
+  <div class="wrap">
+    <div class="reality reveal">
+      <div class="mesh-dark" aria-hidden="true">
+        <svg viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+          <rect width="1000" height="500" fill="#0a0a0c"/>
+          <circle cx="820" cy="120" r="320" fill="url(#g2)" opacity="0.5"/>
+          <circle cx="920" cy="380" r="260" fill="url(#g1)" opacity="0.35"/>
+          <rect width="1000" height="500" filter="url(#grainf)" opacity="0.2"/>
+        </svg>
+      </div>
+      <div class="reality-in">
+        <div>
+          <span class="eyebrow" style="color:var(--amber)">작동 원리</span>
+          <h2>속이는 게 아니라,<br/>진짜로 만나게 합니다.</h2>
+          <p>랭크 스튜디오는 실제 사람들이 리워드를 받고 상품과 가게를 직접 방문하도록 연결합니다. 사람이 스스로 움직이는 유입이기에, 발견 가능성이 건강하게 올라갑니다.</p>
+        </div>
+        <div class="real-list">
+          <div class="real-item">
+            <span class="rk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="rt"><b>실제 사용자, 실제 방문</b><span>사람이 직접 링크를 열고 상품을 둘러봅니다.</span></div>
+          </div>
+          <div class="real-item">
+            <span class="rk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="rt"><b>리워드가 유입의 동기</b><span>참여자는 정당한 리워드를 받고 자발적으로 방문합니다.</span></div>
+          </div>
+          <div class="real-item">
+            <span class="rk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="rt"><b>과정은 언제나 투명</b><span>어떤 유입이 언제 일어났는지 리포트로 남습니다.</span></div>
+          </div>
+          <div class="real-item">
+            <span class="rk"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="rt"><b>내 브랜드는 내가 통제</b><span>목표와 규모, 기간을 직접 정하고 언제든 조정합니다.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow" style="justify-content:center">자주 묻는 질문</span>
+      <h2>궁금한 점을 먼저 풀었습니다.</h2>
+    </div>
+    <div class="faq reveal">
+      <details class="qa" open>
+        <summary>랭크 스튜디오는 무엇을 해주나요?<span class="plus">+</span></summary>
+        <div class="ans">내 상품 링크와 키워드를 넣으면 AI가 셀프 캠페인을 설계합니다. 결제 후에는 실제 사용자가 리워드를 받고 방문하는 유입이 진행되고, 그 흐름을 실시간 리포트로 확인할 수 있습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>유입되는 방문자는 실제 사람인가요?<span class="plus">+</span></summary>
+        <div class="ans">네. 자동화된 프로그램이 아니라, 리워드를 받고 자발적으로 참여하는 실제 사용자입니다. 사람이 직접 링크를 열고 상품을 둘러봅니다.</div>
+      </details>
+      <details class="qa">
+        <summary>결제 전에 미리 볼 수 있나요?<span class="plus">+</span></summary>
+        <div class="ans">설계 미리보기는 카드 등록 없이 무료로 확인할 수 있습니다. 예상 유입 규모와 캠페인 구성을 본 뒤 결제 여부를 결정하세요.</div>
+      </details>
+      <details class="qa">
+        <summary>어떤 상품이나 가게에 맞나요?<span class="plus">+</span></summary>
+        <div class="ans">쇼핑몰·오픈마켓 상품은 물론, 동네 가게를 더 많은 사람에게 알리고 싶은 소상공인에게도 잘 맞습니다. 링크를 걸 수 있는 곳이면 시작할 수 있습니다.</div>
+      </details>
+      <details class="qa">
+        <summary>진행 중에 규모를 바꿀 수 있나요?<span class="plus">+</span></summary>
+        <div class="ans">기간과 하루 유입 규모는 진행 중에도 리포트 화면에서 조정할 수 있습니다. 반응을 보며 유연하게 운영하세요.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="final" id="final">
+  <div class="mesh-soft" aria-hidden="true">
+    <svg viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="1200" height="500" fill="#fff"/>
+      <circle cx="300" cy="120" r="360" fill="url(#g1)"/>
+      <circle cx="900" cy="360" r="380" fill="url(#g2)"/>
+      <rect width="1200" height="500" filter="url(#grainf)" opacity="0.14"/>
+    </svg>
+  </div>
+  <div class="final-in reveal">
+    <span class="eyebrow" style="justify-content:center">지금 시작하기</span>
+    <h2>내 상품의 발견은<br/>지금 시작됩니다.</h2>
+    <p>3분이면 첫 캠페인을 설계할 수 있습니다. 미리보기까지는 비용이 들지 않습니다.</p>
+    <div class="hero-cta">
+      <a href="#start" class="btn btn-primary btn-lg">광고 만들기 →</a>
+      <a href="#how" class="btn btn-ghost btn-lg">작동 원리 다시 보기</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="brand"><span class="mk"></span>랭크 스튜디오</a>
+        <p>AI로 직접 만드는 셀프 캠페인. 실사용자 유입으로 상품과 가게의 발견 가능성을 높입니다.</p>
+      </div>
+      <div>
+        <h4>제품</h4>
+        <a href="#how">이용 방법</a>
+        <a href="#features">기능</a>
+        <a href="#reality">작동 원리</a>
+        <a href="#start">광고 만들기</a>
+      </div>
+      <div>
+        <h4>회사</h4>
+        <a href="#">소개</a>
+        <a href="#">블로그</a>
+        <a href="#">채용</a>
+        <a href="#faq">자주 묻는 질문</a>
+      </div>
+      <div>
+        <h4>정책</h4>
+        <a href="#">이용약관</a>
+        <a href="#">개인정보 처리방침</a>
+        <a href="#">리워드 정책</a>
+      </div>
+    </div>
+    <div class="foot-btm">
+      <span>© 2026 랭크 스튜디오. All rights reserved.</span>
+      <span>실사용자 기반 셀프 캠페인 서비스</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // nav shadow on scroll
+  const nav=document.getElementById('nav');
+  const onScroll=()=>{nav.classList.toggle('scrolled',window.scrollY>12)};
+  onScroll();window.addEventListener('scroll',onScroll,{passive:true});
+
+  // reveal on view
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const io=new IntersectionObserver((es)=>{
+      es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})
+    },{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  }else{
+    document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in'));
+  }
+
+  // chip toggle
+  document.querySelectorAll('.chips').forEach(group=>{
+    group.querySelectorAll('.chip').forEach(c=>{
+      c.addEventListener('click',()=>{
+        group.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+        c.classList.add('on');
+      });
+    });
+  });
+</script>
+</body>
+</html>
